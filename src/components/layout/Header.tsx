@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { LangSwitcher } from "@/lib/i18n";
 import { useSession, signOut } from "next-auth/react";
 
 export default function Header() {
@@ -28,7 +29,7 @@ export default function Header() {
             <NavLink href="/cours">Cours</NavLink>
             <NavLink href="/activites">Activités</NavLink>
             {isTeacher && <NavLink href="/admin">Admin</NavLink>}
-          </nav>
+          <LangSwitcher /></nav>
 
           <div className="hidden md:flex items-center gap-3">
             {session ? (
