@@ -11,7 +11,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" { interface JWT { id: string; role: string } }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as any,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [
