@@ -19,6 +19,39 @@ export default function EditLessonPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPicker, setShowPicker] = useState<number | null>(null);
+  const [showCreate, setShowCreate] = useState<number | null>(null);
+  const [createType, setCreateType] = useState("");
+  const [createTitle, setCreateTitle] = useState("");
+  const [createConfig, setCreateConfig] = useState<any>(null);
+  const [creating, setCreating] = useState(false);
+
+  const gameTypes = [
+    { key:"QCM", label:"QCM", emoji:"\ud83d\udcdd", def:{ questions:[{question:"",options:["","","",""],correctIndex:0,explanation:""}] } },
+    { key:"TRUE_FALSE", label:"Vrai/Faux", emoji:"\u2705", def:{ questions:[{statement:"",isTrue:true}] } },
+    { key:"FILL_BLANKS", label:"Texte a trous", emoji:"\u270f\ufe0f", def:{ text:"", caseSensitive:false } },
+    { key:"MATCHING", label:"Appariement", emoji:"\ud83d\udd17", def:{ pairs:[{left:"",right:""}] } },
+    { key:"MEMORY", label:"Memory", emoji:"\ud83c\udccf", def:{ pairs:[{front:"",back:""}] } },
+    { key:"HANGMAN", label:"Pendu", emoji:"\ud83d\udc80", def:{ words:[{word:"",hint:""}] } },
+    { key:"SORTING", label:"Classement", emoji:"\ud83d\udcca", def:{ items:["",""],correctOrder:["",""],instruction:"" } },
+    { key:"CATEGORIZE", label:"Categorisation", emoji:"\ud83d\udcc2", def:{ categories:[{name:"",imageUrl:""},{name:"",imageUrl:""}], items:[{text:"",category:"",imageUrl:""}], instruction:"" } },
+    { key:"DRAG_DROP", label:"Glisser-deposer", emoji:"\ud83c\udfaf", def:{ zones:[{name:"",imageUrl:""},{name:"",imageUrl:""}], items:[], instruction:"" } },
+  ];
+
+  function startCreate(idx: number) { setShowCreate(idx); setShowPicker(null); setCreateType(""); setCreateTitle(""); setCreateConfig(null); }
+  function pickType(t: string) { setCreateType(t); const g=gameTypes.find(x=>x.key===t); setCreateConfig(g?JSON.parse(JSON.stringify(g.def)):{}); }
+
+  async function createAndInsert(idx: number) {
+    if(!createTitle||!createType||!createConfig) return;
+    setCreating(true);
+    const res = await fetch("/api/activities", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({title:createTitle,type:createType,config:createConfig,isPublic:true}) });
+    if(res.ok) {
+      const act = await res.json();
+      const nb = { id:"new-"+Date.now(), type:"activity" as const, content:null, activityId:act.id, requireScore:false, minScore:60, activity:act };
+      const a=[...blocks]; a.splice(idx+1,0,nb); setBlocks(a);
+      fetch("/api/activities").then(r=>r.json()).then(setActivities);
+    }
+    setCreating(false); setShowCreate(null);
+  }
 
   useEffect(() => {
     Promise.all([
@@ -103,7 +136,8 @@ export default function EditLessonPage() {
                 </div>
               )}
               <div className="flex justify-center mt-1">
-                <button type="button" onClick={() => setShowPicker(showPicker === idx ? null : idx)} className="text-xs px-3 py-1 bg-brand-100 text-brand-700 rounded-full hover:bg-brand-200 font-medium">+ Inserer activite</button>
+                <button type="button" onClick={() => {setShowPicker(showPicker===idx?null:idx);setShowCreate(null);}} className="text-xs px-3 py-1 bg-brand-100 text-brand-700 rounded-full hover:bg-brand-200 font-medium">+ Inserer existante</button>
+                <button type="button" onClick={() => startCreate(idx)} className="text-xs px-3 py-1 bg-amber-100 text-amber-700 rounded-full hover:bg-amber-200 font-medium">+ Creer ici</button>
               </div>
               {showPicker === idx && (
                 <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-4 mt-2 max-h-60 overflow-y-auto animate-slide-down">
@@ -114,6 +148,81 @@ export default function EditLessonPage() {
                         <span className="font-medium text-slate-700">{a.title}</span>
                       </button>
                     ))}
+                </div>
+              )}
+
+              {showCreate === idx && (
+                <div className="bg-amber-50 rounded-xl border border-amber-200 p-4 mt-2">
+                  {!createType ? (
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 mb-3">Type d activite :</p>
+                      <div className="grid grid-cols-3 gap-2">{gameTypes.map(g => (
+                        <button key={g.key} type="button" onClick={()=>pickType(g.key)} className="p-3 bg-white rounded-xl border border-slate-200 hover:border-brand-300 text-center">
+                          <span className="text-xl">{g.emoji}</span><p className="text-xs font-medium text-slate-700 mt-1">{g.label}</p>
+                        </button>
+                      ))}</div>
+                      <button type="button" onClick={()=>setShowCreate(null)} className="text-xs text-slate-400 mt-3">Annuler</button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-bold text-slate-700">{gameTypes.find(g=>g.key===createType)?.emoji} {gameTypes.find(g=>g.key===createType)?.label}</p>
+                        <button type="button" onClick={()=>setCreateType("")} className="text-xs text-slate-400">Changer</button>
+                      </div>
+                      <input value={createTitle} onChange={e=>setCreateTitle(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Titre de l activite" />
+
+                      {createType==="QCM" && <div className="space-y-2">
+                        {createConfig?.questions?.map((q:any,qi:number) => (
+                          <div key={qi} className="p-3 bg-white rounded-lg space-y-2">
+                            <input value={q.question||""} onChange={e=>{const c={...createConfig};c.questions[qi]={...q,question:e.target.value};setCreateConfig({...c});}} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Question" />
+                            {(q.options||[]).map((o:string,oi:number)=>(<div key={oi} className="flex items-center gap-2"><input type="radio" name={`eq${qi}`} checked={q.correctIndex===oi} onChange={()=>{const c={...createConfig};c.questions[qi]={...q,correctIndex:oi};setCreateConfig({...c});}} className="accent-green-600" /><input value={o} onChange={e=>{const c={...createConfig};const opts=[...q.options];opts[oi]=e.target.value;c.questions[qi]={...q,options:opts};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder={`Option ${String.fromCharCode(65+oi)}`} /></div>))}
+                            {createConfig.questions.length>1 && <button type="button" onClick={()=>{const c={...createConfig};c.questions=c.questions.filter((_:any,i:number)=>i!==qi);setCreateConfig({...c});}} className="text-xs text-red-500">Supprimer</button>}
+                          </div>
+                        ))}
+                        <button type="button" onClick={()=>{const c={...createConfig};c.questions=[...c.questions,{question:"",options:["","","",""],correctIndex:0}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Question</button>
+                      </div>}
+
+                      {createType==="TRUE_FALSE" && <div className="space-y-2">
+                        {createConfig?.questions?.map((q:any,i:number) => (
+                          <div key={i} className="p-3 bg-white rounded-lg space-y-2">
+                            <input value={q.statement||""} onChange={e=>{const c={...createConfig};c.questions[i]={...q,statement:e.target.value};setCreateConfig({...c});}} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Affirmation" />
+                            <div className="flex gap-4"><label className="text-sm"><input type="radio" checked={q.isTrue} onChange={()=>{const c={...createConfig};c.questions[i]={...q,isTrue:true};setCreateConfig({...c});}} /> Vrai</label><label className="text-sm"><input type="radio" checked={!q.isTrue} onChange={()=>{const c={...createConfig};c.questions[i]={...q,isTrue:false};setCreateConfig({...c});}} /> Faux</label></div>
+                            {createConfig.questions.length>1 && <button type="button" onClick={()=>{const c={...createConfig};c.questions=c.questions.filter((_:any,j:number)=>j!==i);setCreateConfig({...c});}} className="text-xs text-red-500">Supprimer</button>}
+                          </div>
+                        ))}
+                        <button type="button" onClick={()=>{const c={...createConfig};c.questions=[...c.questions,{statement:"",isTrue:true}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Affirmation</button>
+                      </div>}
+
+                      {createType==="FILL_BLANKS" && <textarea value={createConfig?.text||""} onChange={e=>setCreateConfig({...createConfig,text:e.target.value})} rows={3} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono outline-none" placeholder={"Je {{suis}} francais."} />}
+
+                      {createType==="MATCHING" && <div className="space-y-2">
+                        {createConfig?.pairs?.map((p:any,i:number)=>(<div key={i} className="flex gap-2 items-center"><input value={p.left||""} onChange={e=>{const c={...createConfig};c.pairs[i]={...p,left:e.target.value};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Gauche" /><input value={p.right||""} onChange={e=>{const c={...createConfig};c.pairs[i]={...p,right:e.target.value};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Droite" />{createConfig.pairs.length>1&&<button type="button" onClick={()=>{const c={...createConfig};c.pairs=c.pairs.filter((_:any,j:number)=>j!==i);setCreateConfig({...c});}} className="text-red-400 text-xs">x</button>}</div>))}
+                        <button type="button" onClick={()=>{const c={...createConfig};c.pairs=[...c.pairs,{left:"",right:""}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Paire</button>
+                      </div>}
+
+                      {createType==="MEMORY" && <div className="space-y-2">
+                        {createConfig?.pairs?.map((p:any,i:number)=>(<div key={i} className="flex gap-2 items-center"><input value={p.front||""} onChange={e=>{const c={...createConfig};c.pairs[i]={...p,front:e.target.value};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Recto" /><input value={p.back||""} onChange={e=>{const c={...createConfig};c.pairs[i]={...p,back:e.target.value};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Verso" />{createConfig.pairs.length>1&&<button type="button" onClick={()=>{const c={...createConfig};c.pairs=c.pairs.filter((_:any,j:number)=>j!==i);setCreateConfig({...c});}} className="text-red-400 text-xs">x</button>}</div>))}
+                        <button type="button" onClick={()=>{const c={...createConfig};c.pairs=[...c.pairs,{front:"",back:""}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Paire</button>
+                      </div>}
+
+                      {createType==="HANGMAN" && <div className="space-y-2">
+                        {createConfig?.words?.map((w:any,i:number)=>(<div key={i} className="flex gap-2 items-center"><input value={w.word||""} onChange={e=>{const c={...createConfig};c.words[i]={...w,word:e.target.value};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Mot" /><input value={w.hint||""} onChange={e=>{const c={...createConfig};c.words[i]={...w,hint:e.target.value};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Indice" />{createConfig.words.length>1&&<button type="button" onClick={()=>{const c={...createConfig};c.words=c.words.filter((_:any,j:number)=>j!==i);setCreateConfig({...c});}} className="text-red-400 text-xs">x</button>}</div>))}
+                        <button type="button" onClick={()=>{const c={...createConfig};c.words=[...c.words,{word:"",hint:""}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Mot</button>
+                      </div>}
+
+                      {createType==="SORTING" && <div className="space-y-2">
+                        {createConfig?.items?.map((s:string,i:number)=>(<div key={i} className="flex items-center gap-2"><span className="text-xs w-4">{i+1}.</span><input value={s} onChange={e=>{const c={...createConfig};c.items[i]=e.target.value;c.correctOrder[i]=e.target.value;setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" />{createConfig.items.length>1&&<button type="button" onClick={()=>{const c={...createConfig};c.items=c.items.filter((_:any,j:number)=>j!==i);c.correctOrder=c.correctOrder.filter((_:any,j:number)=>j!==i);setCreateConfig({...c});}} className="text-red-400 text-xs">x</button>}</div>))}
+                        <button type="button" onClick={()=>{const c={...createConfig};c.items=[...c.items,""];c.correctOrder=[...c.correctOrder,""];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Element</button>
+                      </div>}
+
+                      {(createType==="CATEGORIZE"||createType==="DRAG_DROP") && <p className="text-xs text-slate-400">Pour les types complexes, utilisez <a href="/admin/activites/creer" target="_blank" className="text-brand-600 underline">le formulaire complet</a></p>}
+
+                      <div className="flex gap-2 pt-2">
+                        <button type="button" onClick={()=>createAndInsert(idx)} disabled={!createTitle||creating} className="px-5 py-2 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 disabled:opacity-50">{creating?"Creation...":"Creer et inserer"}</button>
+                        <button type="button" onClick={()=>setShowCreate(null)} className="px-5 py-2 bg-slate-100 text-slate-500 text-sm rounded-lg">Annuler</button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
