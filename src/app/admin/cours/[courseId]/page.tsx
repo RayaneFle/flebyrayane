@@ -8,6 +8,8 @@ import AddSectionForm from "./AddSectionForm";
 import AssignClassForm from "./AssignClassForm";
 import UnassignBtn from "./UnassignBtn";
 import DeleteCourseBtn from "./DeleteCourseBtn";
+import DeleteSectionBtn from "./DeleteSectionBtn";
+import DeleteLessonBtn from "./DeleteLessonBtn";
 
 export default async function AdminCourseEditorPage({ params }: { params: { courseId: string } }) {
   const course = await prisma.course.findUnique({ where: { id: params.courseId }, include: { sections: { orderBy: { position: "asc" }, include: { lessons: { orderBy: { position: "asc" }, include: { _count: { select: { blocks: true } } } } } } } });
@@ -56,7 +58,7 @@ export default async function AdminCourseEditorPage({ params }: { params: { cour
           <div key={s.id} className="bg-white rounded-2xl border border-brand-100 overflow-hidden">
             <div className="px-6 py-4 bg-gradient-to-r from-brand-50 to-accent-50 border-b border-brand-100 flex items-center justify-between">
               <h2 className="font-heading font-bold text-slate-800">Section {si+1} - {s.title}</h2>
-              <Link href={`/admin/cours/${course.id}/sections/${s.id}/lessons/new`} className="text-xs px-3 py-1.5 bg-brand-100 text-brand-700 rounded-lg hover:bg-brand-200 font-medium">+ Lecon</Link>
+              <div className="flex items-center gap-2"><Link href={`/admin/cours/${course.id}/sections/${s.id}/lessons/new`} className="text-xs px-3 py-1.5 bg-brand-100 text-brand-700 rounded-lg hover:bg-brand-200 font-medium">+ Lecon</Link><DeleteSectionBtn courseId={course.id} sectionId={s.id} /></div>
             </div>
             {s.lessons.length === 0 ? <p className="px-6 py-6 text-center text-slate-300 text-sm">Aucune lecon.</p> :
               <div className="divide-y divide-slate-50">{s.lessons.map((l, li) => (
@@ -64,7 +66,7 @@ export default async function AdminCourseEditorPage({ params }: { params: { cour
                   <span className="text-sm font-medium text-slate-300 w-8">{si+1}.{li+1}</span>
                   <p className="flex-1 font-medium text-slate-700">{l.title}</p>
                   <span className="text-xs text-slate-400">{l._count.blocks} blocs</span>
-                  <Link href={`/admin/cours/${course.id}/sections/${s.id}/lessons/${l.id}/modifier`} className="text-xs px-3 py-1 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100">Modifier</Link>
+                  <Link href={`/admin/cours/${course.id}/sections/${s.id}/lessons/${l.id}/modifier`} className="text-xs px-3 py-1 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100">Modifier</Link><DeleteLessonBtn courseId={course.id} sectionId={s.id} lessonId={l.id} />
                 </div>
               ))}</div>}
           </div>

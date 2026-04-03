@@ -32,3 +32,9 @@ export async function PUT(request: Request, { params }: { params: { courseId: st
   });
   return NextResponse.json(lesson);
 }
+export async function DELETE(_r: Request, { params }: { params: { courseId: string; sectionId: string; lessonId: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session || (session.user.role !== "admin" && session.user.role !== "teacher")) return NextResponse.json({ message: "Non autorise." }, { status: 401 });
+  await prisma.lesson.delete({ where: { id: params.lessonId } });
+  return NextResponse.json({ success: true });
+}

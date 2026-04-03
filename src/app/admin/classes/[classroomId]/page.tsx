@@ -7,6 +7,8 @@ import AssignActivityForm from "./AssignActivityForm";
 import UnassignActivityBtn from "./UnassignActivityBtn";
 import UnassignCourseBtn from "./UnassignCourseBtn";
 import AddPostForm from "./AddPostForm";
+import DeletePostBtn from "./DeletePostBtn";
+import RemoveMemberBtn from "./RemoveMemberBtn";
 
 export default async function ClassroomDetailPage({ params }: { params: { classroomId: string } }) {
   const classroom = await prisma.classroom.findUnique({
@@ -104,6 +106,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                         <span className="text-lg">{p.type === "video" ? "\ud83c\udfac" : p.type === "pdf" ? "\ud83d\udcc4" : p.type === "link" ? "\ud83d\udd17" : "\ud83d\udcdd"}</span>
                         <span className="font-medium text-slate-800 text-sm">{p.title || "Publication"}</span>
                         <span className="text-xs text-slate-400 ml-auto">{p.author.name} \u00b7 {new Date(p.createdAt).toLocaleDateString("fr-FR")}</span>
+                      <DeletePostBtn classroomId={classroom.id} postId={p.id} />
                       </div>
                       {p.content && <p className="text-sm text-slate-600 mb-2">{p.content}</p>}
                       {p.videoUrl && <div className="rounded-lg overflow-hidden bg-black"><iframe src={p.videoUrl.replace("watch?v=","embed/")} className="w-full aspect-video" allowFullScreen /></div>}
@@ -137,6 +140,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                 <div key={m.id} className="flex items-center gap-3 py-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-300 to-accent-400 flex items-center justify-center text-white text-xs font-bold">{m.user.name?.charAt(0)||"?"}</div>
                   <div className="flex-1 min-w-0"><p className="text-sm font-medium text-slate-700 truncate">{m.user.name}</p><p className="text-xs text-slate-400">{m.user.email}</p></div>
+                  <RemoveMemberBtn classroomId={classroom.id} userId={m.userId} />
                 </div>
               ))}</div>}
             <div className="mt-4 p-3 bg-brand-50 rounded-xl text-center">
