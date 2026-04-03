@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 export async function PUT(request: Request, { params }: { params: { courseId: string } }) {
   const session = await getServerSession(authOptions);
@@ -20,6 +21,21 @@ export async function DELETE(_r: Request, { params }: { params: { courseId: stri
   const course = await prisma.course.findUnique({ where: { id: params.courseId } });
   if (!course) return NextResponse.json({ message: "Non trouvé." }, { status: 404 });
   if (course.authorId !== session.user.id && session.user.role !== "admin") return NextResponse.json({ message: "Non autorisé." }, { status: 403 });
+  // Clean up images from lessons
+  try {
+    const sections = await prisma.section.findMany({ where: { courseId: params.courseId }, include: { lessons: { include: { blocks: true } } } });
+    const urls: string[] = [];
+    sections.forEach(s => s.lessons.forEach(l => l.blocks.forEach(b => {
+      if (b.content && b.content.includes("/storage/v1/object/public/uploads/")) {
+        const matches = b.content.match(/\/storage\/v1\/object\/public\/uploads\/[^"\s)]+/g);
+        if (matches) urls.push(...matches);
+      }
+    })));
+    if (urls.length > 0) {
+      const paths = urls.map(u => u.split("/uploads/").pop()!).filter(Boolean);
+      await supabase.storage.from("uploads").remove(paths);
+    }
+  } catch {}
   await prisma.course.delete({ where: { id: params.courseId } });
   return NextResponse.json({ success: true });
 }
