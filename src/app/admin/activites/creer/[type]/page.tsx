@@ -1,0 +1,187 @@
+"use client";
+import { useState, useEffect, type FormEvent } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { activityTypeLabels } from "@/lib/utils";
+
+const LEVELS = ["A1","A2","B1","B2","C1","C2"];
+
+function ImageUpload({ value, onChange, label }: { value: string; onChange: (url: string) => void; label: string }) {
+  const [uploading, setUploading] = useState(false);
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; if (!file) return;
+    setUploading(true);
+    const fd = new FormData(); fd.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body: fd });
+    if (res.ok) { const d = await res.json(); onChange(d.url); }
+    setUploading(false);
+  }
+  return (
+    <div className="space-y-1">
+      <p className="text-xs text-slate-500">{label}</p>
+      <div className="flex items-center gap-2">
+        <label className="px-3 py-1.5 bg-brand-50 text-brand-700 text-xs font-medium rounded-lg cursor-pointer hover:bg-brand-100">
+          {uploading ? "Upload..." : "📷 Image"}
+          <input type="file" accept="image/*" onChange={handleFile} className="hidden" />
+        </label>
+        <input value={value} onChange={e => onChange(e.target.value)} className="flex-1 border border-slate-200 rounded-lg px-2 py-1 text-xs outline-none" placeholder="ou URL image" />
+        {value && <img src={value} alt="" className="w-8 h-8 rounded object-cover" />}
+      </div>
+    </div>
+  );
+}
+
+export default function CreateActivityPage() {
+  const router = useRouter();
+  const { type } = useParams() as { type: string };
+  const info = activityTypeLabels[type] || { emoji: "\ud83d\udcdd", label: type };
+  const [title, setTitle] = useState(""); const [desc, setDesc] = useState(""); const [level, setLevel] = useState(""); const [pub, setPub] = useState(true);
+  const [loading, setLoading] = useState(false); const [error, setError] = useState<string|null>(null);
+  const [classrooms, setClassrooms] = useState<any[]>([]);
+  const [selectedClassroom, setSelectedClassroom] = useState("");
+
+  useEffect(() => { fetch("/api/classrooms").then(r => r.json()).then(setClassrooms).catch(() => {}); }, []);
+
+  const [qcm, setQcm] = useState([{ question: "", imageUrl: "", options: ["","","",""], correctIndex: 0, explanation: "" }]);
+  const [tf, setTf] = useState([{ statement: "", imageUrl: "", isTrue: true, explanation: "" }]);
+  const [fb, setFb] = useState("");
+  const [pairs, setPairs] = useState([{ left: "", right: "", leftImage: "", rightImage: "" }]);
+  const [memory, setMemory] = useState([{ front: "", back: "", frontImage: "", backImage: "" }]);
+  const [words, setWords] = useState([{ word: "", hint: "", imageUrl: "" }]);
+  const [ddZones, setDdZones] = useState([{ name: "", imageUrl: "" }, { name: "", imageUrl: "" }]);
+  const [ddItems, setDdItems] = useState([{ text: "", zone: "", imageUrl: "" }]);
+  const [sort, setSort] = useState([""]);
+  const [sortInst, setSortInst] = useState("");
+  const [cats, setCats] = useState([{ name: "", imageUrl: "" }, { name: "", imageUrl: "" }]);
+  const [catItems, setCatItems] = useState([{ text: "", category: "", imageUrl: "" }]);
+  const [catInst, setCatInst] = useState("");
+
+  function buildConfig() {
+    switch (type) {
+      case "QCM": return { questions: qcm };
+      case "TRUE_FALSE": return { questions: tf };
+      case "FILL_BLANKS": return { text: fb, caseSensitive: false };
+      case "MATCHING": return { pairs: pairs.filter(p => (p.left || p.leftImage) && (p.right || p.rightImage)), instruction: "Associez les elements" };
+      case "MEMORY": return { pairs: memory.filter(p => (p.front || p.frontImage) && (p.back || p.backImage)) };
+      case "HANGMAN": return { words };
+      case "DRAG_DROP": return { zones: ddZones.filter(z => z.name || z.imageUrl).map(z => ({ ...z, items: ddItems.filter(i => i.zone === (z.name || z.imageUrl) && (i.text || i.imageUrl)).map(i => ({ text: i.text, imageUrl: i.imageUrl })) })), instruction: "Glissez dans la bonne zone" };
+      case "SORTING": return { items: sort.filter(Boolean), correctOrder: sort.filter(Boolean), instruction: sortInst };
+      case "CATEGORIZE": return { categories: cats.filter(c => c.name || c.imageUrl), items: catItems.filter(i => (i.text || i.imageUrl) && i.category), instruction: catInst };
+      default: return {};
+    }
+  }
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault(); if (!title.trim()) { setError("Titre requis."); return; }
+    setLoading(true); setError(null);
+    const res = await fetch("/api/activities", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, description: desc, type, config: buildConfig(), level: level || null, isPublic: pub }) });
+    if (!res.ok) { const d = await res.json().catch(() => ({})); setError(d.message || "Erreur"); setLoading(false); return; }
+    const created = await res.json();
+    if (selectedClassroom) {
+      await fetch(`/api/classrooms/${selectedClassroom}/activities`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ activityId: created.id }) });
+    }
+    router.push("/admin/activites"); router.refresh();
+  }
+
+  return (
+    <div className="max-w-3xl">
+      <div className="flex items-center gap-3 mb-8"><span className="text-3xl">{info.emoji}</span><h1 className="font-heading text-2xl font-bold text-slate-900">Creer : {info.label}</h1></div>
+      {error && <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-6">{error}</div>}
+      <form onSubmit={onSubmit} className="space-y-6">
+        <div className="bg-white rounded-2xl border border-brand-100 p-6 space-y-4">
+          <div><label className="block text-sm font-medium text-slate-600 mb-1">Titre *</label><input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-400 outline-none" /></div>
+          <div><label className="block text-sm font-medium text-slate-600 mb-1">Description</label><textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none" /></div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-sm font-medium text-slate-600 mb-1">Niveau</label><select value={level} onChange={e => setLevel(e.target.value)} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none"><option value="">Tous</option>{LEVELS.map(l => <option key={l} value={l}>{l}</option>)}</select></div>
+            <div><label className="block text-sm font-medium text-slate-600 mb-1">Visibilite</label><select value={pub?"1":"0"} onChange={e => setPub(e.target.value==="1")} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none"><option value="1">Public</option><option value="0">Prive</option></select></div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-brand-100 p-6">
+          <h2 className="font-heading font-bold text-slate-800 mb-4">Contenu</h2>
+
+          {type === "QCM" && <div className="space-y-4">{qcm.map((q, qi) => <div key={qi} className="p-4 bg-slate-50 rounded-xl space-y-3">
+            <div className="flex justify-between"><span className="text-xs font-bold text-slate-400">Q{qi+1}</span>{qcm.length>1 && <button type="button" onClick={() => setQcm(qcm.filter((_,i) => i!==qi))} className="text-xs text-red-500">x</button>}</div>
+            <input value={q.question} onChange={e => { const u=[...qcm]; u[qi].question=e.target.value; setQcm(u); }} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Question" />
+            <ImageUpload value={q.imageUrl} onChange={v => { const u=[...qcm]; u[qi].imageUrl=v; setQcm(u); }} label="Image de la question" />
+            {q.options.map((o, oi) => <div key={oi} className="flex items-center gap-2"><input type="radio" name={`q${qi}`} checked={q.correctIndex===oi} onChange={() => { const u=[...qcm]; u[qi].correctIndex=oi; setQcm(u); }} className="accent-green-600" /><input value={o} onChange={e => { const u=[...qcm]; u[qi].options[oi]=e.target.value; setQcm(u); }} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder={`Option ${String.fromCharCode(65+oi)}`} /></div>)}
+            <input value={q.explanation} onChange={e => { const u=[...qcm]; u[qi].explanation=e.target.value; setQcm(u); }} className="w-full border border-slate-100 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Explication" />
+          </div>)}<button type="button" onClick={() => setQcm([...qcm, {question:"",imageUrl:"",options:["","","",""],correctIndex:0,explanation:""}])} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400">+ Question</button></div>}
+
+          {type === "TRUE_FALSE" && <div className="space-y-4">{tf.map((q, i) => <div key={i} className="p-4 bg-slate-50 rounded-xl space-y-3">
+            <input value={q.statement} onChange={e => { const u=[...tf]; u[i].statement=e.target.value; setTf(u); }} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Affirmation" />
+            <ImageUpload value={q.imageUrl} onChange={v => { const u=[...tf]; u[i].imageUrl=v; setTf(u); }} label="Image" />
+            <div className="flex gap-4"><label className="flex items-center gap-2 text-sm"><input type="radio" name={`tf${i}`} checked={q.isTrue} onChange={() => { const u=[...tf]; u[i].isTrue=true; setTf(u); }} />Vrai</label><label className="flex items-center gap-2 text-sm"><input type="radio" name={`tf${i}`} checked={!q.isTrue} onChange={() => { const u=[...tf]; u[i].isTrue=false; setTf(u); }} />Faux</label></div>
+          </div>)}<button type="button" onClick={() => setTf([...tf, {statement:"",imageUrl:"",isTrue:true,explanation:""}])} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400">+ Affirmation</button></div>}
+
+          {type === "FILL_BLANKS" && <div><p className="text-sm text-slate-400 mb-2">Entourez avec {"{{mot}}"}</p><textarea value={fb} onChange={e => setFb(e.target.value)} rows={6} className="w-full border border-slate-200 rounded-xl px-4 py-3 font-mono text-sm outline-none" placeholder={"Je {{mange}} une {{pomme}}."} /></div>}
+
+          {type === "MATCHING" && <div className="space-y-3">{pairs.map((p, i) => <div key={i} className="p-3 bg-slate-50 rounded-xl space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <input value={p.left} onChange={e => { const u=[...pairs]; u[i].left=e.target.value; setPairs(u); }} className="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Element gauche" />
+              <input value={p.right} onChange={e => { const u=[...pairs]; u[i].right=e.target.value; setPairs(u); }} className="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Element droit" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <ImageUpload value={p.leftImage} onChange={v => { const u=[...pairs]; u[i].leftImage=v; setPairs(u); }} label="Image gauche" />
+              <ImageUpload value={p.rightImage} onChange={v => { const u=[...pairs]; u[i].rightImage=v; setPairs(u); }} label="Image droite" />
+            </div>
+            {pairs.length>1 && <button type="button" onClick={() => setPairs(pairs.filter((_,j)=>j!==i))} className="text-xs text-red-500">Supprimer</button>}
+          </div>)}<button type="button" onClick={() => setPairs([...pairs, {left:"",right:"",leftImage:"",rightImage:""}])} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400">+ Paire</button></div>}
+
+          {type === "MEMORY" && <div className="space-y-3">{memory.map((p, i) => <div key={i} className="p-3 bg-slate-50 rounded-xl space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <input value={p.front} onChange={e => { const u=[...memory]; u[i].front=e.target.value; setMemory(u); }} className="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Recto (texte)" />
+              <input value={p.back} onChange={e => { const u=[...memory]; u[i].back=e.target.value; setMemory(u); }} className="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Verso (texte)" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <ImageUpload value={p.frontImage} onChange={v => { const u=[...memory]; u[i].frontImage=v; setMemory(u); }} label="Image recto (remplace le texte)" />
+              <ImageUpload value={p.backImage} onChange={v => { const u=[...memory]; u[i].backImage=v; setMemory(u); }} label="Image verso" />
+            </div>
+            {memory.length>1 && <button type="button" onClick={() => setMemory(memory.filter((_,j)=>j!==i))} className="text-xs text-red-500">Supprimer</button>}
+          </div>)}<button type="button" onClick={() => setMemory([...memory, {front:"",back:"",frontImage:"",backImage:""}])} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400">+ Paire</button></div>}
+
+          {type === "HANGMAN" && <div className="space-y-2">{words.map((w, i) => <div key={i} className="p-3 bg-slate-50 rounded-xl space-y-2">
+            <div className="flex items-center gap-2"><input value={w.word} onChange={e => { const u=[...words]; u[i].word=e.target.value; setWords(u); }} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Mot" /><input value={w.hint} onChange={e => { const u=[...words]; u[i].hint=e.target.value; setWords(u); }} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Indice" /></div>
+            <ImageUpload value={w.imageUrl} onChange={v => { const u=[...words]; u[i].imageUrl=v; setWords(u); }} label="Image indice" />
+            {words.length > 1 && <button type="button" onClick={() => setWords(words.filter((_: any,j: number) => j!==i))} className="text-xs text-red-500">Supprimer</button>}
+            {words.length > 1 && <button type="button" onClick={() => setWords(words.filter((_: any, j: number) => j !== i))} className="text-xs text-red-500 mt-1">Supprimer ce mot</button>}
+          </div>)}<button type="button" onClick={() => setWords([...words, {word:"",hint:"",imageUrl:""}])} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400">+ Mot</button></div>}
+
+          {type === "DRAG_DROP" && <div className="space-y-4">
+            <div><p className="text-xs font-bold text-slate-500 mb-2">Zones de depot :</p>{ddZones.map((z, i) => <div key={i} className="p-3 bg-slate-50 rounded-xl mb-2 space-y-2"><input value={z.name} onChange={e => { const u=[...ddZones]; u[i].name=e.target.value; setDdZones(u); }} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder={`Zone ${i+1}`} /><ImageUpload value={z.imageUrl} onChange={v => { const u=[...ddZones]; u[i].imageUrl=v; setDdZones(u); }} label="Image zone" />{ddZones.length>2 && <button type="button" onClick={() => setDdZones(ddZones.filter((_,j)=>j!==i))} className="text-xs text-red-500">Supprimer</button>}</div>)}<button type="button" onClick={() => setDdZones([...ddZones, {name:"",imageUrl:""}])} className="text-xs text-brand-600 font-medium">+ Zone</button></div>
+            <div><p className="text-xs font-bold text-slate-500 mb-2">Elements a glisser :</p>{ddItems.map((it, i) => <div key={i} className="p-3 bg-slate-50 rounded-xl mb-2 space-y-2"><div className="flex items-center gap-2"><input value={it.text} onChange={e => { const u=[...ddItems]; u[i].text=e.target.value; setDdItems(u); }} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Texte" /><select value={it.zone} onChange={e => { const u=[...ddItems]; u[i].zone=e.target.value; setDdItems(u); }} className="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none"><option value="">Zone...</option>{ddZones.filter(z=>z.name||z.imageUrl).map(z=><option key={z.name||z.imageUrl} value={z.name||z.imageUrl}>{z.name||"(image)"}</option>)}</select></div><ImageUpload value={it.imageUrl} onChange={v => { const u=[...ddItems]; u[i].imageUrl=v; setDdItems(u); }} label="Image element" />{ddItems.length>1 && <button type="button" onClick={() => setDdItems(ddItems.filter((_,j)=>j!==i))} className="text-xs text-red-500">Supprimer</button>}</div>)}<button type="button" onClick={() => setDdItems([...ddItems, {text:"",zone:"",imageUrl:""}])} className="text-xs text-brand-600 font-medium">+ Element</button></div>
+          </div>}
+
+          {type === "SORTING" && <div className="space-y-3"><input value={sortInst} onChange={e => setSortInst(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Instruction" />{sort.map((s, i) => <div key={i} className="flex items-center gap-2"><span className="text-xs text-slate-300 w-6">{i+1}.</span><input value={s} onChange={e => { const u=[...sort]; u[i]=e.target.value; setSort(u); }} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" />{sort.length>1 && <button type="button" onClick={() => setSort(sort.filter((_,j)=>j!==i))} className="text-red-400 p-1">x</button>}</div>)}<button type="button" onClick={() => setSort([...sort, ""])} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400">+ Element</button></div>}
+
+          {type === "CATEGORIZE" && <div className="space-y-4"><input value={catInst} onChange={e => setCatInst(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Instruction" />
+            <div><p className="text-xs font-bold text-slate-500 mb-2">Categories :</p>{cats.map((c, i) => <div key={i} className="p-3 bg-slate-50 rounded-xl mb-2 space-y-2">
+              <input value={c.name} onChange={e => { const u=[...cats]; u[i].name=e.target.value; setCats(u); }} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder={`Categorie ${i+1}`} />
+              <ImageUpload value={c.imageUrl} onChange={v => { const u=[...cats]; u[i].imageUrl=v; setCats(u); }} label="Image categorie" />
+              {cats.length>2 && <button type="button" onClick={() => setCats(cats.filter((_,j)=>j!==i))} className="text-xs text-red-500">Supprimer</button>}
+            </div>)}<button type="button" onClick={() => setCats([...cats, {name:"",imageUrl:""}])} className="text-xs text-brand-600 font-medium">+ Categorie</button></div>
+            <div><p className="text-xs font-bold text-slate-500 mb-2">Elements :</p>{catItems.map((it, i) => <div key={i} className="p-3 bg-slate-50 rounded-xl mb-2 space-y-2">
+              <div className="flex items-center gap-2"><input value={it.text} onChange={e => { const u=[...catItems]; u[i].text=e.target.value; setCatItems(u); }} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Texte" /><select value={it.category} onChange={e => { const u=[...catItems]; u[i].category=e.target.value; setCatItems(u); }} className="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none"><option value="">Cat...</option>{cats.filter(c=>c.name||c.imageUrl).map(c=><option key={c.name||c.imageUrl} value={c.name||c.imageUrl}>{c.name||"(image)"}</option>)}</select></div>
+              <ImageUpload value={it.imageUrl} onChange={v => { const u=[...catItems]; u[i].imageUrl=v; setCatItems(u); }} label="Image element" />
+              {catItems.length>1 && <button type="button" onClick={() => setCatItems(catItems.filter((_,j)=>j!==i))} className="text-xs text-red-500">Supprimer</button>}
+            </div>)}<button type="button" onClick={() => setCatItems([...catItems, {text:"",category:"",imageUrl:""}])} className="text-xs text-brand-600 font-medium">+ Element</button></div>
+          </div>}
+        </div>
+
+        <div className="bg-white rounded-2xl border border-brand-100 p-6">
+          <h2 className="font-heading font-bold text-slate-800 mb-3">Assigner a une classe (optionnel)</h2>
+          {classrooms.length > 0 ? (
+            <select value={selectedClassroom} onChange={e => setSelectedClassroom(e.target.value)} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none">
+              <option value="">Aucune classe</option>
+              {classrooms.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          ) : <p className="text-xs text-slate-400">Aucune classe. Creez-en une d abord.</p>}
+        </div>
+
+        <div className="flex gap-4">
+          <button type="submit" disabled={loading} className="px-8 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow disabled:opacity-50 transition-all">{loading ? "Publication..." : "Publier"}</button>
+          <button type="button" onClick={() => router.back()} className="px-8 py-3 bg-slate-50 text-slate-600 font-semibold rounded-xl">Annuler</button>
+        </div>
+      </form>
+    </div>
+  );
+}

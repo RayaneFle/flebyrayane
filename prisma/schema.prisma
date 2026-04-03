@@ -1,0 +1,233 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id             String   @id @default(cuid())
+  name           String?
+  email          String   @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  role           String   @default("student")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  enrollments    Enrollment[]
+  activityResults ActivityResult[]
+  activities     Activity[]        @relation("CreatedActivities")
+  courses        Course[]          @relation("CreatedCourses")
+  classroomMemberships ClassroomMember[]
+  ownedClassrooms Classroom[]       @relation("ClassroomOwner")
+  classroomPosts ClassroomPost[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Classroom {
+  id          String  @id @default(cuid())
+  name        String
+  code        String  @unique
+  description String?
+  ownerId     String
+  owner       User    @relation("ClassroomOwner", fields: [ownerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  members     ClassroomMember[]
+  courses     ClassroomCourse[]
+  posts       ClassroomPost[]
+  activities  ClassroomActivity[]
+}
+
+model ClassroomMember {
+  id          String    @id @default(cuid())
+  userId      String
+  classroomId String
+  joinedAt    DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  @@unique([userId, classroomId])
+}
+
+model ClassroomCourse {
+  id          String    @id @default(cuid())
+  classroomId String
+  courseId     String
+  assignedAt  DateTime  @default(now())
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  @@unique([classroomId, courseId])
+}
+
+model ClassroomActivity {
+  id          String    @id @default(cuid())
+  classroomId String
+  activityId  String
+  assignedAt  DateTime  @default(now())
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  activity    Activity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  @@unique([classroomId, activityId])
+}
+
+model ClassroomPost {
+  id          String   @id @default(cuid())
+  classroomId String
+  authorId    String
+  type        String   @default("text")
+  title       String?
+  content     String?
+  fileUrl     String?
+  fileName    String?
+  videoUrl    String?
+  createdAt   DateTime @default(now())
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  author      User      @relation(fields: [authorId], references: [id])
+}
+
+model Course {
+  id                 String  @id @default(cuid())
+  title              String
+  description        String
+  slug               String  @unique
+  imageUrl           String?
+  level              String
+  published          Boolean @default(false)
+  requiresEnrollment Boolean @default(false)
+  enrollmentCode     String?
+  authorId           String
+  author             User    @relation("CreatedCourses", fields: [authorId], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  sections           Section[]
+  enrollments        Enrollment[]
+  classrooms         ClassroomCourse[]
+}
+
+model Section {
+  id        String   @id @default(cuid())
+  title     String
+  position  Int      @default(0)
+  courseId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons   Lesson[]
+}
+
+model Lesson {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  type      String   @default("TEXT")
+  fileUrl   String?
+  position  Int      @default(0)
+  sectionId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  blocks    LessonBlock[]
+}
+
+model LessonBlock {
+  id           String    @id @default(cuid())
+  position     Int       @default(0)
+  type         String    @default("text")
+  content      String?
+  activityId   String?
+  requireScore Boolean   @default(false)
+  minScore     Int       @default(60)
+  lessonId     String
+  activity     Activity? @relation(fields: [activityId], references: [id])
+  lesson       Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  type        String
+  config      String
+  level       String?
+  isPublic    Boolean  @default(true)
+  createdById String
+  createdBy   User     @relation("CreatedActivities", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  results     ActivityResult[]
+  blocks      LessonBlock[]
+  classrooms  ClassroomActivity[]
+}
+
+model ActivityResult {
+  id          String    @id @default(cuid())
+  userId      String
+  activityId  String
+  completed   Boolean   @default(false)
+  score       Float?
+  timeSpent   Int?
+  attempts    Int       @default(1)
+  answers     String?
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity    Activity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  @@unique([userId, activityId])
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId   String
+  progress  Float    @default(0)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  @@unique([userId, courseId])
+}
+
+model Upload {
+  id        String   @id @default(cuid())
+  filename  String
+  mimetype  String
+  size      Int
+  path      String
+  createdAt DateTime @default(now())
+}
