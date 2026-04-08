@@ -73,6 +73,7 @@ model Classroom {
   members     ClassroomMember[]
   courses     ClassroomCourse[]
   posts       ClassroomPost[]
+  subclasses Subclass[]
   activities  ClassroomActivity[]
 }
 
