@@ -85,6 +85,7 @@ export default function EditActivityPage() {
           break;
         case "SORTING": setSort(cfg.items || []); setSortInst(cfg.instruction || ""); break;
         case "WORD_ORDER": setSentences(cfg.sentences || []); break;
+        case "WORD_ORDER": setSentences(cfg.sentences || []); break;
         case "CATEGORIZE":
           setCats((cfg.categories || []).map((c: any) => typeof c === "string" ? { name: c, imageUrl: "" } : c));
           setCatItems(cfg.items || []);
@@ -105,8 +106,7 @@ export default function EditActivityPage() {
       case "HANGMAN": return { words };
       case "DRAG_DROP": return { zones: ddZones.filter(z => z.name || z.imageUrl).map(z => ({ ...z, items: ddItems.filter(i => i.zone === (z.name || z.imageUrl) && (i.text || i.imageUrl)).map(i => ({ text: i.text, imageUrl: i.imageUrl })) })), instruction: "Glissez dans la bonne zone" };
       case "SORTING": return { items: sort.filter(Boolean), correctOrder: sort.filter(Boolean), instruction: sortInst };
-      case "WORD_ORDER": setSentences(cfg.sentences || []); break;
-        case "CATEGORIZE": return { categories: cats.filter(c => c.name || c.imageUrl), items: catItems.filter(i => (i.text || i.imageUrl) && i.category), instruction: catInst };
+      case "CATEGORIZE": return { categories: cats.filter(c => c.name || c.imageUrl), items: catItems.filter(i => (i.text || i.imageUrl) && i.category), instruction: catInst };
       case "WORD_ORDER": return { sentences: sentences.filter((s: any) => s.text?.trim()) };
       default: return {};
     }
