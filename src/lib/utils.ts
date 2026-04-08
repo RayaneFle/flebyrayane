@@ -32,3 +32,22 @@ export function formatTime(seconds: number): string {
   const s = seconds % 60;
   return m > 0 ? m + "min " + s + "s" : s + "s";
 }
+
+export const levelLabels: Record<string, string> = {
+  A1: "Débutant", A2: "Élémentaire", B1: "Intermédiaire", B2: "Avancé", C1: "Autonome", C2: "Maîtrise",
+};
+
+export const levelEmoji: Record<string, string> = {
+  A1: "🌱", A2: "🌿", B1: "🌳", B2: "🏔️", C1: "⭐", C2: "👑",
+};
+
+export function slugify(text: string): string {
+  return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+export function generateClassCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
