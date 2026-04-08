@@ -26,6 +26,7 @@ model User {
   classroomMemberships ClassroomMember[]
   ownedClassrooms Classroom[]       @relation("ClassroomOwner")
   classroomPosts ClassroomPost[]
+  lessonProgress LessonProgress[]
 }
 
 model Account {
@@ -162,6 +163,7 @@ model Lesson {
   updatedAt DateTime @updatedAt
   section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   blocks    LessonBlock[]
+  progress  LessonProgress[]
 }
 
 model LessonBlock {
@@ -221,6 +223,19 @@ model Enrollment {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   @@unique([userId, courseId])
+}
+
+model LessonProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  lessonId    String
+  status      String    @default("not_started")
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  @@unique([userId, lessonId])
 }
 
 model Upload {
