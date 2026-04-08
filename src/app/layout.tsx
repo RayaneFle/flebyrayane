@@ -4,7 +4,7 @@ import PageLoader from "@/components/PageLoader";
 import { Suspense } from "react";
 import "./globals.css";
 
-export const metadata: any: Metadata = {
+export const metadata: Metadata = {
   title: "FLEbyRayane — Apprenez le français",
   description: "Plateforme interactive FLE avec cours, activités ludiques et suivi de progression.",
 };
