@@ -83,6 +83,8 @@ model ClassroomMember {
   joinedAt    DateTime  @default(now())
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  subclassId  String?
+  subclass    Subclass? @relation(fields: [subclassId], references: [id], onDelete: SetNull)
   @@unique([userId, classroomId])
 }
 
@@ -223,6 +225,15 @@ model Enrollment {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   @@unique([userId, courseId])
+}
+
+model Subclass {
+  id          String    @id @default(cuid())
+  name        String
+  classroomId String
+  createdAt   DateTime  @default(now())
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  members     ClassroomMember[]
 }
 
 model LessonProgress {

@@ -9,12 +9,14 @@ import UnassignCourseBtn from "./UnassignCourseBtn";
 import AddPostForm from "./AddPostForm";
 import DeletePostBtn from "./DeletePostBtn";
 import RemoveMemberBtn from "./RemoveMemberBtn";
+import SubclassManager from "./SubclassManager";
 
 export default async function ClassroomDetailPage({ params }: { params: { classroomId: string } }) {
   const classroom = await prisma.classroom.findUnique({
     where: { id: params.classroomId },
     include: {
       members: { include: { user: { select: { id: true, name: true, email: true } } }, orderBy: { joinedAt: "desc" } },
+      subclasses: { orderBy: { createdAt: "asc" } },
       courses: { include: { course: { select: { id: true, title: true, slug: true, level: true } } } },
       activities: { include: { activity: { select: { id: true, title: true, type: true, level: true } } } },
       posts: { include: { author: { select: { name: true } } }, orderBy: { createdAt: "desc" } },
@@ -155,7 +157,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                       <summary className="px-4 py-3 cursor-pointer bg-slate-50 hover:bg-brand-50/50 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">{m.user.name?.charAt(0) || "?"}</div>
-                          <div><p className="text-sm font-bold text-slate-900">{m.user.name}</p><p className="text-[11px] text-slate-400">{m.user.email}</p></div>
+                          <div><p className="text-sm font-bold text-slate-900">{m.user.name} {(classroom.subclasses as any[]).find((sc: any) => sc.id === (m as any).subclassId) ? <span className="text-[10px] bg-brand-100 text-brand-600 px-1.5 py-0.5 rounded ml-1">{(classroom.subclasses as any[]).find((sc: any) => sc.id === (m as any).subclassId)?.name}</span> : null}</p><p className="text-[11px] text-slate-400">{m.user.email}</p></div>
                         </div>
                         <div className="flex items-center gap-2 text-xs">
                           <span className="bg-green-100 text-green-700 px-2.5 py-1 rounded-lg font-bold">{completedCount}/{allLessonsForTracking.length} lecons</span>
@@ -227,6 +229,12 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
         <div>
           <div className="bg-white rounded-2xl border border-brand-100 p-6 sticky top-24">
             <h2 className="font-heading font-bold text-slate-800 mb-4">👥 Élèves ({classroom.members.length})</h2>
+            <details className="mb-4 border border-brand-100 rounded-xl overflow-hidden">
+              <summary className="px-4 py-2.5 bg-brand-50 cursor-pointer text-sm font-bold text-brand-700">Sous-classes ({classroom.subclasses.length})</summary>
+              <div className="p-3">
+                <SubclassManager classroomId={classroom.id} members={classroom.members as any} subclasses={classroom.subclasses} />
+              </div>
+            </details>
             {classroom.members.length === 0 ? <p className="text-sm text-slate-400">Aucun élève.</p> :
               <div className="space-y-2">{classroom.members.map(m => (
                 <div key={m.id} className="flex items-center gap-3 py-2">
