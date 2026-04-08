@@ -29,9 +29,9 @@ export default function Header() {
             <NavLink href="/cours">Cours</NavLink>
             <NavLink href="/activites">Activités</NavLink>
             {isTeacher && <NavLink href="/admin">Admin</NavLink>}
-          <LangSwitcher /></nav>
+          </nav>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3"><LangSwitcher />
             {session ? (
               <div className="relative">
                 <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-2.5 px-3 py-1.5 rounded-full hover:bg-brand-50 transition-colors">
