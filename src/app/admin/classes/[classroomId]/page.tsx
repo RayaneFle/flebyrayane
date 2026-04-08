@@ -130,8 +130,8 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
             </div>
           </details>
 
-          <details open className="bg-white rounded-2xl border border-brand-100 overflow-hidden">
-            <summary className="px-6 py-4 bg-gradient-to-r from-brand-50 to-accent-50 border-b border-brand-100 cursor-pointer font-heading font-bold text-slate-800 select-none">📊 Suivi des élèves</summary>
+          <details open className="bg-white rounded-2xl border-2 border-brand-200 overflow-hidden">
+            <summary className="px-6 py-4 bg-gradient-to-r from-brand-100 to-accent-100 border-b-2 border-brand-200 cursor-pointer font-heading text-lg font-bold text-slate-900 select-none">📊 Suivi des élèves</summary>
             <div className="p-6">
               {classroom.members.length === 0 ? <p className="text-sm text-slate-400">Aucun élève.</p> :
                 <div className="space-y-4">{classroom.members.map(m => {
@@ -148,16 +148,16 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                   const dedupedResults = Array.from(uniqueResults.values());
                   const avgScore = dedupedResults.length > 0 ? dedupedResults.reduce((sum, r) => sum + (r.score || 0), 0) / dedupedResults.length : 0;
                   return (
-                    <details key={m.id} className="border border-slate-100 rounded-xl overflow-hidden">
-                      <summary className="px-4 py-3 cursor-pointer hover:bg-brand-50/30 flex items-center justify-between">
+                    <details key={m.id} className="border-2 border-slate-200 rounded-xl overflow-hidden hover:border-brand-200 transition-colors">
+                      <summary className="px-4 py-3 cursor-pointer bg-slate-50 hover:bg-brand-50/50 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-300 to-accent-400 flex items-center justify-center text-white text-xs font-bold">{m.user.name?.charAt(0) || "?"}</div>
-                          <div><p className="text-sm font-medium text-slate-800">{m.user.name}</p><p className="text-xs text-slate-400">{m.user.email}</p></div>
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">{m.user.name?.charAt(0) || "?"}</div>
+                          <div><p className="text-sm font-bold text-slate-900">{m.user.name}</p><p className="text-[11px] text-slate-400">{m.user.email}</p></div>
                         </div>
-                        <div className="flex items-center gap-2 text-xs flex-wrap">
-                          <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-lg font-bold">{completedCount}/{allLessonsForTracking.length}</span>
-                          {inProgressCount > 0 && <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-lg font-bold">{inProgressCount} en cours</span>}
-                          <span className="bg-brand-100 text-brand-700 px-2 py-0.5 rounded-lg font-bold">{Math.round(avgScore)}%</span>
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="bg-green-100 text-green-700 px-2.5 py-1 rounded-lg font-bold">{completedCount}/{allLessonsForTracking.length} lecons</span>
+                          {inProgressCount > 0 && <span className="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-lg font-bold">{inProgressCount} en cours</span>}
+                          <span className="bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg font-bold">Moy. {Math.round(avgScore)}%</span>
                         </div>
                       </summary>
                       <div className="px-4 pb-4 border-t border-slate-50 mt-2">
@@ -168,37 +168,42 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                             {allLessonsForTracking.length > 0 && (() => {
                               const grouped: Record<string, typeof allLessonsForTracking> = {};
                               allLessonsForTracking.forEach(l => {
-                                const key = l.courseTitle + " > " + l.sectionTitle;
+                                const key = l.sectionTitle;
                                 if (!grouped[key]) grouped[key] = [];
                                 grouped[key].push(l);
                               });
                               return (
                               <div>
-                                <p className="text-xs font-bold text-slate-500 mb-2">Progression des lecons :</p>
-                                <div className="space-y-3">{Object.entries(grouped).map(([section, lessons]) => (
-                                  <div key={section}>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">{section}</p>
-                                    <div className="space-y-0.5">{lessons.map(l => {
+                                <h4 className="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-200">Progression des lecons</h4>
+                                <div className="space-y-4">{Object.entries(grouped).map(([section, lessons]) => {
+                                  const sectionDone = lessons.filter(l => memberProgress.find(p => p.lessonId === l.id && p.status === "completed")).length;
+                                  return (
+                                  <div key={section} className="bg-slate-50 rounded-xl p-3">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <p className="text-xs font-bold text-brand-700">{section}</p>
+                                      <span className="text-[10px] text-slate-400 font-medium">{sectionDone}/{lessons.length}</span>
+                                    </div>
+                                    <div className="space-y-1">{lessons.map(l => {
                                       const prog = memberProgress.find(p => p.lessonId === l.id);
                                       const st = prog ? prog.status : "not_started";
                                       return (
-                                        <div key={l.id} className="flex items-center justify-between py-1 px-3 rounded-lg hover:bg-slate-50">
+                                        <div key={l.id} className="flex items-center justify-between py-1.5 px-3 bg-white rounded-lg">
                                           <p className="text-xs text-slate-700 truncate flex-1">{l.title}</p>
-                                          <span className={"text-[10px] font-bold shrink-0 ml-2 px-2 py-0.5 rounded " + (st === "completed" ? "bg-green-100 text-green-700" : st === "in_progress" ? "bg-amber-100 text-amber-700" : "bg-red-50 text-red-400")}>{st === "completed" ? "Faite" : st === "in_progress" ? "En cours" : "Non faite"}</span>
+                                          <span className={"text-[10px] font-bold shrink-0 ml-2 px-2 py-0.5 rounded-full " + (st === "completed" ? "bg-green-500 text-white" : st === "in_progress" ? "bg-amber-400 text-white" : "bg-slate-200 text-slate-500")}>{st === "completed" ? "Faite" : st === "in_progress" ? "En cours" : "A faire"}</span>
                                         </div>
                                       );
                                     })}</div>
-                                  </div>
-                                ))}</div>
+                                  </div>);
+                                })}</div>
                               </div>);})()
                             }
                             {dedupedResults.length > 0 && (
                               <div>
-                                <p className="text-xs font-bold text-slate-500 mb-2">Activites ({dedupedResults.length}) :</p>
-                                <div className="space-y-0.5">{dedupedResults.map(r => (
-                                  <div key={r.id} className="flex items-center justify-between py-1 px-3 rounded-lg hover:bg-slate-50">
+                                <h4 className="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-200">Activites ({dedupedResults.length})</h4>
+                                <div className="bg-slate-50 rounded-xl p-3 space-y-1">{dedupedResults.map(r => (
+                                  <div key={r.id} className="flex items-center justify-between py-1.5 px-3 bg-white rounded-lg">
                                     <p className="text-xs text-slate-700 truncate flex-1">{r.activity.title}</p>
-                                    <span className={"text-[10px] font-bold ml-2 px-2 py-0.5 rounded " + ((r.score || 0) >= 80 ? "bg-green-100 text-green-700" : (r.score || 0) >= 50 ? "bg-amber-100 text-amber-700" : "bg-red-50 text-red-500")}>{Math.round(r.score || 0)}%</span>
+                                    <span className={"text-[10px] font-bold ml-2 px-2 py-0.5 rounded-full " + ((r.score || 0) >= 80 ? "bg-green-500 text-white" : (r.score || 0) >= 50 ? "bg-amber-400 text-white" : "bg-red-400 text-white")}>{Math.round(r.score || 0)}%</span>
                                   </div>
                                 ))}</div>
                               </div>
