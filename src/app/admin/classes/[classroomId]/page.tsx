@@ -15,7 +15,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
     where: { id: params.classroomId },
     include: {
       members: { include: { user: { select: { id: true, name: true, email: true } } }, orderBy: { joinedAt: "desc" } },
-      courses: { include: { course: { select: { id: true, title: true, slug: true, level: true } } } },
+      courses: { include: { course: { select: { id: true, title: true, slug: true, level: true, sections: { orderBy: { position: "asc" }, include: { lessons: { orderBy: { position: "asc" }, select: { id: true, title: true } } } } } } } },
       activities: { include: { activity: { select: { id: true, title: true, type: true, level: true } } } },
       posts: { include: { author: { select: { name: true } } }, orderBy: { createdAt: "desc" } },
     },
@@ -42,7 +42,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
   const studentResults = await prisma.activityResult.findMany({
     where: { userId: { in: classroom.members.map(m => m.userId) }, completed: true },
     include: { user: { select: { id: true, name: true } }, activity: { select: { title: true } } },
-    orderBy: { completedAt: "desc" }, take: 20,
+    orderBy: { completedAt: "desc" },
   });
 
   return (
@@ -127,14 +127,16 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
           </details>
 
           <details open className="bg-white rounded-2xl border border-brand-100 overflow-hidden">
-            <summary className="px-6 py-4 bg-gradient-to-r from-brand-50 to-accent-50 border-b border-brand-100 cursor-pointer font-heading font-bold text-slate-800 select-none">\ud83d\udcca Suivi des eleves</summary>
+            <summary className="px-6 py-4 bg-gradient-to-r from-brand-50 to-accent-50 border-b border-brand-100 cursor-pointer font-heading font-bold text-slate-800 select-none">Suivi des eleves</summary>
             <div className="p-6">
               {classroom.members.length === 0 ? <p className="text-sm text-slate-400">Aucun eleve.</p> :
                 <div className="space-y-4">{classroom.members.map(m => {
                   const memberProgress = allLessonProgress.filter(p => p.userId === m.userId);
                   const memberResults = studentResults.filter(r => r.user.id === m.userId);
-                  const completedLessons = memberProgress.filter(p => p.status === "completed").length;
-                  const inProgressLessons = memberProgress.filter(p => p.status === "in_progress").length;
+                  const allLessons = classroom.courses.flatMap(cc => cc.course.sections.flatMap(s => s.lessons.map(l => ({ ...l, sectionTitle: s.title, courseTitle: cc.course.title }))));
+                  const completedLessons = allLessons.filter(l => memberProgress.find(p => p.lessonId === l.id && p.status === "completed")).length;
+                  const inProgressLessons = allLessons.filter(l => memberProgress.find(p => p.lessonId === l.id && p.status === "in_progress")).length;
+                  const notStartedLessons = allLessons.length - completedLessons - inProgressLessons;
                   const avgScore = memberResults.length > 0 ? memberResults.reduce((sum, r) => sum + (r.score || 0), 0) / memberResults.length : 0;
                   return (
                     <details key={m.id} className="border border-slate-100 rounded-xl overflow-hidden">
@@ -144,8 +146,9 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                           <div><p className="text-sm font-medium text-slate-800">{m.user.name}</p><p className="text-xs text-slate-400">{m.user.email}</p></div>
                         </div>
                         <div className="flex items-center gap-4 text-xs">
-                          <span className="text-green-600 font-bold">{completedLessons} faites</span>
+                          <span className="text-green-600 font-bold">{completedLessons}/{allLessons.length} faites</span>
                           <span className="text-amber-500 font-bold">{inProgressLessons} en cours</span>
+                          <span className="text-red-400 font-bold">{notStartedLessons} restantes</span>
                           <span className="text-brand-600 font-bold">{Math.round(avgScore)}%</span>
                         </div>
                       </summary>
@@ -154,30 +157,41 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                           <p className="text-xs text-slate-400 py-3">Aucune activite.</p>
                         ) : (
                           <div className="mt-3 space-y-3">
-                            {memberProgress.length > 0 && (
+                            {allLessons.length > 0 && (
                               <div>
                                 <p className="text-xs font-bold text-slate-500 mb-2">Lecons :</p>
-                                <div className="space-y-1">{memberProgress.map(p => (
-                                  <div key={p.id} className="flex items-center justify-between py-1.5 px-3 bg-slate-50 rounded-lg">
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs text-slate-700 truncate">{p.lesson.title}</p>
-                                      <p className="text-[10px] text-slate-400">{p.lesson.section.course.title} &gt; {p.lesson.section.title}</p>
+                                <div className="space-y-1">{allLessons.map(l => {
+                                  const prog = memberProgress.find(p => p.lessonId === l.id);
+                                  const status = prog ? prog.status : "not_started";
+                                  return (
+                                    <div key={l.id} className="flex items-center justify-between py-1.5 px-3 bg-slate-50 rounded-lg">
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-xs text-slate-700 truncate">{l.title}</p>
+                                        <p className="text-[10px] text-slate-400">{l.courseTitle} &gt; {l.sectionTitle}</p>
+                                      </div>
+                                      <span className={"text-xs font-bold shrink-0 ml-2 px-2 py-0.5 rounded-lg " + (status === "completed" ? "bg-green-100 text-green-700" : status === "in_progress" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700")}>{status === "completed" ? "Faite" : status === "in_progress" ? "En cours" : "Non faite"}</span>
                                     </div>
-                                    <span className={"text-xs font-bold shrink-0 ml-2 px-2 py-0.5 rounded-lg " + (p.status === "completed" ? "bg-green-100 text-green-700" : p.status === "in_progress" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700")}>{p.status === "completed" ? "Faite" : p.status === "in_progress" ? "En cours" : "Non faite"}</span>
-                                  </div>
-                                ))}</div>
+                                  );
+                                })}</div>
                               </div>
                             )}
-                            {memberResults.length > 0 && (
+                            {memberResults.length > 0 && (() => {
+                              const uniqueActs = new Map();
+                              memberResults.forEach(r => {
+                                const existing = uniqueActs.get(r.activityId);
+                                if (!existing || (r.score||0) > (existing.score||0)) uniqueActs.set(r.activityId, r);
+                              });
+                              const acts = Array.from(uniqueActs.values());
+                              return (
                               <div>
-                                <p className="text-xs font-bold text-slate-500 mb-2">Activites :</p>
-                                <div className="space-y-1">{memberResults.map(r => (
+                                <p className="text-xs font-bold text-slate-500 mb-2">Activites ({acts.length}) :</p>
+                                <div className="space-y-1">{acts.map(r => (
                                   <div key={r.id} className="flex items-center justify-between py-1.5 px-3 bg-slate-50 rounded-lg">
                                     <p className="text-xs text-slate-700 truncate flex-1">{r.activity.title}</p>
                                     <span className={"text-xs font-bold ml-2 " + ((r.score||0) >= 60 ? "text-green-600" : "text-amber-500")}>{Math.round(r.score||0)}%</span>
                                   </div>
                                 ))}</div>
-                              </div>
+                              </div>);})()
                             )}
                           </div>
                         )}
