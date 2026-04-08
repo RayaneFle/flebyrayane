@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import ActivityPlayer from "@/components/activities/ActivityPlayer";
 import { activityTypeLabels } from "@/lib/utils";
@@ -10,14 +10,21 @@ interface Block {
   activity: { id: string; title: string; type: string; config: any; level: string | null } | null;
 }
 
-export default function LessonContent({ blocks, lessonId }: { blocks: Block[]; lessonId: string }) {
+interface Props {
+  blocks: Block[];
+  lessonId: string;
+  nextLessonUrl?: string;
+  courseUrl?: string;
+}
+
+export default function LessonContent({ blocks, lessonId, nextLessonUrl, courseUrl }: Props) {
   const { data: session } = useSession();
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [scores, setScores] = useState<Map<string, number>>(new Map());
-  const [currentBlock, setCurrentBlock] = useState(0);
   const [lessonDone, setLessonDone] = useState(false);
+  const blockRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
-  // Mark lesson as "in_progress" when opened
+  // Mark lesson as in_progress when opened
   useEffect(() => {
     if (session?.user && lessonId) {
       fetch("/api/lessons/" + lessonId + "/progress", {
@@ -28,11 +35,12 @@ export default function LessonContent({ blocks, lessonId }: { blocks: Block[]; l
     }
   }, [session, lessonId]);
 
-  // Check if all required activities are completed
+  // Check if all required activities are done
   const checkCompletion = useCallback(() => {
     const activityBlocks = blocks.filter(b => b.type === "activity" && b.activity);
+    if (activityBlocks.length === 0) return;
     const allDone = activityBlocks.every(b => completed.has(b.activity!.id));
-    if (allDone && activityBlocks.length > 0 && !lessonDone) {
+    if (allDone && !lessonDone) {
       setLessonDone(true);
       if (session?.user && lessonId) {
         fetch("/api/lessons/" + lessonId + "/progress", {
@@ -62,11 +70,18 @@ export default function LessonContent({ blocks, lessonId }: { blocks: Block[]; l
     return true;
   }
 
-  function goNext() {
-    if (currentBlock < blocks.length - 1) {
-      setCurrentBlock(currentBlock + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+  function scrollToBlock(idx: number) {
+    const el = blockRefs.current.get(idx);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  }
+
+  function findNextBlock(currentIdx: number): number {
+    for (let i = currentIdx + 1; i < blocks.length; i++) {
+      if (isAccessible(i)) return i;
+    }
+    return -1;
   }
 
   return (
@@ -76,15 +91,9 @@ export default function LessonContent({ blocks, lessonId }: { blocks: Block[]; l
 
         if (block.type === "text" && block.content) {
           return (
-            <div key={block.id} className={"bg-white rounded-2xl border border-brand-100 p-6 sm:p-8 transition-opacity " + (!accessible ? "opacity-40 pointer-events-none" : "")}>
+            <div key={block.id} ref={el => { if (el) blockRefs.current.set(idx, el); }}
+              className={"bg-white rounded-2xl border border-brand-100 p-6 sm:p-8 transition-opacity " + (!accessible ? "opacity-40 pointer-events-none" : "")}>
               <div className="lesson-content" dangerouslySetInnerHTML={{ __html: block.content }} />
-              {accessible && idx < blocks.length - 1 && (
-                <div className="mt-6 text-center">
-                  <button onClick={goNext} className="px-6 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all text-sm">
-                    Partie suivante {"\u2192"}
-                  </button>
-                </div>
-              )}
             </div>
           );
         }
@@ -93,9 +102,11 @@ export default function LessonContent({ blocks, lessonId }: { blocks: Block[]; l
           const t = activityTypeLabels[block.activity.type] || { emoji: "?", label: block.activity.type };
           const done = completed.has(block.activity.id);
           const needsHigher = block.requireScore && scores.has(block.activity.id) && (scores.get(block.activity.id) || 0) < block.minScore;
+          const nextIdx = findNextBlock(idx);
 
           return (
-            <div key={block.id} className={"rounded-2xl border-2 overflow-hidden transition-all " + (!accessible ? "border-slate-200 opacity-40" : done ? "border-green-300 bg-green-50/30" : "border-brand-200 bg-brand-50/20")}>
+            <div key={block.id} ref={el => { if (el) blockRefs.current.set(idx, el); }}
+              className={"rounded-2xl border-2 overflow-hidden transition-all " + (!accessible ? "border-slate-200 opacity-40" : done ? "border-green-300 bg-green-50/30" : "border-brand-200 bg-brand-50/20")}>
               <div className="px-6 py-3 bg-gradient-to-r from-brand-50 to-accent-50 border-b border-brand-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{t.emoji}</span>
@@ -115,7 +126,7 @@ export default function LessonContent({ blocks, lessonId }: { blocks: Block[]; l
                   </div>
                 ) : needsHigher ? (
                   <div className="text-center py-4 mb-4">
-                    <p className="text-amber-600 text-sm font-medium">Score: {Math.round(scores.get(block.activity.id) || 0)}% — Min: {block.minScore}%</p>
+                    <p className="text-amber-600 text-sm font-medium">Score: {Math.round(scores.get(block.activity.id) || 0)}% - Min: {block.minScore}%</p>
                     <p className="text-slate-400 text-xs mt-1">Reessayez pour atteindre le minimum.</p>
                   </div>
                 ) : null}
@@ -128,9 +139,9 @@ export default function LessonContent({ blocks, lessonId }: { blocks: Block[]; l
                     onEmbeddedComplete={(score) => onComplete(block.id, block.activity!.id, score)}
                   />
                 )}
-                {accessible && done && idx < blocks.length - 1 && (
+                {accessible && done && nextIdx >= 0 && (
                   <div className="mt-4 text-center">
-                    <button onClick={goNext} className="px-6 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all text-sm">
+                    <button onClick={() => scrollToBlock(nextIdx)} className="px-6 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all text-sm">
                       Partie suivante {"\u2192"}
                     </button>
                   </div>
@@ -157,6 +168,17 @@ export default function LessonContent({ blocks, lessonId }: { blocks: Block[]; l
                 </div>
               ) : null;
             })}
+          </div>
+          <div className="mt-6 flex justify-center gap-3">
+            {nextLessonUrl ? (
+              <a href={nextLessonUrl} className="px-6 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all">
+                Lecon suivante {"\u2192"}
+              </a>
+            ) : courseUrl ? (
+              <a href={courseUrl} className="px-6 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all">
+                {"\u2705"} Retour au cours
+              </a>
+            ) : null}
           </div>
         </div>
       )}

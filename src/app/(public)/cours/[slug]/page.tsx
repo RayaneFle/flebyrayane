@@ -68,7 +68,7 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
                 <div className="divide-y divide-slate-50">
                   {s.lessons.map((l, li) => {
                     const status = progressMap.get(l.id) || "not_started";
-                    const icon = status === "completed" ? "\u2705" : status === "in_progress" ? "\ud83d\udd04" : "\u274c";
+                    const icon = !session?.user ? "" : status === "completed" ? "\u2705" : status === "in_progress" ? "\ud83d\udd04" : "\u274c";
                     return (
                       <Link key={l.id} href={"/cours/" + slug + "/lecon/" + l.id} className="flex items-center gap-4 px-6 py-4 hover:bg-brand-50/50 transition-colors">
                         <span className="text-lg shrink-0">{icon}</span>
