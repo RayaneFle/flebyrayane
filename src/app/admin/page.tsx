@@ -31,6 +31,11 @@ export default async function AdminPage() {
   const studentIds = [...new Set(classrooms.flatMap(c => c.members.map(m => m.userId)))];
 
   // Get all activity results for these students
+  const allLessonProgress = await prisma.lessonProgress.findMany({
+    where: { userId: { in: studentIds } },
+    include: { user: { select: { id: true } }, lesson: { select: { title: true } } },
+  });
+
   const allResults = await prisma.activityResult.findMany({
     where: { userId: { in: studentIds } },
     include: {
@@ -75,6 +80,12 @@ export default async function AdminPage() {
         attempts: r.attempts,
       });
       if (r.completed) studentProgress[r.userId].totalDone++;
+    });
+
+  allLessonProgress.forEach(lp => {
+    if (studentProgress[lp.userId]) {
+      studentProgress[lp.userId].lessons.push({ title: lp.lesson.title, status: lp.status });
+    }
     }
   });
 

@@ -30,6 +30,15 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
   const assignedActivityIds = new Set(classroom.activities.map(a => a.activityId));
   const availableActivities = allActivities.filter(a => !assignedActivityIds.has(a.id));
 
+  // Get lesson progress for all students
+  const allLessonProgress = await prisma.lessonProgress.findMany({
+    where: { userId: { in: classroom.members.map(m => m.userId) } },
+    include: { 
+      user: { select: { id: true, name: true } },
+      lesson: { select: { id: true, title: true, section: { select: { title: true, course: { select: { title: true } } } } } },
+    },
+  });
+
   const studentResults = await prisma.activityResult.findMany({
     where: { userId: { in: classroom.members.map(m => m.userId) }, completed: true },
     include: { user: { select: { id: true, name: true } }, activity: { select: { title: true } } },
@@ -117,17 +126,65 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
             </div>
           </details>
 
-          <details className="bg-white rounded-2xl border border-brand-100 overflow-hidden">
+          <details open className="bg-white rounded-2xl border border-brand-100 overflow-hidden">
             <summary className="px-6 py-4 bg-gradient-to-r from-brand-50 to-accent-50 border-b border-brand-100 cursor-pointer font-heading font-bold text-slate-800 select-none">\ud83d\udcca Suivi des eleves</summary>
             <div className="p-6">
-              {studentResults.length === 0 ? <p className="text-sm text-slate-400">Aucune activite.</p> :
-                <div className="space-y-2">{studentResults.map(r => (
-                  <div key={r.id} className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-brand-300 to-accent-400 flex items-center justify-center text-white text-xs font-bold">{r.user.name?.charAt(0)||"?"}</div>
-                    <div className="flex-1 min-w-0"><p className="text-sm font-medium text-slate-700 truncate">{r.user.name}</p><p className="text-xs text-slate-400">{r.activity.title}</p></div>
-                    <span className={`text-sm font-bold ${(r.score||0)>=60?"text-green-600":"text-amber-500"}`}>{Math.round(r.score||0)}%</span>
-                  </div>
-                ))}</div>}
+              {classroom.members.length === 0 ? <p className="text-sm text-slate-400">Aucun eleve.</p> :
+                <div className="space-y-4">{classroom.members.map(m => {
+                  const memberProgress = allLessonProgress.filter(p => p.userId === m.userId);
+                  const memberResults = studentResults.filter(r => r.user.id === m.userId);
+                  const completedLessons = memberProgress.filter(p => p.status === "completed").length;
+                  const inProgressLessons = memberProgress.filter(p => p.status === "in_progress").length;
+                  const avgScore = memberResults.length > 0 ? memberResults.reduce((sum, r) => sum + (r.score || 0), 0) / memberResults.length : 0;
+                  return (
+                    <details key={m.id} className="border border-slate-100 rounded-xl overflow-hidden">
+                      <summary className="px-4 py-3 cursor-pointer hover:bg-brand-50/30 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-300 to-accent-400 flex items-center justify-center text-white text-xs font-bold">{m.user.name?.charAt(0)||"?"}</div>
+                          <div><p className="text-sm font-medium text-slate-800">{m.user.name}</p><p className="text-xs text-slate-400">{m.user.email}</p></div>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs">
+                          <span className="text-green-600 font-bold">\u2705 {completedLessons}</span>
+                          <span className="text-amber-500 font-bold">\ud83d\udd04 {inProgressLessons}</span>
+                          <span className="text-brand-600 font-bold">{Math.round(avgScore)}%</span>
+                        </div>
+                      </summary>
+                      <div className="px-4 pb-4 border-t border-slate-50">
+                        {memberProgress.length === 0 && memberResults.length === 0 ? (
+                          <p className="text-xs text-slate-400 py-3">Aucune activite.</p>
+                        ) : (
+                          <div className="mt-3 space-y-3">
+                            {memberProgress.length > 0 && (
+                              <div>
+                                <p className="text-xs font-bold text-slate-500 mb-2">Lecons :</p>
+                                <div className="space-y-1">{memberProgress.map(p => (
+                                  <div key={p.id} className="flex items-center justify-between py-1.5 px-3 bg-slate-50 rounded-lg">
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-slate-700 truncate">{p.lesson.title}</p>
+                                      <p className="text-[10px] text-slate-400">{p.lesson.section.course.title} &gt; {p.lesson.section.title}</p>
+                                    </div>
+                                    <span className="text-sm shrink-0 ml-2">{p.status === "completed" ? "\u2705" : p.status === "in_progress" ? "\ud83d\udd04" : "\u274c"}</span>
+                                  </div>
+                                ))}</div>
+                              </div>
+                            )}
+                            {memberResults.length > 0 && (
+                              <div>
+                                <p className="text-xs font-bold text-slate-500 mb-2">Activites :</p>
+                                <div className="space-y-1">{memberResults.map(r => (
+                                  <div key={r.id} className="flex items-center justify-between py-1.5 px-3 bg-slate-50 rounded-lg">
+                                    <p className="text-xs text-slate-700 truncate flex-1">{r.activity.title}</p>
+                                    <span className={"text-xs font-bold ml-2 " + ((r.score||0) >= 60 ? "text-green-600" : "text-amber-500")}>{Math.round(r.score||0)}%</span>
+                                  </div>
+                                ))}</div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  );
+                })}</div>}
             </div>
           </details>
         </div>
