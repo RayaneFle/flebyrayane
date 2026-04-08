@@ -235,19 +235,50 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                 <SubclassManager classroomId={classroom.id} members={classroom.members as any} subclasses={classroom.subclasses} />
               </div>
             </details>
-            <details className="border border-slate-100 rounded-xl overflow-hidden">
-              <summary className="px-4 py-2.5 cursor-pointer text-xs font-bold text-slate-500 hover:bg-slate-50">Liste des eleves ({classroom.members.length})</summary>
-              <div className="px-3 pb-3 max-h-60 overflow-y-auto">
-                {classroom.members.length === 0 ? <p className="text-xs text-slate-400 py-2">Aucun eleve.</p> :
-                  <div className="space-y-0.5 mt-1">{classroom.members.map(m => (
-                    <div key={m.id} className="flex items-center gap-2 py-1 px-2 hover:bg-slate-50 rounded">
-                      <div className="w-5 h-5 rounded-full bg-brand-200 flex items-center justify-center text-brand-700 text-[9px] font-bold shrink-0">{m.user.name?.charAt(0) || "?"}</div>
-                      <p className="text-[11px] text-slate-700 truncate flex-1">{m.user.name}</p>
-                      <RemoveMemberBtn classroomId={classroom.id} userId={m.userId} />
+            <div className="space-y-2">
+              {(classroom.subclasses as any[]).map((sc: any) => {
+                const scMembers = classroom.members.filter((m: any) => m.subclassId === sc.id);
+                if (scMembers.length === 0) return null;
+                return (
+                  <details key={sc.id} className="border border-brand-100 rounded-xl overflow-hidden">
+                    <summary className="px-4 py-2 cursor-pointer bg-brand-50/50 hover:bg-brand-50 flex items-center justify-between">
+                      <span className="text-xs font-bold text-brand-800">{sc.name}</span>
+                      <span className="text-[10px] text-slate-400">{scMembers.length} eleve{scMembers.length > 1 ? "s" : ""}</span>
+                    </summary>
+                    <div className="px-3 pb-2">
+                      <div className="space-y-0.5 mt-1">{scMembers.map((m: any) => (
+                        <div key={m.id} className="flex items-center gap-2 py-1 px-2 hover:bg-slate-50 rounded">
+                          <div className="w-5 h-5 rounded-full bg-brand-200 flex items-center justify-center text-brand-700 text-[9px] font-bold shrink-0">{m.user.name?.charAt(0) || "?"}</div>
+                          <p className="text-[11px] text-slate-700 truncate flex-1">{m.user.name}</p>
+                          <RemoveMemberBtn classroomId={classroom.id} userId={m.userId} />
+                        </div>
+                      ))}</div>
                     </div>
-                  ))}</div>}
-              </div>
-            </details>
+                  </details>
+                );
+              })}
+              {(() => {
+                const unassigned = classroom.members.filter((m: any) => !(classroom.subclasses as any[]).some((sc: any) => sc.id === m.subclassId));
+                if (unassigned.length === 0) return null;
+                return (
+                  <details className="border border-slate-200 rounded-xl overflow-hidden">
+                    <summary className="px-4 py-2 cursor-pointer bg-slate-50/50 hover:bg-slate-50 flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-500">Non assignes</span>
+                      <span className="text-[10px] text-slate-400">{unassigned.length} eleve{unassigned.length > 1 ? "s" : ""}</span>
+                    </summary>
+                    <div className="px-3 pb-2">
+                      <div className="space-y-0.5 mt-1">{unassigned.map((m: any) => (
+                        <div key={m.id} className="flex items-center gap-2 py-1 px-2 hover:bg-slate-50 rounded">
+                          <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-[9px] font-bold shrink-0">{m.user.name?.charAt(0) || "?"}</div>
+                          <p className="text-[11px] text-slate-700 truncate flex-1">{m.user.name}</p>
+                          <RemoveMemberBtn classroomId={classroom.id} userId={m.userId} />
+                        </div>
+                      ))}</div>
+                    </div>
+                  </details>
+                );
+              })()}
+            </div>
             <div className="mt-4 p-3 bg-brand-50 rounded-xl text-center">
               <p className="text-xs text-slate-500">Code à partager :</p>
               <p className="font-mono font-bold text-lg text-brand-700 tracking-widest">{classroom.code}</p>
