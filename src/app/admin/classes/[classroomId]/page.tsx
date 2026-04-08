@@ -58,7 +58,10 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
           <h1 className="font-heading text-2xl font-bold text-slate-900">{classroom.name}</h1>
           {classroom.description && <p className="text-slate-400 mt-1">{classroom.description}</p>}
         </div>
-        <span className="px-4 py-2 bg-brand-100 text-brand-700 font-mono font-bold text-lg rounded-xl tracking-widest">{classroom.code}</span>
+        <div className="flex items-center gap-3">
+          <a href={"/api/classrooms/" + classroom.id + "/export"} download className="px-4 py-2 bg-green-100 text-green-700 font-bold text-sm rounded-xl hover:bg-green-200 transition-colors">📥 Exporter Excel</a>
+          <span className="px-4 py-2 bg-brand-100 text-brand-700 font-mono font-bold text-lg rounded-xl tracking-widest">{classroom.code}</span>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
