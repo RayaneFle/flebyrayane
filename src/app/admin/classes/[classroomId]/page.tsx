@@ -160,9 +160,9 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                           <span className="bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg font-bold">Moy. {Math.round(avgScore)}%</span>
                         </div>
                       </summary>
-                      <div className="px-4 pb-4 border-t border-slate-50 mt-2">
+                      <div className="px-4 py-4 bg-white border-t border-slate-100">
                         {allLessonsForTracking.length === 0 && dedupedResults.length === 0 ? (
-                          <p className="text-xs text-slate-400 py-3">Aucun cours assigné.</p>
+                          <p className="text-xs text-slate-400 py-3 text-center italic">Aucune progression enregistree.</p>
                         ) : (
                           <div className="space-y-3">
                             {allLessonsForTracking.length > 0 && (() => {
@@ -173,17 +173,20 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                                 grouped[key].push(l);
                               });
                               return (
-                              <div>
-                                <h4 className="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-200">Progression des lecons</h4>
+                              <details open className="group">
+                                <summary className="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-200 cursor-pointer flex items-center justify-between"><span>Progression des lecons</span><span className="text-[10px] text-slate-400 font-normal group-open:hidden">Cliquer pour voir</span></summary>
                                 <div className="space-y-4">{Object.entries(grouped).map(([section, lessons]) => {
                                   const sectionDone = lessons.filter(l => memberProgress.find(p => p.lessonId === l.id && p.status === "completed")).length;
                                   return (
-                                  <div key={section} className="bg-slate-50 rounded-xl p-3">
-                                    <div className="flex items-center justify-between mb-2">
-                                      <p className="text-xs font-bold text-brand-700">{section}</p>
-                                      <span className="text-[10px] text-slate-400 font-medium">{sectionDone}/{lessons.length}</span>
-                                    </div>
-                                    <div className="space-y-1">{lessons.map(l => {
+                                  <details key={section} className="bg-gradient-to-r from-slate-50 to-brand-50/30 rounded-xl overflow-hidden border border-slate-100">
+                                    <summary className="flex items-center justify-between px-4 py-2.5 cursor-pointer hover:bg-brand-50/50">
+                                      <p className="text-xs font-bold text-brand-800">{section}</p>
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden"><div className="h-full bg-green-500 rounded-full" style={{width: (sectionDone/lessons.length*100)+"%"}} /></div>
+                                        <span className="text-[10px] text-slate-500 font-bold w-8 text-right">{sectionDone}/{lessons.length}</span>
+                                      </div>
+                                    </summary>
+                                    <div className="px-3 pb-3 space-y-1">{lessons.map(l => {
                                       const prog = memberProgress.find(p => p.lessonId === l.id);
                                       const st = prog ? prog.status : "not_started";
                                       return (
@@ -193,20 +196,20 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                                         </div>
                                       );
                                     })}</div>
-                                  </div>);
+                                  </details>);
                                 })}</div>
-                              </div>);})()
+                              </details>);})()
                             }
                             {dedupedResults.length > 0 && (
-                              <div>
-                                <h4 className="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-200">Activites ({dedupedResults.length})</h4>
+                              <details className="group">
+                                <summary className="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-200 cursor-pointer flex items-center justify-between"><span>Activites ({dedupedResults.length})</span><span className="text-[10px] text-slate-400 font-normal group-open:hidden">Cliquer pour voir</span></summary>
                                 <div className="bg-slate-50 rounded-xl p-3 space-y-1">{dedupedResults.map(r => (
                                   <div key={r.id} className="flex items-center justify-between py-1.5 px-3 bg-white rounded-lg">
                                     <p className="text-xs text-slate-700 truncate flex-1"><span className="mr-1">{(activityTypeLabels[r.activity.type] || {emoji:"?"}).emoji}</span>{r.activity.title}</p>
                                     <span className={"text-[10px] font-bold ml-2 px-2 py-0.5 rounded-full " + ((r.score || 0) >= 80 ? "bg-green-500 text-white" : (r.score || 0) >= 50 ? "bg-amber-400 text-white" : "bg-red-400 text-white")}>{Math.round(r.score || 0)}%</span>
                                   </div>
                                 ))}</div>
-                              </div>
+                              </details>
                             )}
                           </div>
                         )}
