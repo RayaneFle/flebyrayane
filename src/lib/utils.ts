@@ -1,14 +1,14 @@
 export const activityTypeLabels: Record<string, { emoji: string; label: string }> = {
-  QCM: { emoji: "\ud83d\udcdd", label: "QCM" },
-  TRUE_FALSE: { emoji: "\u2705", label: "Vrai ou Faux" },
-  FILL_BLANKS: { emoji: "\u270f\ufe0f", label: "Texte a trous" },
-  MATCHING: { emoji: "\ud83d\udd17", label: "Appariement" },
-  MEMORY: { emoji: "\ud83c\udccf", label: "Memory" },
-  HANGMAN: { emoji: "\ud83d\udc80", label: "Pendu" },
-  DRAG_DROP: { emoji: "\ud83c\udfaf", label: "Glisser-deposer" },
-  SORTING: { emoji: "\ud83d\udcca", label: "Classement" },
-  CATEGORIZE: { emoji: "\ud83d\udcc2", label: "Categorisation" },
-  WORD_ORDER: { emoji: "\ud83d\udd24", label: "Remettre dans l'ordre" },
+  QCM: { emoji: "📝", label: "QCM" },
+  TRUE_FALSE: { emoji: "✅", label: "Vrai ou Faux" },
+  FILL_BLANKS: { emoji: "✏️", label: "Texte à trous" },
+  MATCHING: { emoji: "🔗", label: "Appariement" },
+  MEMORY: { emoji: "🃏", label: "Memory" },
+  HANGMAN: { emoji: "💀", label: "Pendu" },
+  DRAG_DROP: { emoji: "🎯", label: "Glisser-déposer" },
+  SORTING: { emoji: "📊", label: "Classement" },
+  CATEGORIZE: { emoji: "📂", label: "Catégorisation" },
+  WORD_ORDER: { emoji: "🔤", label: "Remettre dans l'ordre" },
 };
 
 export const levelColors: Record<string, string> = {
