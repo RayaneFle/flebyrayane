@@ -72,3 +72,13 @@ h1,h2,h3,h4,h5,h6 { font-family: "Outfit", system-ui, sans-serif; letter-spacing
 .lesson-content img { max-width:100%; border-radius:0.5rem; margin:1rem 0 }
 .lesson-content a { color:#0d9488; text-decoration:underline } .lesson-content a:hover { color:#0f766e }
 .lesson-content iframe { width:100%; aspect-ratio:16/9; border-radius:0.5rem; margin:1rem 0 }
+
+/* B11: Fix table overflow on mobile */
+.lesson-content table { min-width: 100%; }
+.lesson-content .tableWrapper,
+.lesson-content table { overflow-x: auto; display: block; max-width: 100%; }
+.lesson-content td, .lesson-content th { min-width: 80px; white-space: nowrap; }
+.tiptap-editor .ProseMirror table { overflow-x: auto; display: block; max-width: 100%; }
+.prose table { display: block; overflow-x: auto; max-width: 100%; }
+.prose img { max-width: 100%; height: auto; }
+.lesson-content img { max-width: 100%; height: auto; border-radius: 0.5rem; }
