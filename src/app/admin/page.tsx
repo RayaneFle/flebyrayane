@@ -52,12 +52,12 @@ export default async function AdminPage() {
   });
 
   // Build student progress map
-  const studentProgress: Record<string, { name: string; email: string; courses: any[]; activities: any[]; avgScore: number; totalDone: number }> = {};
+  const studentProgress: Record<string, { name: string; email: string; courses: any[]; activities: any[]; avgScore: number; totalDone: number; lessons: any[] }> = {};
   
   classrooms.forEach(cls => {
     cls.members.forEach(m => {
       if (!studentProgress[m.userId]) {
-        studentProgress[m.userId] = { name: m.user.name || "?", email: m.user.email || "", courses: [], activities: [], avgScore: 0, totalDone: 0 };
+        studentProgress[m.userId] = { name: m.user.name || "?", email: m.user.email || "", courses: [], activities: [], avgScore: 0, totalDone: 0, lessons: [] };
       }
     });
   });
@@ -85,7 +85,6 @@ export default async function AdminPage() {
   allLessonProgress.forEach(lp => {
     if (studentProgress[lp.userId]) {
       studentProgress[lp.userId].lessons.push({ title: lp.lesson.title, status: lp.status });
-    }
     }
   });
 
