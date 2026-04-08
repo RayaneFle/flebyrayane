@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 const KB = [["A","Z","E","R","T","Y","U","I","O","P"],["Q","S","D","F","G","H","J","K","L","M"],["W","X","C","V","B","N","É","È","Ê","Ç"]];
 const MAX = 7;
 
-export default function HangmanGame({ config, onComplete }: { config: any; onComplete: (s: number) => void }) {
+export default function HangmanGame({ config, onComplete }: { config: any; onComplete: (s: number, details?: any[]) => void }) {
   const [wi, setWi] = useState(0);
   const [guessed, setGuessed] = useState<Set<string>>(new Set());
   const [won, setWon] = useState(0);
@@ -19,7 +19,7 @@ export default function HangmanGame({ config, onComplete }: { config: any; onCom
   function guess(l: string) { if (over || guessed.has(l)) return; setGuessed(p => new Set(p).add(l)); }
   function next() {
     const w = found ? won + 1 : won; setWon(w);
-    if (isLast) onComplete((w / config.words.length) * 100); else { setWi(i => i + 1); setGuessed(new Set()); }
+    if (isLast) { const details = config.words.map((wd: any, i: number) => ({ question: wd.hint || "Mot " + (i+1), userAnswer: i < wi ? "Trouve" : found ? "Trouve" : "Perdu", correctAnswer: wd.word, isCorrect: i < wi ? true : found, imageUrl: wd.imageUrl })); onComplete((w / config.words.length) * 100, details); } else { setWi(i => i + 1); setGuessed(new Set()); }
   }
 
   const parts = [

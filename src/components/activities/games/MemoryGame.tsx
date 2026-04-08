@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-export default function MemoryGame({ config, onComplete }: { config: any; onComplete: (s: number) => void }) {
+export default function MemoryGame({ config, onComplete }: { config: any; onComplete: (s: number, details?: any[]) => void }) {
   const [cards, setCards] = useState<any[]>([]);
   const [flipped, setFlipped] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
@@ -33,7 +33,7 @@ export default function MemoryGame({ config, onComplete }: { config: any; onComp
           setCards(p => p.map(c => c.pairId === a.pairId ? { ...c, matched: true } : c));
           setFlipped([]);
           const nm = matched+1; setMatched(nm);
-          if (nm === total) { const r = Math.max(0, 1-(moves+1-total)/(total*2)); onComplete(Math.round(r*100)); }
+          if (nm === total) { const r = Math.max(0, 1-(moves+1-total)/(total*2)); const details = config.pairs.map((p: any) => ({ question: p.front || '(image)', userAnswer: p.back || '(image)', correctAnswer: p.back || '(image)', isCorrect: true })); onComplete(Math.round(r*100), details); }
         }, 500);
       } else {
         setTimeout(() => { setCards(p => p.map(c => nf.includes(c.id) ? { ...c, flipped: false } : c)); setFlipped([]); }, 1000);

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 
-export default function CategorizeGame({ config, onComplete }: { config: any; onComplete: (s: number) => void }) {
+export default function CategorizeGame({ config, onComplete }: { config: any; onComplete: (s: number, details?: any[]) => void }) {
   const [placements, setPlacements] = useState<Map<string, string>>(new Map());
   const [dragging, setDragging] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -24,7 +24,8 @@ export default function CategorizeGame({ config, onComplete }: { config: any; on
     const r = new Map<string, boolean>();
     config.items.forEach((i: any) => r.set(key(i), placements.get(key(i)) === i.category));
     setResults(r); setChecked(true);
-    setTimeout(() => onComplete((Array.from(r.values()).filter(Boolean).length / config.items.length) * 100), 2000);
+    const details = config.items.map((i: any) => ({ question: i.text || i.imageUrl || "?", userAnswer: placements.get(key(i)) || "(non place)", correctAnswer: i.category, isCorrect: r.get(key(i)) || false, imageUrl: i.imageUrl }));
+    onComplete((Array.from(r.values()).filter(Boolean).length / config.items.length) * 100, details);
   }
 
   return (

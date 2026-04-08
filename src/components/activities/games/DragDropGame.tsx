@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 
-export default function DragDropGame({ config, onComplete }: { config: any; onComplete: (s: number) => void }) {
+export default function DragDropGame({ config, onComplete }: { config: any; onComplete: (s: number, details?: any[]) => void }) {
   // Support 2 modes: pairs (1-to-1) or zones (many-to-1)
   const zones = config.zones || config.pairs?.reduce((acc: any[], p: any) => {
     const existing = acc.find((z: any) => z.name === p.target);
@@ -34,7 +34,8 @@ export default function DragDropGame({ config, onComplete }: { config: any; onCo
     const r = new Map<string, boolean>();
     allItems.forEach((i: any) => r.set(key(i), placements.get(key(i)) === i.correctZone));
     setResults(r); setChecked(true);
-    setTimeout(() => onComplete((Array.from(r.values()).filter(Boolean).length / allItems.length) * 100), 2000);
+    const details = allItems.map((i: any) => ({ question: i.text || i.imageUrl || "?", userAnswer: placements.get(key(i)) || "(non place)", correctAnswer: i.correctZone, isCorrect: r.get(key(i)) || false, imageUrl: i.imageUrl }));
+    onComplete((Array.from(r.values()).filter(Boolean).length / allItems.length) * 100, details);
   }
 
   const colors = ["from-teal-50 to-teal-100 border-teal-200","from-cyan-50 to-cyan-100 border-cyan-200","from-emerald-50 to-emerald-100 border-emerald-200","from-sky-50 to-sky-100 border-sky-200","from-lime-50 to-lime-100 border-lime-200"];

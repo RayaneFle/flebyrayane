@@ -1,7 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 
-export default function MatchingGame({ config, onComplete }: { config: any; onComplete: (s: number) => void }) {
+export default function MatchingGame({ config, onComplete }: { config: any; onComplete: (s: number, details?: any[]) => void }) {
   const left = useMemo(() => [...config.pairs].sort(() => Math.random() - 0.5), [config.pairs]);
   const right = useMemo(() => [...config.pairs].sort(() => Math.random() - 0.5), [config.pairs]);
   const [selLeft, setSelLeft] = useState<string | null>(null);
@@ -15,7 +15,7 @@ export default function MatchingGame({ config, onComplete }: { config: any; onCo
     if (config.pairs.some((p: any) => p.left === selLeft && p.right === r)) {
       const nm = new Map(matches); nm.set(selLeft, r); setMatches(nm);
       const nd = new Set(done); nd.add(selLeft); nd.add(r); setDone(nd);
-      setSelLeft(null); if (nm.size === config.pairs.length) setTimeout(() => onComplete(100), 500);
+      setSelLeft(null); if (nm.size === config.pairs.length) { const details = config.pairs.map((p: any) => ({ question: p.left || "(image)", userAnswer: p.right || "(image)", correctAnswer: p.right || "(image)", isCorrect: true })); setTimeout(() => onComplete(100, details), 500); }
     } else { setWrong([selLeft, r]); setTimeout(() => { setWrong(null); setSelLeft(null); }, 800); }
   }
 
