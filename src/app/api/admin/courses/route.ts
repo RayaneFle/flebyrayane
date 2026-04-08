@@ -7,6 +7,7 @@ import { slugify, generateClassCode } from "@/lib/utils";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
+  if (!session?.user) return NextResponse.json([]);
   const courses = await prisma.course.findMany({
     where: { authorId: session.user.id },
     select: { id: true, title: true, sections: { select: { id: true, title: true }, orderBy: { position: "asc" } } },
