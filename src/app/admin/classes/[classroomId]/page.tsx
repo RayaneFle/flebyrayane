@@ -37,7 +37,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
 
   const studentResults = await prisma.activityResult.findMany({
     where: { userId: { in: classroom.members.map(m => m.userId) }, completed: true },
-    include: { user: { select: { id: true, name: true } }, activity: { select: { id: true, title: true } } },
+    include: { user: { select: { id: true, name: true } }, activity: { select: { id: true, title: true, type: true } } },
   });
 
   const assignedCourseLessons = await prisma.lesson.findMany({
@@ -202,7 +202,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                                 <h4 className="text-sm font-bold text-slate-800 mb-3 pb-2 border-b border-slate-200">Activites ({dedupedResults.length})</h4>
                                 <div className="bg-slate-50 rounded-xl p-3 space-y-1">{dedupedResults.map(r => (
                                   <div key={r.id} className="flex items-center justify-between py-1.5 px-3 bg-white rounded-lg">
-                                    <p className="text-xs text-slate-700 truncate flex-1">{r.activity.title}</p>
+                                    <p className="text-xs text-slate-700 truncate flex-1"><span className="mr-1">{(activityTypeLabels[r.activity.type] || {emoji:"?"}).emoji}</span>{r.activity.title}</p>
                                     <span className={"text-[10px] font-bold ml-2 px-2 py-0.5 rounded-full " + ((r.score || 0) >= 80 ? "bg-green-500 text-white" : (r.score || 0) >= 50 ? "bg-amber-400 text-white" : "bg-red-400 text-white")}>{Math.round(r.score || 0)}%</span>
                                   </div>
                                 ))}</div>
