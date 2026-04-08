@@ -8,7 +8,7 @@ export default async function AdminPage() {
   const uid = session?.user?.id || "";
   const isAdmin = session?.user?.role === "admin";
 
-  const [myActivities, myCourses, myClassrooms, totalUsers, totalResults, recentCourses, recentResults] = await Promise.all([
+  const [myActivities, myCourses, myClassrooms, totalUsers, totalResults, recentResults] = await Promise.all([
     prisma.activity.count({ where: { createdById: uid } }),
     prisma.course.count({ where: { authorId: uid } }),
     prisma.classroom.findMany({
@@ -22,22 +22,23 @@ export default async function AdminPage() {
     }),
     isAdmin ? prisma.user.count() : Promise.resolve(0),
     prisma.activityResult.count({ where: { activity: { createdById: uid } } }),
-    prisma.course.findMany({
-      where: { authorId: uid },
-      select: {
-        id: true, title: true, slug: true, updatedAt: true,
-        sections: { select: { id: true, title: true, _count: { select: { lessons: true } } }, orderBy: { position: "asc" } },
-      },
-      orderBy: { updatedAt: "desc" },
-      take: 5,
-    }),
-    prisma.activityResult.findMany({
+prisma.activityResult.findMany({
       where: { activity: { createdById: uid }, completed: true },
       include: { user: { select: { name: true } }, activity: { select: { title: true, type: true } } },
       orderBy: { completedAt: "desc" },
       take: 10,
     }),
   ]);
+
+  const recentCourses = await prisma.course.findMany({
+    where: { authorId: uid },
+    select: {
+      id: true, title: true, slug: true,
+      sections: { select: { id: true, title: true }, orderBy: { position: "asc" } },
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 5,
+  });
 
   const totalStudents = new Set(myClassrooms.flatMap(c => c.members.map(m => m.userId))).size;
   const avgScore = recentResults.length > 0
@@ -84,7 +85,7 @@ export default async function AdminPage() {
                 <p className="text-[10px] text-slate-400 mt-1">{c.sections.length} section{c.sections.length > 1 ? "s" : ""}</p>
                 <div className="mt-2 space-y-0.5">
                   {c.sections.slice(0, 3).map((s: any) => (
-                    <Link key={s.id} href={"/admin/cours/" + c.id + "/sections/" + s.id + "/lessons/new"} onClick={(e: any) => e.stopPropagation()}
+                    <Link key={s.id} href={"/admin/cours/" + c.id + "/sections/" + s.id + "/lessons/new"}
                       className="flex items-center justify-between text-[10px] py-1 px-2 rounded bg-slate-50 hover:bg-brand-100 transition-colors group">
                       <span className="text-slate-500 truncate">{s.title}</span>
                       <span className="text-brand-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1">+ Lecon</span>

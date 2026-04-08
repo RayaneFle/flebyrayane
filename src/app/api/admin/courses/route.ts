@@ -4,6 +4,17 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify, generateClassCode } from "@/lib/utils";
 
+
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  const courses = await prisma.course.findMany({
+    where: { authorId: session.user.id },
+    select: { id: true, title: true, sections: { select: { id: true, title: true }, orderBy: { position: "asc" } } },
+    orderBy: { updatedAt: "desc" },
+  });
+  return NextResponse.json(courses);
+}
+
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session || (session.user.role !== "admin" && session.user.role !== "teacher")) return NextResponse.json({ message: "Non autorisé." }, { status: 401 });
