@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import DuplicateActivityBtn from "./DuplicateActivityBtn";
 import { activityTypeLabels, levelColors } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";

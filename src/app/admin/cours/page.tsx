@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import DuplicateCourseBtn from "./DuplicateCourseBtn";
 import { levelColors } from "@/lib/utils";
 import DeleteCourseInline from "./DeleteCourseInline";
 import { getServerSession } from "next-auth";
