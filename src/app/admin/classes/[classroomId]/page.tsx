@@ -154,11 +154,10 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-300 to-accent-400 flex items-center justify-center text-white text-xs font-bold">{m.user.name?.charAt(0) || "?"}</div>
                           <div><p className="text-sm font-medium text-slate-800">{m.user.name}</p><p className="text-xs text-slate-400">{m.user.email}</p></div>
                         </div>
-                        <div className="flex items-center gap-3 text-xs">
-                          <span className="text-green-600 font-bold">{completedCount}/{allLessonsForTracking.length} faites</span>
-                          <span className="text-amber-500 font-bold">{inProgressCount} en cours</span>
-                          <span className="text-red-400 font-bold">{notStartedCount} restantes</span>
-                          <span className="text-brand-600 font-bold">{Math.round(avgScore)}% moy.</span>
+                        <div className="flex items-center gap-2 text-xs flex-wrap">
+                          <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-lg font-bold">{completedCount}/{allLessonsForTracking.length}</span>
+                          {inProgressCount > 0 && <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-lg font-bold">{inProgressCount} en cours</span>}
+                          <span className="bg-brand-100 text-brand-700 px-2 py-0.5 rounded-lg font-bold">{Math.round(avgScore)}%</span>
                         </div>
                       </summary>
                       <div className="px-4 pb-4 border-t border-slate-50 mt-2">
@@ -166,31 +165,40 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                           <p className="text-xs text-slate-400 py-3">Aucun cours assigné.</p>
                         ) : (
                           <div className="space-y-3">
-                            {allLessonsForTracking.length > 0 && (
+                            {allLessonsForTracking.length > 0 && (() => {
+                              const grouped: Record<string, typeof allLessonsForTracking> = {};
+                              allLessonsForTracking.forEach(l => {
+                                const key = l.courseTitle + " > " + l.sectionTitle;
+                                if (!grouped[key]) grouped[key] = [];
+                                grouped[key].push(l);
+                              });
+                              return (
                               <div>
-                                <p className="text-xs font-bold text-slate-500 mb-2">Leçons :</p>
-                                <div className="space-y-1">{allLessonsForTracking.map(l => {
-                                  const prog = memberProgress.find(p => p.lessonId === l.id);
-                                  const st = prog ? prog.status : "not_started";
-                                  return (
-                                    <div key={l.id} className="flex items-center justify-between py-1.5 px-3 bg-slate-50 rounded-lg">
-                                      <div className="flex-1 min-w-0">
-                                        <p className="text-xs text-slate-700 truncate">{l.title}</p>
-                                        <p className="text-[10px] text-slate-400">{l.courseTitle} &gt; {l.sectionTitle}</p>
-                                      </div>
-                                      <span className={"text-xs font-bold shrink-0 ml-2 px-2 py-0.5 rounded-lg " + (st === "completed" ? "bg-green-100 text-green-700" : st === "in_progress" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700")}>{st === "completed" ? "Faite" : st === "in_progress" ? "En cours" : "Non faite"}</span>
-                                    </div>
-                                  );
-                                })}</div>
-                              </div>
-                            )}
+                                <p className="text-xs font-bold text-slate-500 mb-2">Progression des lecons :</p>
+                                <div className="space-y-3">{Object.entries(grouped).map(([section, lessons]) => (
+                                  <div key={section}>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">{section}</p>
+                                    <div className="space-y-0.5">{lessons.map(l => {
+                                      const prog = memberProgress.find(p => p.lessonId === l.id);
+                                      const st = prog ? prog.status : "not_started";
+                                      return (
+                                        <div key={l.id} className="flex items-center justify-between py-1 px-3 rounded-lg hover:bg-slate-50">
+                                          <p className="text-xs text-slate-700 truncate flex-1">{l.title}</p>
+                                          <span className={"text-[10px] font-bold shrink-0 ml-2 px-2 py-0.5 rounded " + (st === "completed" ? "bg-green-100 text-green-700" : st === "in_progress" ? "bg-amber-100 text-amber-700" : "bg-red-50 text-red-400")}>{st === "completed" ? "Faite" : st === "in_progress" ? "En cours" : "Non faite"}</span>
+                                        </div>
+                                      );
+                                    })}</div>
+                                  </div>
+                                ))}</div>
+                              </div>);})()
+                            }
                             {dedupedResults.length > 0 && (
                               <div>
-                                <p className="text-xs font-bold text-slate-500 mb-2">Activités ({dedupedResults.length}) :</p>
-                                <div className="space-y-1">{dedupedResults.map(r => (
-                                  <div key={r.id} className="flex items-center justify-between py-1.5 px-3 bg-slate-50 rounded-lg">
+                                <p className="text-xs font-bold text-slate-500 mb-2">Activites ({dedupedResults.length}) :</p>
+                                <div className="space-y-0.5">{dedupedResults.map(r => (
+                                  <div key={r.id} className="flex items-center justify-between py-1 px-3 rounded-lg hover:bg-slate-50">
                                     <p className="text-xs text-slate-700 truncate flex-1">{r.activity.title}</p>
-                                    <span className={"text-xs font-bold ml-2 " + ((r.score || 0) >= 60 ? "text-green-600" : "text-amber-500")}>{Math.round(r.score || 0)}%</span>
+                                    <span className={"text-[10px] font-bold ml-2 px-2 py-0.5 rounded " + ((r.score || 0) >= 80 ? "bg-green-100 text-green-700" : (r.score || 0) >= 50 ? "bg-amber-100 text-amber-700" : "bg-red-50 text-red-500")}>{Math.round(r.score || 0)}%</span>
                                   </div>
                                 ))}</div>
                               </div>
