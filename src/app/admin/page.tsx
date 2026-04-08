@@ -8,7 +8,7 @@ export default async function AdminPage() {
   const uid = session?.user?.id || "";
   const isAdmin = session?.user?.role === "admin";
 
-  const [myActivities, myCourses, myClassrooms, totalUsers, totalResults, recentResults] = await Promise.all([
+  const [myActivities, myCourses, myClassrooms, totalUsers, totalResults, recentCourses, recentResults] = await Promise.all([
     prisma.activity.count({ where: { createdById: uid } }),
     prisma.course.count({ where: { authorId: uid } }),
     prisma.classroom.findMany({
@@ -22,6 +22,15 @@ export default async function AdminPage() {
     }),
     isAdmin ? prisma.user.count() : Promise.resolve(0),
     prisma.activityResult.count({ where: { activity: { createdById: uid } } }),
+    prisma.course.findMany({
+      where: { authorId: uid },
+      select: {
+        id: true, title: true, slug: true, updatedAt: true,
+        sections: { select: { id: true, title: true, _count: { select: { lessons: true } } }, orderBy: { position: "asc" } },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 5,
+    }),
     prisma.activityResult.findMany({
       where: { activity: { createdById: uid }, completed: true },
       include: { user: { select: { name: true } }, activity: { select: { title: true, type: true } } },
@@ -63,6 +72,30 @@ export default async function AdminPage() {
           <p className="font-heading text-3xl font-bold mt-1">{avgScore}%</p>
         </div>
       </div>
+
+      {/* Quick Course Access */}
+      {recentCourses.length > 0 && (
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
+          <h2 className="font-heading font-bold text-slate-800 mb-4">Acces rapide - Mes cours</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {recentCourses.map((c: any) => (
+              <Link key={c.id} href={"/admin/cours/" + c.id} className="block p-4 rounded-xl border border-slate-100 hover:border-brand-300 hover:bg-brand-50/30 transition-all">
+                <p className="text-sm font-bold text-slate-800 truncate">{c.title}</p>
+                <p className="text-[10px] text-slate-400 mt-1">{c.sections.length} section{c.sections.length > 1 ? "s" : ""}</p>
+                <div className="mt-2 space-y-0.5">
+                  {c.sections.slice(0, 3).map((s: any) => (
+                    <Link key={s.id} href={"/admin/cours/" + c.id + "/sections/" + s.id + "/lessons/new"} onClick={(e: any) => e.stopPropagation()}
+                      className="flex items-center justify-between text-[10px] py-1 px-2 rounded bg-slate-50 hover:bg-brand-100 transition-colors group">
+                      <span className="text-slate-500 truncate">{s.title}</span>
+                      <span className="text-brand-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1">+ Lecon</span>
+                    </Link>
+                  ))}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
         {/* Quick Actions */}

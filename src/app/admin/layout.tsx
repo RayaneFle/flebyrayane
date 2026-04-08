@@ -1,3 +1,4 @@
+import AdminFAB from "@/components/AdminFAB";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -21,12 +22,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               {session.user.role === "admin" && <SL href="/admin/utilisateurs" e="👥">Utilisateurs</SL>}
             </nav>
           </div></aside>
-          <main className="flex-1 min-w-0">{children}</main>
+          <main className="flex-1 min-w-0">{children}<AdminFAB /></main>
         </div>
       </div>
     </div>
   );
 }
 function SL({ href, e, children }: { href: string; e: string; children: React.ReactNode }) {
-  return <Link href={href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-brand-50 hover:text-brand-700 transition-colors"><span>{e}</span>{children}</Link>;
+  return <Link href={href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-brand-50 hover:text-brand-700 transition-colors"><span>{e}</span>{children}<AdminFAB /></Link>;
 }
