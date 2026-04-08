@@ -51,7 +51,7 @@ export default function NewLessonPage() {
   function loadActivities() { fetch("/api/activities").then(r => r.json()).then(setActivities).catch(() => {}); }
 
   const gameTypes = [
-    { key:"QCM", label:"QCM", emoji:"\ud83d\udcdd", def:{ questions:[{question:"",options:["","","",""],correctIndex:0,explanation:""}] } },
+    { key:"QCM", label:"QCM", emoji:"\ud83d\udcdd", def:{ questions:[{question:"",options:["",""],correctIndex:0,explanation:""}] } },
     { key:"TRUE_FALSE", label:"Vrai/Faux", emoji:"\u2705", def:{ questions:[{statement:"",isTrue:true}] } },
     { key:"FILL_BLANKS", label:"Texte a trous", emoji:"\u270f\ufe0f", def:{ text:"", caseSensitive:false } },
     { key:"MATCHING", label:"Appariement", emoji:"\ud83d\udd17", def:{ pairs:[{left:"",right:""}] } },
@@ -188,11 +188,12 @@ export default function NewLessonPage() {
                           <div key={qi} className="p-3 bg-white rounded-lg space-y-2">
                             <div className="flex justify-between"><span className="text-xs font-bold text-slate-400">Q{qi+1}</span>{createConfig.questions.length>1 && <button type="button" onClick={()=>{const c={...createConfig};c.questions=c.questions.filter((_:any,i:number)=>i!==qi);setCreateConfig({...c});}} className="text-xs text-red-500">x</button>}</div>
                             <input value={q.question||""} onChange={e=>{const c={...createConfig};c.questions[qi]={...q,question:e.target.value};setCreateConfig({...c});}} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Question" />
-                            {(q.options||[]).map((o:string,oi:number)=>(<div key={oi} className="flex items-center gap-2"><input type="radio" name={`iq${qi}`} checked={q.correctIndex===oi} onChange={()=>{const c={...createConfig};c.questions[qi]={...q,correctIndex:oi};setCreateConfig({...c});}} className="accent-green-600" /><input value={o} onChange={e=>{const c={...createConfig};const opts=[...q.options];opts[oi]=e.target.value;c.questions[qi]={...q,options:opts};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder={`Option ${String.fromCharCode(65+oi)}`} /></div>))}
+                            {(q.options||[]).map((o:string,oi:number)=>(<div key={oi} className="flex items-center gap-2"><input type="radio" name={`iq${qi}`} checked={q.correctIndex===oi} onChange={()=>{const c={...createConfig};c.questions[qi]={...q,correctIndex:oi};setCreateConfig({...c});}} className="accent-green-600" /><input value={o} onChange={e=>{const c={...createConfig};const opts=[...q.options];opts[oi]=e.target.value;c.questions[qi]={...q,options:opts};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder={`Option ${String.fromCharCode(65+oi)}`} />{(q.options||[]).length>2 && <button type="button" onClick={()=>{const c={...createConfig};const opts=q.options.filter((_:any,j:number)=>j!==oi);c.questions[qi]={...q,options:opts,correctIndex:q.correctIndex>=opts.length?0:q.correctIndex};setCreateConfig({...c});}} className="text-red-400 text-xs">x</button>}</div>))}
+                            <button type="button" onClick={()=>{const c={...createConfig};c.questions[qi]={...q,options:[...q.options,""]};setCreateConfig({...c});}} className="text-xs text-brand-600 mt-1">+ Reponse</button>
                             <input value={q.explanation||""} onChange={e=>{const c={...createConfig};c.questions[qi]={...q,explanation:e.target.value};setCreateConfig({...c});}} className="w-full border border-slate-100 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Explication" />
                           </div>
                         ))}
-                        <button type="button" onClick={()=>{const c={...createConfig};c.questions=[...c.questions,{question:"",options:["","","",""],correctIndex:0,explanation:""}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400 hover:border-brand-400">+ Question</button>
+                        <button type="button" onClick={()=>{const c={...createConfig};c.questions=[...c.questions,{question:"",options:["",""],correctIndex:0,explanation:""}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400 hover:border-brand-400">+ Question</button>
                       </div>}
 
                       {createType==="TRUE_FALSE" && <div className="space-y-2">

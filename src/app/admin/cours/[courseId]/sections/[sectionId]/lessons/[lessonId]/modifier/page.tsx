@@ -26,7 +26,7 @@ export default function EditLessonPage() {
   const [creating, setCreating] = useState(false);
 
   const gameTypes = [
-    { key:"QCM", label:"QCM", emoji:"\ud83d\udcdd", def:{ questions:[{question:"",options:["","","",""],correctIndex:0,explanation:""}] } },
+    { key:"QCM", label:"QCM", emoji:"\ud83d\udcdd", def:{ questions:[{question:"",options:["",""],correctIndex:0,explanation:""}] } },
     { key:"TRUE_FALSE", label:"Vrai/Faux", emoji:"\u2705", def:{ questions:[{statement:"",isTrue:true}] } },
     { key:"FILL_BLANKS", label:"Texte a trous", emoji:"\u270f\ufe0f", def:{ text:"", caseSensitive:false } },
     { key:"MATCHING", label:"Appariement", emoji:"\ud83d\udd17", def:{ pairs:[{left:"",right:""}] } },
@@ -179,7 +179,7 @@ export default function EditLessonPage() {
                             {createConfig.questions.length>1 && <button type="button" onClick={()=>{const c={...createConfig};c.questions=c.questions.filter((_:any,i:number)=>i!==qi);setCreateConfig({...c});}} className="text-xs text-red-500">Supprimer</button>}
                           </div>
                         ))}
-                        <button type="button" onClick={()=>{const c={...createConfig};c.questions=[...c.questions,{question:"",options:["","","",""],correctIndex:0}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Question</button>
+                        <button type="button" onClick={()=>{const c={...createConfig};c.questions=[...c.questions,{question:"",options:["",""],correctIndex:0}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Question</button>
                       </div>}
 
                       {createType==="TRUE_FALSE" && <div className="space-y-2">

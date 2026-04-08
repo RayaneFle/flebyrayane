@@ -41,7 +41,7 @@ export default function CreateActivityPage() {
 
   useEffect(() => { fetch("/api/classrooms").then(r => r.json()).then(setClassrooms).catch(() => {}); }, []);
 
-  const [qcm, setQcm] = useState([{ question: "", imageUrl: "", options: ["","","",""], correctIndex: 0, explanation: "" }]);
+  const [qcm, setQcm] = useState([{ question: "", imageUrl: "", options: ["",""], correctIndex: 0, explanation: "" }]);
   const [tf, setTf] = useState([{ statement: "", imageUrl: "", isTrue: true, explanation: "" }]);
   const [fb, setFb] = useState("");
   const [pairs, setPairs] = useState([{ left: "", right: "", leftImage: "", rightImage: "" }]);
@@ -103,7 +103,8 @@ export default function CreateActivityPage() {
             <div className="flex justify-between"><span className="text-xs font-bold text-slate-400">Q{qi+1}</span>{qcm.length>1 && <button type="button" onClick={() => setQcm(qcm.filter((_,i) => i!==qi))} className="text-xs text-red-500">x</button>}</div>
             <input value={q.question} onChange={e => { const u=[...qcm]; u[qi].question=e.target.value; setQcm(u); }} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Question" />
             <ImageUpload value={q.imageUrl} onChange={v => { const u=[...qcm]; u[qi].imageUrl=v; setQcm(u); }} label="Image de la question" />
-            {q.options.map((o, oi) => <div key={oi} className="flex items-center gap-2"><input type="radio" name={`q${qi}`} checked={q.correctIndex===oi} onChange={() => { const u=[...qcm]; u[qi].correctIndex=oi; setQcm(u); }} className="accent-green-600" /><input value={o} onChange={e => { const u=[...qcm]; u[qi].options[oi]=e.target.value; setQcm(u); }} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder={`Option ${String.fromCharCode(65+oi)}`} /></div>)}
+            {q.options.map((o: string, oi: number) => <div key={oi} className="flex items-center gap-2"><input type="radio" name={`q${qi}`} checked={q.correctIndex===oi} onChange={() => { const u=[...qcm]; u[qi].correctIndex=oi; setQcm(u); }} className="accent-green-600" /><input value={o} onChange={e => { const u=[...qcm]; u[qi].options[oi]=e.target.value; setQcm(u); }} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder={`Option ${String.fromCharCode(65+oi)}`} />{q.options.length > 2 && <button type="button" onClick={() => { const u=[...qcm]; u[qi].options = u[qi].options.filter((_:any,j:number)=>j!==oi); if(u[qi].correctIndex >= u[qi].options.length) u[qi].correctIndex = 0; setQcm(u); }} className="text-red-400 text-xs shrink-0">x</button>}</div>)}
+            <button type="button" onClick={() => { const u=[...qcm]; u[qi].options = [...u[qi].options, ""]; setQcm(u); }} className="text-xs text-brand-600 font-medium mt-1">+ Ajouter une reponse</button>
             <input value={q.explanation} onChange={e => { const u=[...qcm]; u[qi].explanation=e.target.value; setQcm(u); }} className="w-full border border-slate-100 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Explication" />
           </div>)}<button type="button" onClick={() => setQcm([...qcm, {question:"",imageUrl:"",options:["","","",""],correctIndex:0,explanation:""}])} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400">+ Question</button></div>}
 
