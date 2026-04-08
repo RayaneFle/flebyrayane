@@ -15,7 +15,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
     where: { id: params.classroomId },
     include: {
       members: { include: { user: { select: { id: true, name: true, email: true } } }, orderBy: { joinedAt: "desc" } },
-      courses: { include: { course: { select: { id: true, title: true, slug: true, level: true, sections: { orderBy: { position: "asc" }, include: { lessons: { orderBy: { position: "asc" }, select: { id: true, title: true } } } } } } } },
+      courses: { include: { course: { select: { id: true, title: true, slug: true, level: true } } } },
       activities: { include: { activity: { select: { id: true, title: true, type: true, level: true } } } },
       posts: { include: { author: { select: { name: true } } }, orderBy: { createdAt: "desc" } },
     },
@@ -43,6 +43,13 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
     where: { userId: { in: classroom.members.map(m => m.userId) }, completed: true },
     include: { user: { select: { id: true, name: true } }, activity: { select: { id: true, title: true } } },
     orderBy: { completedAt: "desc" },
+  });
+
+  // Get all lessons from assigned courses
+  const assignedCourseLessons = await prisma.lesson.findMany({
+    where: { section: { courseId: { in: classroom.courses.map(c => c.courseId) } } },
+    select: { id: true, title: true, section: { select: { title: true, course: { select: { title: true } } } } },
+    orderBy: { position: "asc" },
   });
 
   return (
@@ -84,7 +91,14 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
               {classroom.activities.length > 0 && (
                 <div className="space-y-2 mb-4">{classroom.activities.map(ca => {
                   const t = activityTypeLabels[ca.activity.type] || { emoji: "?", label: ca.activity.type };
-                  return (
+                  // Get all lessons from assigned courses
+  const assignedCourseLessons = await prisma.lesson.findMany({
+    where: { section: { courseId: { in: classroom.courses.map(c => c.courseId) } } },
+    select: { id: true, title: true, section: { select: { title: true, course: { select: { title: true } } } } },
+    orderBy: { position: "asc" },
+  });
+
+  return (
                     <div key={ca.id} className="flex items-center justify-between p-3 bg-brand-50 rounded-xl">
                       <div className="flex items-center gap-2">
                         <span>{t.emoji}</span>
@@ -133,12 +147,19 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                 <div className="space-y-4">{classroom.members.map(m => {
                   const memberProgress = allLessonProgress.filter(p => p.userId === m.userId);
                   const memberResults = studentResults.filter(r => r.user.id === m.userId);
-                  const allLessons = classroom.courses.flatMap(cc => cc.course.sections.flatMap(s => s.lessons.map(l => ({ ...l, sectionTitle: s.title, courseTitle: cc.course.title }))));
+                  const allLessons = assignedCourseLessons.map(l => ({ id: l.id, title: l.title, sectionTitle: l.section.title, courseTitle: l.section.course.title }));
                   const completedLessons = allLessons.filter(l => memberProgress.find(p => p.lessonId === l.id && p.status === "completed")).length;
                   const inProgressLessons = allLessons.filter(l => memberProgress.find(p => p.lessonId === l.id && p.status === "in_progress")).length;
                   const notStartedLessons = allLessons.length - completedLessons - inProgressLessons;
                   const avgScore = memberResults.length > 0 ? memberResults.reduce((sum, r) => sum + (r.score || 0), 0) / memberResults.length : 0;
-                  return (
+                  // Get all lessons from assigned courses
+  const assignedCourseLessons = await prisma.lesson.findMany({
+    where: { section: { courseId: { in: classroom.courses.map(c => c.courseId) } } },
+    select: { id: true, title: true, section: { select: { title: true, course: { select: { title: true } } } } },
+    orderBy: { position: "asc" },
+  });
+
+  return (
                     <details key={m.id} className="border border-slate-100 rounded-xl overflow-hidden">
                       <summary className="px-4 py-3 cursor-pointer hover:bg-brand-50/30 flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -163,7 +184,14 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                                 <div className="space-y-1">{allLessons.map(l => {
                                   const prog = memberProgress.find(p => p.lessonId === l.id);
                                   const status = prog ? prog.status : "not_started";
-                                  return (
+                                  // Get all lessons from assigned courses
+  const assignedCourseLessons = await prisma.lesson.findMany({
+    where: { section: { courseId: { in: classroom.courses.map(c => c.courseId) } } },
+    select: { id: true, title: true, section: { select: { title: true, course: { select: { title: true } } } } },
+    orderBy: { position: "asc" },
+  });
+
+  return (
                                     <div key={l.id} className="flex items-center justify-between py-1.5 px-3 bg-slate-50 rounded-lg">
                                       <div className="flex-1 min-w-0">
                                         <p className="text-xs text-slate-700 truncate">{l.title}</p>
@@ -182,7 +210,14 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                                 if (!existing || (r.score||0) > (existing.score||0)) uniqueActs.set(r.activityId, r);
                               });
                               const acts = Array.from(uniqueActs.values());
-                              return (
+                              // Get all lessons from assigned courses
+  const assignedCourseLessons = await prisma.lesson.findMany({
+    where: { section: { courseId: { in: classroom.courses.map(c => c.courseId) } } },
+    select: { id: true, title: true, section: { select: { title: true, course: { select: { title: true } } } } },
+    orderBy: { position: "asc" },
+  });
+
+  return (
                               <div>
                                 <p className="text-xs font-bold text-slate-500 mb-2">Activites ({acts.length}) :</p>
                                 <div className="space-y-1">{acts.map(r => (
