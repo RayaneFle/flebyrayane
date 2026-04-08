@@ -35,7 +35,7 @@ export default async function LessonPage({ params }: { params: { slug: string; l
         <p className="text-xs text-brand-400 mb-1">{lesson.section.title}</p>
         <h1 className="font-heading text-2xl md:text-3xl font-bold text-brand-900">{lesson.title}</h1>
       </div>
-      <LessonContent blocks={blocksWithParsedConfig} />
+      <LessonContent blocks={blocksWithParsedConfig} lessonId={params.lessonId} />
       <div className="flex items-center justify-between mt-8 pt-6 border-t border-brand-100">
         {prev ? <Link href={`/cours/${slug}/lecon/${prev.id}`} className="text-sm font-medium text-brand-500 hover:text-brand-700">← {prev.title}</Link> : <div />}
         {next ? <Link href={`/cours/${slug}/lecon/${next.id}`} className="text-sm font-medium text-accent-600 hover:text-accent-700">{next.title} →</Link> : <Link href={`/cours/${slug}`} className="text-sm font-medium text-green-600">✅ Retour au cours</Link>}
