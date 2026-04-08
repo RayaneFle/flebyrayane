@@ -10,6 +10,7 @@ import HangmanGame from "./games/HangmanGame";
 import DragDropGame from "./games/DragDropGame";
 import SortingGame from "./games/SortingGame";
 import CategorizeGame from "./games/CategorizeGame";
+import WordOrderGame from "./games/WordOrderGame";
 import { scoreToStars, formatTime } from "@/lib/utils";
 
 export interface AnswerDetail {
@@ -134,6 +135,7 @@ export default function ActivityPlayer({ activityId, type, config, embedded, onE
     DRAG_DROP: <DragDropGame config={config} onComplete={onComplete} />,
     SORTING: <SortingGame config={config} onComplete={onComplete} />,
     CATEGORIZE: <CategorizeGame config={config} onComplete={onComplete} />,
+    WORD_ORDER: <WordOrderGame config={config} onComplete={onComplete} />,
   };
 
   return (

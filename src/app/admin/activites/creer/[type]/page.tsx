@@ -54,6 +54,7 @@ export default function CreateActivityPage() {
   const [cats, setCats] = useState([{ name: "", imageUrl: "" }, { name: "", imageUrl: "" }]);
   const [catItems, setCatItems] = useState([{ text: "", category: "", imageUrl: "" }]);
   const [catInst, setCatInst] = useState("");
+  const [sentences, setSentences] = useState([{ text: "", hint: "" }]);
 
   function buildConfig() {
     switch (type) {
@@ -66,6 +67,7 @@ export default function CreateActivityPage() {
       case "DRAG_DROP": return { zones: ddZones.filter(z => z.name || z.imageUrl).map(z => ({ ...z, items: ddItems.filter(i => i.zone === (z.name || z.imageUrl) && (i.text || i.imageUrl)).map(i => ({ text: i.text, imageUrl: i.imageUrl })) })), instruction: "Glissez dans la bonne zone" };
       case "SORTING": return { items: sort.filter(Boolean), correctOrder: sort.filter(Boolean), instruction: sortInst };
       case "CATEGORIZE": return { categories: cats.filter(c => c.name || c.imageUrl), items: catItems.filter(i => (i.text || i.imageUrl) && i.category), instruction: catInst };
+      case "WORD_ORDER": return { sentences: sentences.filter(s => s.text.trim()) };
       default: return {};
     }
   }
@@ -153,6 +155,16 @@ export default function CreateActivityPage() {
           </div>}
 
           {type === "SORTING" && <div className="space-y-3"><input value={sortInst} onChange={e => setSortInst(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Instruction" />{sort.map((s, i) => <div key={i} className="flex items-center gap-2"><span className="text-xs text-slate-300 w-6">{i+1}.</span><input value={s} onChange={e => { const u=[...sort]; u[i]=e.target.value; setSort(u); }} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" />{sort.length>1 && <button type="button" onClick={() => setSort(sort.filter((_,j)=>j!==i))} className="text-red-400 p-1">x</button>}</div>)}<button type="button" onClick={() => setSort([...sort, ""])} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400">+ Element</button></div>}
+
+          {type === "WORD_ORDER" && <div className="space-y-3">
+            <p className="text-xs text-slate-400 mb-2">Ecrivez les phrases dans le bon ordre. Les mots seront melanges automatiquement.</p>
+            {sentences.map((s, i) => <div key={i} className="p-3 bg-slate-50 rounded-xl space-y-2">
+              <div className="flex justify-between"><span className="text-xs font-bold text-slate-400">Phrase {i+1}</span>{sentences.length>1 && <button type="button" onClick={() => setSentences(sentences.filter((_,j)=>j!==i))} className="text-xs text-red-500">x</button>}</div>
+              <input value={s.text} onChange={e => { const u=[...sentences]; u[i]={...u[i], text:e.target.value}; setSentences(u); }} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Ex: Je suis francais" />
+              <input value={s.hint} onChange={e => { const u=[...sentences]; u[i]={...u[i], hint:e.target.value}; setSentences(u); }} className="w-full border border-slate-100 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Indice (optionnel)" />
+            </div>)}
+            <button type="button" onClick={() => setSentences([...sentences, {text:"",hint:""}])} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400">+ Phrase</button>
+          </div>}
 
           {type === "CATEGORIZE" && <div className="space-y-4"><input value={catInst} onChange={e => setCatInst(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Instruction" />
             <div><p className="text-xs font-bold text-slate-500 mb-2">Categories :</p>{cats.map((c, i) => <div key={i} className="p-3 bg-slate-50 rounded-xl mb-2 space-y-2">

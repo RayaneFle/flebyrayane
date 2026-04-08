@@ -58,6 +58,7 @@ export default function NewLessonPage() {
     { key:"MEMORY", label:"Memory", emoji:"\ud83c\udccf", def:{ pairs:[{front:"",back:""}] } },
     { key:"HANGMAN", label:"Pendu", emoji:"\ud83d\udc80", def:{ words:[{word:"",hint:""}] } },
     { key:"SORTING", label:"Classement", emoji:"\ud83d\udcca", def:{ items:["",""],correctOrder:["",""],instruction:"" } },
+    { key:"WORD_ORDER", label:"Mots dans l'ordre", emoji:"\ud83d\udd24", def:{ sentences:[{text:"",hint:""}] } },
     { key:"CATEGORIZE", label:"Categorisation", emoji:"\ud83d\udcc2", def:{ categories:[{name:"",imageUrl:""},{name:"",imageUrl:""}], items:[{text:"",category:"",imageUrl:""}], instruction:"" } },
     { key:"DRAG_DROP", label:"Glisser-deposer", emoji:"\ud83c\udfaf", def:{ zones:[{name:"",imageUrl:""},{name:"",imageUrl:""}], items:[], instruction:"" } },
   ];
@@ -228,6 +229,15 @@ export default function NewLessonPage() {
                         <input value={createConfig?.instruction||""} onChange={e=>setCreateConfig({...createConfig,instruction:e.target.value})} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Instruction" />
                         {createConfig?.items?.map((s:string,i:number)=>(<div key={i} className="flex items-center gap-2"><span className="text-xs w-4">{i+1}.</span><input value={s} onChange={e=>{const c={...createConfig};c.items[i]=e.target.value;c.correctOrder[i]=e.target.value;setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" />{createConfig.items.length>1&&<button type="button" onClick={()=>{const c={...createConfig};c.items=c.items.filter((_:any,j:number)=>j!==i);c.correctOrder=c.correctOrder.filter((_:any,j:number)=>j!==i);setCreateConfig({...c});}} className="text-red-400 text-xs">x</button>}</div>))}
                         <button type="button" onClick={()=>{const c={...createConfig};c.items=[...c.items,""];c.correctOrder=[...c.correctOrder,""];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400 hover:border-brand-400">+ Element</button>
+                      </div>}
+
+                      {createType==="WORD_ORDER" && <div className="space-y-2">
+                        {createConfig?.sentences?.map((s:any,i:number)=>(<div key={i} className="p-2 bg-white rounded-lg space-y-1">
+                          <input value={s.text||""} onChange={e=>{const c={...createConfig};c.sentences[i]={...s,text:e.target.value};setCreateConfig({...c});}} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Phrase" />
+                          <input value={s.hint||""} onChange={e=>{const c={...createConfig};c.sentences[i]={...s,hint:e.target.value};setCreateConfig({...c});}} className="w-full border border-slate-100 rounded-lg px-3 py-1 text-xs outline-none" placeholder="Indice" />
+                          {createConfig.sentences.length>1&&<button type="button" onClick={()=>{const c={...createConfig};c.sentences=c.sentences.filter((_:any,j:number)=>j!==i);setCreateConfig({...c});}} className="text-red-400 text-xs">x</button>}
+                        </div>))}
+                        <button type="button" onClick={()=>{const c={...createConfig};c.sentences=[...c.sentences,{text:"",hint:""}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Phrase</button>
                       </div>}
 
                       {createType==="CATEGORIZE" && <div className="space-y-3">

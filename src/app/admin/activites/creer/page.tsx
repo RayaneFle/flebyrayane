@@ -4,7 +4,7 @@ import { activityTypeLabels } from "@/lib/utils";
 const CATS: Record<string, string[]> = {
   "Quiz": ["QCM", "TRUE_FALSE", "FILL_BLANKS"],
   "Vocabulaire": ["MATCHING", "MEMORY", "HANGMAN"],
-  "Organisation": ["DRAG_DROP", "SORTING", "CATEGORIZE"],
+  "Organisation": ["DRAG_DROP", "SORTING", "CATEGORIZE", "WORD_ORDER"],
 };
 const DESC: Record<string, string> = { QCM: "Choix multiples avec feedback", TRUE_FALSE: "Vrai ou faux", FILL_BLANKS: "Texte avec trous", MATCHING: "Associer des paires", MEMORY: "Retrouver les paires", HANGMAN: "Deviner lettre par lettre", DRAG_DROP: "Glisser vers la zone", SORTING: "Remettre en ordre", CATEGORIZE: "Trier dans des catégories" };
 
