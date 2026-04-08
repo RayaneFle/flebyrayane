@@ -31,7 +31,7 @@ export default function Header() {
             {isTeacher && <NavLink href="/admin">Admin</NavLink>}
           </nav>
 
-          <div className="hidden md:flex items-center gap-3"><LangSwitcher />
+          <div className="hidden md:flex items-center gap-3"><div className="mr-2 border border-brand-100 rounded-lg p-1"><LangSwitcher /></div>
             {session ? (
               <div className="relative">
                 <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-2.5 px-3 py-1.5 rounded-full hover:bg-brand-50 transition-colors">
@@ -78,7 +78,7 @@ export default function Header() {
             <MLink href="/cours" onClick={() => setMenuOpen(false)}>📖 Cours</MLink>
             <MLink href="/activites" onClick={() => setMenuOpen(false)}>🎮 Activités</MLink>
             {isTeacher && <MLink href="/admin" onClick={() => setMenuOpen(false)}>⚙️ Admin</MLink>}
-            <hr className="border-brand-100 my-2" />
+            <div className="px-4 py-2"><LangSwitcher /></div><hr className="border-brand-100 my-2" />
             {session ? (
               <>
                 <MLink href="/dashboard" onClick={() => setMenuOpen(false)}>📊 Mon espace</MLink>
