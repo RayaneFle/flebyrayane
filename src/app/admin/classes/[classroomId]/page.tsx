@@ -41,7 +41,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
 
   const studentResults = await prisma.activityResult.findMany({
     where: { userId: { in: classroom.members.map(m => m.userId) }, completed: true },
-    include: { user: { select: { id: true, name: true } }, activity: { select: { title: true } } },
+    include: { user: { select: { id: true, name: true } }, activity: { select: { id: true, title: true } } },
     orderBy: { completedAt: "desc" },
   });
 
