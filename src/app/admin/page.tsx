@@ -80,7 +80,8 @@ export default async function AdminPage() {
         attempts: r.attempts,
       });
       if (r.completed) studentProgress[r.userId].totalDone++;
-    });
+    }
+  });
 
   allLessonProgress.forEach(lp => {
     if (studentProgress[lp.userId]) {
