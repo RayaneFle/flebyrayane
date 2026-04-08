@@ -144,8 +144,8 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                           <div><p className="text-sm font-medium text-slate-800">{m.user.name}</p><p className="text-xs text-slate-400">{m.user.email}</p></div>
                         </div>
                         <div className="flex items-center gap-4 text-xs">
-                          <span className="text-green-600 font-bold">\u2705 {completedLessons}</span>
-                          <span className="text-amber-500 font-bold">\ud83d\udd04 {inProgressLessons}</span>
+                          <span className="text-green-600 font-bold">{completedLessons} faites</span>
+                          <span className="text-amber-500 font-bold">{inProgressLessons} en cours</span>
                           <span className="text-brand-600 font-bold">{Math.round(avgScore)}%</span>
                         </div>
                       </summary>
@@ -163,7 +163,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
                                       <p className="text-xs text-slate-700 truncate">{p.lesson.title}</p>
                                       <p className="text-[10px] text-slate-400">{p.lesson.section.course.title} &gt; {p.lesson.section.title}</p>
                                     </div>
-                                    <span className="text-sm shrink-0 ml-2">{p.status === "completed" ? "\u2705" : p.status === "in_progress" ? "\ud83d\udd04" : "\u274c"}</span>
+                                    <span className={"text-xs font-bold shrink-0 ml-2 px-2 py-0.5 rounded-lg " + (p.status === "completed" ? "bg-green-100 text-green-700" : p.status === "in_progress" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700")}>{p.status === "completed" ? "Faite" : p.status === "in_progress" ? "En cours" : "Non faite"}</span>
                                   </div>
                                 ))}</div>
                               </div>
