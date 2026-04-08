@@ -4,6 +4,8 @@ import { activityTypeLabels, levelColors } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+export const revalidate = 60;
+
 export default async function ActivitesPage({ searchParams }: { searchParams: { type?: string; level?: string } }) {
   const sp = await (searchParams as any);
   const type = sp?.type; const level = sp?.level;

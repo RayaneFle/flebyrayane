@@ -5,6 +5,8 @@ import { authOptions } from "@/lib/auth";
 import { levelColors } from "@/lib/utils";
 import Link from "next/link";
 
+export const revalidate = 30;
+
 export default async function CourseDetailPage({ params }: { params: { slug: string } }) {
   const slug = params.slug;
   const course = await prisma.course.findUnique({

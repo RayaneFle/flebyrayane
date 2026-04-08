@@ -4,6 +4,8 @@ import { levelColors } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+export const revalidate = 60;
+
 export default async function CoursPage({ searchParams }: { searchParams: { level?: string } }) {
   const sp = await (searchParams as any);
   const level = sp?.level;

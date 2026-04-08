@@ -4,10 +4,12 @@ import { activityTypeLabels, levelColors, levelEmoji } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+export const revalidate = 60;
+
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const [recentActivities, courseCount, activityCount, userCount] = await Promise.all([
-    prisma.activity.findMany({ where: { isPublic: true }, orderBy: { createdAt: "desc" }, take: 6, include: { createdBy: { select: { name: true } }, _count: { select: { results: true } } } }),
+    prisma.activity.findMany({ where: { isPublic: true, title: { not: "" } }, orderBy: { createdAt: "desc" }, take: 6, include: { createdBy: { select: { name: true } }, _count: { select: { results: true } } } }),
     prisma.course.count({ where: { published: true } }),
     prisma.activity.count({ where: { isPublic: true } }),
     prisma.user.count(),
@@ -21,7 +23,7 @@ export default async function HomePage() {
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
             <div className="flex-1 text-center md:text-left">
               <h1 className="font-heading text-3xl md:text-5xl font-extrabold text-white leading-tight">
-                Apprenez le français<span className="block bg-gradient-to-r from-accent-200 to-yellow-200 bg-clip-text text-transparent">en vous amusant</span>
+                Apprenez le français<br /><span className="bg-gradient-to-r from-accent-200 to-yellow-200 bg-clip-text text-transparent">en vous amusant</span>
               </h1>
               <p className="mt-4 text-base md:text-lg text-pink-100/80 max-w-md leading-relaxed">Cours structurés, exercices ludiques et suivi de progression — tout en un.</p>
               <div className="mt-6 flex flex-wrap gap-3 justify-center md:justify-start">
