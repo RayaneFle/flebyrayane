@@ -43,7 +43,7 @@ export default function EditLessonPage() {
   async function createAndInsert(idx: number) {
     if(!createTitle||!createType||!createConfig) return;
     setCreating(true);
-    const res = await fetch("/api/activities", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({title:createTitle,type:createType,config:createConfig,isPublic:true}) });
+    const res = await fetch("/api/activities", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({title:createTitle,type:createType,config: createType==="DRAG_DROP" ? { zones: (createConfig.zones||[]).filter((z:any)=>z.name||z.imageUrl).map((z:any)=>({...z, items:(createConfig.items||[]).filter((i:any)=>i.zone===(z.name||z.imageUrl)&&(i.text||i.imageUrl)).map((i:any)=>({text:i.text,imageUrl:i.imageUrl}))})), instruction:"Glissez dans la bonne zone" } : createType==="CATEGORIZE" ? { categories:(createConfig.categories||[]).filter((c:any)=>c.name||c.imageUrl), items:(createConfig.items||[]).filter((i:any)=>(i.text||i.imageUrl)&&i.category), instruction:createConfig.instruction||"" } : createConfig, isPublic:true}) });
     if(res.ok) {
       const act = await res.json();
       const nb = { id:"new-"+Date.now(), type:"activity" as const, content:null, activityId:act.id, requireScore:false, minScore:60, activity:act };
