@@ -229,20 +229,25 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
         <div>
           <div className="bg-white rounded-2xl border border-brand-100 p-6 sticky top-24">
             <h2 className="font-heading font-bold text-slate-800 mb-4">👥 Élèves ({classroom.members.length})</h2>
-            <details className="mb-4 border border-brand-100 rounded-xl overflow-hidden">
+            <details className="mb-3 border border-brand-100 rounded-xl overflow-hidden">
               <summary className="px-4 py-2.5 bg-brand-50 cursor-pointer text-sm font-bold text-brand-700">Sous-classes ({classroom.subclasses.length})</summary>
               <div className="p-3">
                 <SubclassManager classroomId={classroom.id} members={classroom.members as any} subclasses={classroom.subclasses} />
               </div>
             </details>
-            {classroom.members.length === 0 ? <p className="text-sm text-slate-400">Aucun élève.</p> :
-              <div className="space-y-2">{classroom.members.map(m => (
-                <div key={m.id} className="flex items-center gap-3 py-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-300 to-accent-400 flex items-center justify-center text-white text-xs font-bold">{m.user.name?.charAt(0) || "?"}</div>
-                  <div className="flex-1 min-w-0"><p className="text-sm font-medium text-slate-700 truncate">{m.user.name}</p><p className="text-xs text-slate-400">{m.user.email}</p></div>
-                  <RemoveMemberBtn classroomId={classroom.id} userId={m.userId} />
-                </div>
-              ))}</div>}
+            <details className="border border-slate-100 rounded-xl overflow-hidden">
+              <summary className="px-4 py-2.5 cursor-pointer text-xs font-bold text-slate-500 hover:bg-slate-50">Liste des eleves ({classroom.members.length})</summary>
+              <div className="px-3 pb-3 max-h-60 overflow-y-auto">
+                {classroom.members.length === 0 ? <p className="text-xs text-slate-400 py-2">Aucun eleve.</p> :
+                  <div className="space-y-0.5 mt-1">{classroom.members.map(m => (
+                    <div key={m.id} className="flex items-center gap-2 py-1 px-2 hover:bg-slate-50 rounded">
+                      <div className="w-5 h-5 rounded-full bg-brand-200 flex items-center justify-center text-brand-700 text-[9px] font-bold shrink-0">{m.user.name?.charAt(0) || "?"}</div>
+                      <p className="text-[11px] text-slate-700 truncate flex-1">{m.user.name}</p>
+                      <RemoveMemberBtn classroomId={classroom.id} userId={m.userId} />
+                    </div>
+                  ))}</div>}
+              </div>
+            </details>
             <div className="mt-4 p-3 bg-brand-50 rounded-xl text-center">
               <p className="text-xs text-slate-500">Code à partager :</p>
               <p className="font-mono font-bold text-lg text-brand-700 tracking-widest">{classroom.code}</p>
