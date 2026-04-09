@@ -110,7 +110,7 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
                   <p className="px-6 py-8 text-center text-slate-300 text-sm">Bientot disponible</p>
                 ) : (
                   <div>
-                    {s.lessons.filter((l: any) => !(l as any).publishAt || new Date((l as any).publishAt) <= new Date()).map((l, li) => {
+                    {s.lessons.filter((l: any) => !l.publishAt || new Date(l.publishAt) <= new Date()).map((l, li) => {
                       const status = progressMap.get(l.id) || "not_started";
                       return (
                         <Link key={l.id} href={"/cours/" + slug + "/lecon/" + l.id}
