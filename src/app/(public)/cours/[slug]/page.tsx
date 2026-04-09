@@ -38,7 +38,7 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
 
   const canAccess = !course.requiresEnrollment || isEnrolled || isMemberOfClass;
 
-  const totalLessons = course.sections.reduce((s, sec) => s + sec.lessons.filter((l: any) => !(l as any).publishAt || new Date((l as any).publishAt) <= new Date()).length, 0);
+  const totalLessons = course.sections.reduce((s, sec) => s + sec.lessons.filter((l: any) => !l.hidden).length, 0);
   const completedLessons = session?.user ? course.sections.reduce((s, sec) => s + sec.lessons.filter(l => progressMap.get(l.id) === "completed").length, 0) : 0;
   const overallProgress = totalLessons > 0 ? Math.round(completedLessons / totalLessons * 100) : 0;
 
@@ -88,8 +88,9 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
       ) : (
         <div className="space-y-6">
           {course.sections.map((s, si) => {
-            const sectionDone = s.lessons.filter(l => progressMap.get(l.id) === "completed").length;
-            const sectionProgress = s.lessons.length > 0 ? Math.round(sectionDone / s.lessons.length * 100) : 0;
+            const visibleLessons = s.lessons.filter((l: any) => !l.hidden);
+            const sectionDone = visibleLessons.filter(l => progressMap.get(l.id) === "completed").length;
+            const sectionProgress = visibleLessons.length > 0 ? Math.round(sectionDone / visibleLessons.length * 100) : 0;
 
             return (
               <div key={s.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
@@ -110,7 +111,7 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
                   <p className="px-6 py-8 text-center text-slate-300 text-sm">Bientot disponible</p>
                 ) : (
                   <div>
-                    {s.lessons.filter((l: any) => !l.publishAt || new Date(l.publishAt) <= new Date()).map((l, li) => {
+                    {s.lessons.filter((l: any) => !l.hidden).map((l, li) => {
                       const status = progressMap.get(l.id) || "not_started";
                       return (
                         <Link key={l.id} href={"/cours/" + slug + "/lecon/" + l.id}
