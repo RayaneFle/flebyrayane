@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: Request, { params }: { params: { courseId: string; sectionId: string } }) {
   const session = await getServerSession(authOptions);
   if (!session || (session.user.role !== "admin" && session.user.role !== "teacher")) return NextResponse.json({ message: "Non autorisé." }, { status: 401 });
-  const { title, blocks, publishAt } = await request.json();
+  const { title, blocks } = await request.json();
   if (!title) return NextResponse.json({ message: "Titre requis." }, { status: 400 });
   const last = await prisma.lesson.findFirst({ where: { sectionId: params.sectionId }, orderBy: { position: "desc" } });
   const lesson = await prisma.lesson.create({

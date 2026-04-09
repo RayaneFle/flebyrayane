@@ -17,8 +17,7 @@ export default function EditLessonPage() {
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [publishAt, setPublishAt] = useState("");
-  const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
   const [showPicker, setShowPicker] = useState<number | null>(null);
   const [showCreate, setShowCreate] = useState<number | null>(null);
   const [createType, setCreateType] = useState("");
