@@ -22,10 +22,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white font-heading font-black text-sm">R</div>
             <span className="font-heading font-bold text-sm text-brand-800">FLE<span className="text-accent-500">by</span>Rayane</span>
           </Link>
-          <Link href="/" className="flex items-center gap-2.5 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white font-heading font-black text-sm">R</div>
-            <span className="font-heading font-bold text-sm text-brand-800">FLE<span className="text-accent-500">by</span>Rayane</span>
-          </Link>
           <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Mon espace</p>
         </div>
         <nav className="flex-1 p-2 space-y-0.5">
