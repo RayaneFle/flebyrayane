@@ -21,7 +21,7 @@ export async function GET(_r: Request, { params }: { params: { courseId: string;
 export async function PUT(request: Request, { params }: { params: { courseId: string; sectionId: string; lessonId: string } }) {
   const session = await getServerSession(authOptions);
   if (!session || (session.user.role !== "admin" && session.user.role !== "teacher")) return NextResponse.json({ message: "Non autorise." }, { status: 401 });
-  const { title, blocks } = await request.json();
+  const { title, blocks, publishAt } = await request.json();
   await prisma.lessonBlock.deleteMany({ where: { lessonId: params.lessonId } });
   const lesson = await prisma.lesson.update({
     where: { id: params.lessonId },

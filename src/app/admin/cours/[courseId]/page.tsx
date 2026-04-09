@@ -12,7 +12,7 @@ import DeleteSectionBtn from "./DeleteSectionBtn";
 import DeleteLessonBtn from "./DeleteLessonBtn";
 
 export default async function AdminCourseEditorPage({ params }: { params: { courseId: string } }) {
-  const course = await prisma.course.findUnique({ where: { id: params.courseId }, include: { sections: { orderBy: { position: "asc" }, include: { lessons: { orderBy: { position: "asc" }, include: { _count: { select: { blocks: true } } } } } } } });
+  const course = await prisma.course.findUnique({ where: { id: params.courseId }, include: { sections: { orderBy: { position: "asc" }, include: { lessons: { orderBy: { position: "asc" }, include: { _count: { select: { blocks: true } } }, select: { id: true, title: true, position: true, publishAt: true, _count: { select: { blocks: true } } } } } } } });
   if (!course) notFound();
 
   const session = await getServerSession(authOptions);
