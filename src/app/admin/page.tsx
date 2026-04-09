@@ -31,7 +31,7 @@ prisma.activityResult.findMany({
   ]);
 
   const recentCourses = await prisma.course.findMany({
-    where: { authorId: uid },
+    where: isAdmin ? {} : { authorId: uid },
     select: {
       id: true, title: true, slug: true,
       sections: { select: { id: true, title: true }, orderBy: { position: "asc" } },
