@@ -23,7 +23,7 @@ export default function SubclassManager({ classroomId, members, subclasses }: { 
   }
 
   async function deleteSubclass(id: string) {
-    if (!confirm("Supprimer cette sous-classe ? Les eleves ne seront pas supprimes.")) return;
+    if (!confirm("Supprimer cette sous-classe ? Les élèves ne seront pas supprimés.")) return;
     await fetch("/api/classrooms/" + classroomId + "/subclasses/" + id, { method: "DELETE" });
     router.refresh();
   }
@@ -107,7 +107,7 @@ export default function SubclassManager({ classroomId, members, subclasses }: { 
             )}
 
             {isAdding && unassigned.length === 0 && (
-              <p className="px-3 py-2 text-[10px] text-slate-400 text-center border-t border-brand-50">Tous les eleves sont assignes.</p>
+              <p className="px-3 py-2 text-[10px] text-slate-400 text-center border-t border-brand-50">Tous les élèves sont assignés.</p>
             )}
           </div>
         );

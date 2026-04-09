@@ -11,10 +11,10 @@ export default function JoinClassPage() {
     const data = await res.json();
     if (!res.ok) { setError(data.message); setLoading(false); return; }
     setSuccess(`Vous avez rejoint « ${data.classroom.name} » !`);
-    setLoading(false); setTimeout(() => router.push("/dashboard"), 2000);
+    setLoading(false); setTimeout(() => window.location.href = "/dashboard", 2000);
   }
   return (
-    <div><h1 className="font-heading text-3xl font-bold text-slate-900 mb-2">Rejoindre une classe</h1><p className="text-slate-400 mb-8">Entrez le code de votre professeur</p>
+    <div><h1 className="font-heading text-2xl font-bold text-slate-900 mb-2">Rejoindre une classe</h1><p className="text-slate-400 mb-8">Entrez le code de votre professeur</p>
       <div className="bg-white rounded-2xl border border-brand-100 p-8 max-w-md">
         {error && <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4">{error}</div>}
         {success && <div className="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-xl mb-4">{success}</div>}

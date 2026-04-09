@@ -15,7 +15,7 @@ export default async function AdminActivitesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <div><h1 className="font-heading text-3xl font-bold text-slate-900">{isAdmin ? "Toutes les activités" : "Mes activités"}</h1><p className="text-slate-400">{activities.length} activité(s)</p></div>
+        <div><h1 className="font-heading text-2xl font-bold text-slate-900">{isAdmin ? "Toutes les activités" : "Mes activités"}</h1><p className="text-slate-400">{activities.length} activité(s)</p></div>
         <Link href="/admin/activites/creer" className="px-5 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all">+ Créer</Link>
       </div>
       {activities.length === 0 ? <div className="bg-white rounded-2xl border border-brand-100 p-12 text-center"><span className="text-5xl">🎮</span><p className="text-slate-400 mt-4">Aucune activité.</p></div> : (

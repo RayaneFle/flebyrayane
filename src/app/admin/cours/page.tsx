@@ -15,7 +15,7 @@ export default async function AdminCoursPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <div><h1 className="font-heading text-3xl font-bold text-slate-900">{isAdmin ? "Tous les cours" : "Mes cours"}</h1><p className="text-slate-400">{courses.length} cours</p></div>
+        <div><h1 className="font-heading text-2xl font-bold text-slate-900">{isAdmin ? "Tous les cours" : "Mes cours"}</h1><p className="text-slate-400">{courses.length} cours</p></div>
         <Link href="/admin/cours/creer" className="px-5 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all">+ Créer un cours</Link>
       </div>
       {courses.length === 0 ? <div className="bg-white rounded-2xl border border-brand-100 p-12 text-center"><span className="text-5xl">📖</span><p className="text-slate-400 mt-4">Aucun cours.</p></div> : (

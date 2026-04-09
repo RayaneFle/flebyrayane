@@ -61,11 +61,11 @@ prisma.activityResult.findMany({
           <p className="font-heading text-3xl font-bold mt-1">{myCourses}</p>
         </div>
         <div className="bg-gradient-to-br from-accent-500 to-accent-600 rounded-2xl p-5 text-white">
-          <p className="text-accent-100 text-xs font-medium">Mes activites</p>
+          <p className="text-accent-100 text-xs font-medium">Mes activités</p>
           <p className="font-heading text-3xl font-bold mt-1">{myActivities}</p>
         </div>
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-5 text-white">
-          <p className="text-green-100 text-xs font-medium">Eleves</p>
+          <p className="text-green-100 text-xs font-medium">Élèves</p>
           <p className="font-heading text-3xl font-bold mt-1">{totalStudents}</p>
         </div>
         <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-5 text-white">
@@ -77,7 +77,7 @@ prisma.activityResult.findMany({
       {/* Quick Course Access */}
       {recentCourses.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
-          <h2 className="font-heading font-bold text-slate-800 mb-4">Acces rapide - Mes cours</h2>
+          <h2 className="font-heading font-bold text-slate-800 mb-4">Accès rapide - Mes cours</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {recentCourses.map((c: any) => (
               <Link key={c.id} href={"/admin/cours/" + c.id} className="block p-4 rounded-xl border border-slate-100 hover:border-brand-300 hover:bg-brand-50/30 transition-all">
@@ -105,15 +105,15 @@ prisma.activityResult.findMany({
           <div className="space-y-2">
             <Link href="/admin/cours/creer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-50 transition-colors">
               <div className="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center text-lg">+</div>
-              <div><p className="text-sm font-bold text-slate-800">Creer un cours</p><p className="text-[11px] text-slate-400">Nouveau cours structure</p></div>
+              <div><p className="text-sm font-bold text-slate-800">Créer un cours</p><p className="text-[11px] text-slate-400">Nouveau cours structuré</p></div>
             </Link>
             <Link href="/admin/activites/creer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent-50 transition-colors">
               <div className="w-10 h-10 rounded-xl bg-accent-100 flex items-center justify-center text-lg">+</div>
-              <div><p className="text-sm font-bold text-slate-800">Creer une activite</p><p className="text-[11px] text-slate-400">QCM, memory, pendu...</p></div>
+              <div><p className="text-sm font-bold text-slate-800">Créer une activité</p><p className="text-[11px] text-slate-400">QCM, memory, pendu...</p></div>
             </Link>
             <Link href="/admin/classes" className="flex items-center gap-3 p-3 rounded-xl hover:bg-green-50 transition-colors">
               <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center text-lg">+</div>
-              <div><p className="text-sm font-bold text-slate-800">Gerer les classes</p><p className="text-[11px] text-slate-400">Classes et sous-classes</p></div>
+              <div><p className="text-sm font-bold text-slate-800">Gérer les classes</p><p className="text-[11px] text-slate-400">Classes et sous-classes</p></div>
             </Link>
             {isAdmin && <Link href="/admin/utilisateurs" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
               <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-lg">U</div>
@@ -136,7 +136,7 @@ prisma.activityResult.findMany({
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-bold text-slate-800">{cls.name}</p>
-                    <p className="text-[11px] text-slate-400">{cls.members.length} eleves | {cls.courses.length} cours</p>
+                    <p className="text-[11px] text-slate-400">{cls.members.length} élèves | {cls.courses.length} cours</p>
                   </div>
                   <div className="flex items-center gap-1">
                     {cls.subclasses.map((sc: any) => (
@@ -151,9 +151,9 @@ prisma.activityResult.findMany({
 
         {/* Recent Activity */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="font-heading font-bold text-slate-800 mb-4">Activite recente</h2>
+          <h2 className="font-heading font-bold text-slate-800 mb-4">Activité récente</h2>
           {recentResults.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-6">Aucune activite recente</p>
+            <p className="text-sm text-slate-400 text-center py-6">Aucune activité récente</p>
           ) : (
             <div className="space-y-1.5">{recentResults.map((r, i) => (
               <div key={i} className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-slate-50">
@@ -171,13 +171,13 @@ prisma.activityResult.findMany({
       {/* Quick stats per class */}
       {myClassrooms.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="font-heading font-bold text-slate-800 mb-4">Apercu par classe</h2>
+          <h2 className="font-heading font-bold text-slate-800 mb-4">Aperçu par classe</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-100">
                   <th className="text-left text-xs font-bold text-slate-500 py-3 px-3">Classe</th>
-                  <th className="text-center text-xs font-bold text-slate-500 py-3 px-3">Eleves</th>
+                  <th className="text-center text-xs font-bold text-slate-500 py-3 px-3">Élèves</th>
                   <th className="text-center text-xs font-bold text-slate-500 py-3 px-3">Cours</th>
                   <th className="text-center text-xs font-bold text-slate-500 py-3 px-3">Sous-classes</th>
                   <th className="text-right text-xs font-bold text-slate-500 py-3 px-3">Action</th>

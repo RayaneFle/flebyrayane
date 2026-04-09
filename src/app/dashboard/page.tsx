@@ -101,7 +101,7 @@ export default async function DashboardPage() {
       {resumeLesson && (
         <Link href={"/cours/" + resumeLesson.courseSlug + "/lecon/" + resumeLesson.id}
           className="block mb-8 bg-gradient-to-r from-brand-500 to-accent-500 rounded-2xl p-6 text-white hover:shadow-lg transition-all hover:scale-[1.01]">
-          <p className="text-brand-100 text-xs font-medium mb-1">Reprendre ou vous en etiez</p>
+          <p className="text-brand-100 text-xs font-medium mb-1">Reprendre où vous en étiez</p>
           <p className="font-heading text-xl font-bold">{resumeLesson.title}</p>
           <p className="text-brand-100 text-sm mt-1">{resumeLesson.courseTitle} &gt; {resumeLesson.sectionTitle}</p>
           <div className="mt-3 inline-flex items-center gap-2 bg-white/20 rounded-lg px-4 py-2 text-sm font-bold">
@@ -114,11 +114,11 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         <div className="bg-white rounded-2xl border border-slate-200 p-4 text-center">
           <p className="text-2xl font-bold text-brand-600">{completedLessons}</p>
-          <p className="text-xs text-slate-400 mt-1">Lecons terminees</p>
+          <p className="text-xs text-slate-400 mt-1">Leçons terminées</p>
         </div>
         <div className="bg-white rounded-2xl border border-slate-200 p-4 text-center">
           <p className="text-2xl font-bold text-accent-600">{completedCount}</p>
-          <p className="text-xs text-slate-400 mt-1">Activites faites</p>
+          <p className="text-xs text-slate-400 mt-1">Activités faites</p>
         </div>
         <div className="bg-white rounded-2xl border border-slate-200 p-4 text-center">
           <p className={"text-2xl font-bold " + (avgScore >= 60 ? "text-green-600" : "text-amber-500")}>{Math.round(avgScore)}%</p>
@@ -169,10 +169,10 @@ export default async function DashboardPage() {
 
         {/* Recent Activity */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="font-heading font-bold text-slate-800 mb-4">Activite recente</h2>
+          <h2 className="font-heading font-bold text-slate-800 mb-4">Activité récente</h2>
           {results.length === 0 ? (
             <div className="text-center py-6">
-              <p className="text-sm text-slate-400 mb-3">Pas encore d activite</p>
+              <p className="text-sm text-slate-400 mb-3">Pas encore d'activité</p>
               <Link href="/activites" className="text-sm font-bold text-brand-600 bg-brand-50 px-4 py-2 rounded-lg">Jouer</Link>
             </div>
           ) : (
@@ -183,7 +183,7 @@ export default async function DashboardPage() {
                   <span className="text-base">{t.emoji}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-slate-700 truncate">{r.activity.title}</p>
-                    <p className="text-[10px] text-slate-400">{r.completed ? "Termine" : "En cours"}</p>
+                    <p className="text-[10px] text-slate-400">{r.completed ? "Terminé" : "En cours"}</p>
                   </div>
                   <span className={"text-xs font-bold px-2 py-0.5 rounded-full " + ((r.score || 0) >= 80 ? "bg-green-100 text-green-700" : (r.score || 0) >= 50 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700")}>{Math.round(r.score || 0)}%</span>
                 </div>

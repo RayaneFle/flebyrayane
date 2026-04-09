@@ -67,16 +67,16 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
                 </div>
               </div>
             ))}</div>
-          ) : <p className="text-sm text-slate-400 mb-4">Aucun cours assigne.</p>}
+          ) : <p className="text-sm text-slate-400 mb-4">Aucun cours assigné.</p>}
           <AssignCourseForm classroomId={classroom.id} courses={availableCourses} />
-          <a href="/admin/cours/creer" target="_blank" className="inline-block mt-3 text-xs text-brand-600 font-medium hover:text-brand-700">+ Creer un cours</a>
+          <a href="/admin/cours/creer" target="_blank" className="inline-block mt-3 text-xs text-brand-600 font-medium hover:text-brand-700">+ Créer un cours</a>
         </div>
       )}
 
       {/* ACTIVITES TAB */}
       {tab === "activites" && (
         <div className="bg-white rounded-2xl border border-brand-100 p-6">
-          <h2 className="font-heading font-bold text-lg text-slate-900 mb-4">Activites assignees</h2>
+          <h2 className="font-heading font-bold text-lg text-slate-900 mb-4">Activités assignées</h2>
           {classroom.activities.length > 0 ? (
             <div className="space-y-2 mb-6">{classroom.activities.map((ca: any) => {
               const t = activityTypeLabels[ca.activity.type] || { emoji: "?", label: ca.activity.type };
@@ -93,9 +93,9 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
                 </div>
               );
             })}</div>
-          ) : <p className="text-sm text-slate-400 mb-4">Aucune activite assignee.</p>}
+          ) : <p className="text-sm text-slate-400 mb-4">Aucune activité assignée.</p>}
           <AssignActivityForm classroomId={classroom.id} activities={availableActivities} />
-          <a href="/admin/activites/creer" target="_blank" className="inline-block mt-3 text-xs text-brand-600 font-medium hover:text-brand-700">+ Creer une activite</a>
+          <a href="/admin/activites/creer" target="_blank" className="inline-block mt-3 text-xs text-brand-600 font-medium hover:text-brand-700">+ Créer une activité</a>
         </div>
       )}
 
@@ -103,7 +103,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
       {tab === "suivi" && (
         <div className="bg-white rounded-2xl border border-brand-100 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-heading font-bold text-lg text-slate-900">Suivi des eleves</h2>
+            <h2 className="font-heading font-bold text-lg text-slate-900">Suivi des élèves</h2>
             {classroom.subclasses.length > 0 && (
               <div className="flex gap-1">
                 <button onClick={() => setSubclassFilter(null)} className={"px-3 py-1 rounded-lg text-xs font-medium transition-all " + (!subclassFilter ? "bg-brand-500 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200")}>Tous</button>
@@ -113,7 +113,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
               </div>
             )}
           </div>
-          {filteredMembers.length === 0 ? <p className="text-sm text-slate-400">Aucun eleve.</p> :
+          {filteredMembers.length === 0 ? <p className="text-sm text-slate-400">Aucun élève.</p> :
             <div className="space-y-3">{filteredMembers.map((m: any) => {
               const memberProgress = allLessonProgress.filter((p: any) => p.userId === m.userId);
               const memberResults = studentResults.filter((r: any) => r.user.id === m.userId);
@@ -202,7 +202,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
             <SubclassManager classroomId={classroom.id} members={classroom.members} subclasses={classroom.subclasses} />
           </div>
           <div className="bg-white rounded-2xl border border-brand-100 p-6">
-            <h2 className="font-heading font-bold text-lg text-slate-900 mb-4">Tous les eleves ({classroom.members.length})</h2>
+            <h2 className="font-heading font-bold text-lg text-slate-900 mb-4">Tous les élèves ({classroom.members.length})</h2>
             <div className="space-y-2">
               {classroom.subclasses.map((sc: any) => {
                 const scMembers = classroom.members.filter((m: any) => m.subclassId === sc.id);
@@ -229,7 +229,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
                 return (
                   <details open={classroom.subclasses.length === 0} className="border border-slate-200 rounded-xl overflow-hidden">
                     <summary className="px-4 py-2.5 bg-slate-50 cursor-pointer flex items-center justify-between">
-                      <span className="text-sm font-bold text-slate-600">{classroom.subclasses.length > 0 ? "Non assignes" : "Eleves"}</span>
+                      <span className="text-sm font-bold text-slate-600">{classroom.subclasses.length > 0 ? "Non assignés" : "Eleves"}</span>
                       <span className="text-xs text-slate-400">{unassigned.length}</span>
                     </summary>
                     <div className="p-2 space-y-0.5">{unassigned.map((m: any) => (

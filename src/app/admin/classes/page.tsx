@@ -15,7 +15,7 @@ export default async function AdminClassesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <div><h1 className="font-heading text-3xl font-bold text-slate-900">Mes classes</h1><p className="text-slate-400">{classrooms.length} classe(s)</p></div>
+        <div><h1 className="font-heading text-2xl font-bold text-slate-900">Mes classes</h1><p className="text-slate-400">{classrooms.length} classe(s)</p></div>
       </div>
       <CreateClassroomForm />
       {classrooms.length === 0 ? (

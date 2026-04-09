@@ -22,7 +22,7 @@ export default function ProfilPage() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-bold text-slate-900 mb-8">Mon profil</h1>
+      <h1 className="font-heading text-2xl font-bold text-slate-900 mb-8">Mon profil</h1>
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl border border-brand-100 p-6">
           <h2 className="font-heading font-bold text-slate-800 mb-4">Informations</h2>

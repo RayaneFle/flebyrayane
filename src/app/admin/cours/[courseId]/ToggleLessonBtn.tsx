@@ -21,7 +21,7 @@ export default function ToggleLessonBtn({ lessonId, hidden: initialHidden }: { l
   return (
     <button onClick={toggle} disabled={loading}
       className={"text-xs px-2 py-1 rounded-lg font-medium transition-all " + (hidden ? "bg-red-50 text-red-600 hover:bg-red-100" : "bg-green-50 text-green-600 hover:bg-green-100")}>
-      {loading ? "..." : hidden ? "Masquee" : "Visible"}
+      {loading ? "..." : hidden ? "Masquée" : "Visible"}
     </button>
   );
 }

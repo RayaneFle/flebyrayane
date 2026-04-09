@@ -45,7 +45,7 @@ export default function LoginForm() {
           {loading ? "Connexion..." : "Se connecter"}
         </button>
       </form>
-      <p className="text-center text-sm text-slate-400 mt-8">Pas encore de compte ? <Link href="/register" className="text-brand-600 font-semibold hover:text-brand-700">Creer un compte</Link></p>
+      <p className="text-center text-sm text-slate-400 mt-8">Pas encore de compte ? <Link href="/register" className="text-brand-600 font-semibold hover:text-brand-700">Créer un compte</Link></p>
     </div>
   );
 }

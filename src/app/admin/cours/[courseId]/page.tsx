@@ -41,7 +41,7 @@ export default async function AdminCourseEditorPage({ params }: { params: { cour
       </div>
 
       <div className="bg-white rounded-2xl border border-brand-100 p-6 mb-6">
-        <h2 className="font-heading font-bold text-slate-800 mb-4">Classes assignees</h2>
+        <h2 className="font-heading font-bold text-slate-800 mb-4">Classes assignées</h2>
         {assignedClassrooms.length > 0 && (
           <div className="space-y-2 mb-4">{assignedClassrooms.map(c => (
             <div key={c.id} className="flex items-center justify-between p-3 bg-brand-50 rounded-xl">
@@ -51,7 +51,7 @@ export default async function AdminCourseEditorPage({ params }: { params: { cour
           ))}</div>
         )}
         {availableClassrooms.length > 0 && <AssignClassForm courseId={course.id} classrooms={availableClassrooms} />}
-        {classrooms.length === 0 && <p className="text-xs text-slate-400">Aucune classe. <Link href="/admin/classes" className="text-brand-600">Creer une classe</Link></p>}
+        {classrooms.length === 0 && <p className="text-xs text-slate-400">Aucune classe. <Link href="/admin/classes" className="text-brand-600">Créer une classe</Link></p>}
       </div>
 
       <div className="space-y-4 mb-6">
@@ -61,7 +61,7 @@ export default async function AdminCourseEditorPage({ params }: { params: { cour
               <h2 className="font-heading font-bold text-slate-800">Section {si+1} - {s.title}</h2>
               <div className="flex items-center gap-2"><Link href={`/admin/cours/${course.id}/sections/${s.id}/lessons/new`} className="text-xs px-3 py-1.5 bg-brand-100 text-brand-700 rounded-lg hover:bg-brand-200 font-medium">+ Lecon</Link><DeleteSectionBtn courseId={course.id} sectionId={s.id} /></div>
             </div>
-            {s.lessons.length === 0 ? <p className="px-6 py-6 text-center text-slate-300 text-sm">Aucune lecon.</p> :
+            {s.lessons.length === 0 ? <p className="px-6 py-6 text-center text-slate-300 text-sm">Aucune leçon.</p> :
               <div className="divide-y divide-slate-50">{s.lessons.map((l, li) => (
                 <div key={l.id} className="flex items-center gap-4 px-6 py-3 hover:bg-brand-50/50">
                   <span className="text-sm font-medium text-slate-300 w-8">{si+1}.{li+1}</span>

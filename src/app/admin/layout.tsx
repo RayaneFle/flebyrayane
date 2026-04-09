@@ -7,7 +7,7 @@ import AdminFAB from "@/components/AdminFAB";
 const NAV = [
   { href: "/admin", label: "Tableau de bord", icon: "📊" },
   { href: "/admin/cours", label: "Mes cours", icon: "📖" },
-  { href: "/admin/activites", label: "Mes activites", icon: "🎮" },
+  { href: "/admin/activites", label: "Mes activités", icon: "🎮" },
   { href: "/admin/classes", label: "Mes classes", icon: "🏫" },
 ];
 

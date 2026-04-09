@@ -11,7 +11,7 @@ export default async function AdminUsersPage() {
   const users = await prisma.user.findMany({ orderBy: { createdAt: "desc" }, select: { id: true, name: true, email: true, role: true, createdAt: true } });
   return (
     <div>
-      <h1 className="font-heading text-3xl font-bold text-slate-900 mb-8">Utilisateurs</h1>
+      <h1 className="font-heading text-2xl font-bold text-slate-900 mb-8">Utilisateurs</h1>
       <div className="bg-white rounded-2xl border border-brand-100 overflow-x-auto">
         <table className="w-full"><thead><tr className="border-b border-slate-100 bg-brand-50/50 text-xs font-semibold text-slate-400 uppercase"><th className="text-left px-5 py-3">Nom</th><th className="text-left px-5 py-3">Email</th><th className="text-center px-5 py-3">Rôle</th><th className="text-right px-5 py-3">Inscrit le</th><th className="text-right px-5 py-3">Actions</th></tr></thead>
         <tbody className="divide-y divide-slate-50">{users.map(u => (

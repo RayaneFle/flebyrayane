@@ -81,9 +81,9 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
       {!canAccess ? (
         <div className="bg-white rounded-2xl border border-brand-100 p-8 text-center">
           <span className="text-5xl">🔒</span>
-          <h2 className="font-heading text-xl font-bold text-slate-800 mt-4">Cours protege</h2>
-          <p className="text-slate-400 mt-2">Ce cours necessite une inscription.</p>
-          <Link href={"/cours/" + slug + "/inscription"} className="inline-block mt-4 px-6 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all">S inscrire</Link>
+          <h2 className="font-heading text-xl font-bold text-slate-800 mt-4">Cours protégé</h2>
+          <p className="text-slate-400 mt-2">Ce cours nécessite une inscription.</p>
+          <Link href={"/cours/" + slug + "/inscription"} className="inline-block mt-4 px-6 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all">S'inscrire</Link>
         </div>
       ) : (
         <div className="space-y-6">
@@ -108,7 +108,7 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
                   </div>
                 </div>
                 {s.lessons.length === 0 ? (
-                  <p className="px-6 py-8 text-center text-slate-300 text-sm">Bientot disponible</p>
+                  <p className="px-6 py-8 text-center text-slate-300 text-sm">Bientôt disponible</p>
                 ) : (
                   <div>
                     {s.lessons.filter((l: any) => !l.hidden).map((l, li) => {

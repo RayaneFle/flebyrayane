@@ -16,7 +16,7 @@ export default async function ResultatsPage() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-bold text-slate-900 mb-8">Mes résultats</h1>
+      <h1 className="font-heading text-2xl font-bold text-slate-900 mb-8">Mes résultats</h1>
 
       <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded-2xl border border-brand-100 p-5 text-center"><p className="text-2xl font-bold text-slate-800">{results.length}</p><p className="text-xs text-slate-400">Activités jouées</p></div>
