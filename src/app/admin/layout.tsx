@@ -64,6 +64,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main content */}
       <main className="flex-1 p-6 lg:p-8 pb-20 lg:pb-8 overflow-x-hidden">
+        <div className="lg:hidden flex items-center justify-between mb-4">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white font-heading font-black text-xs">R</div>
+            <span className="font-heading font-bold text-sm text-brand-800">FLE<span className="text-accent-500">by</span>Rayane</span>
+          </Link>
+          <span className="text-[10px] font-bold text-slate-300 uppercase">Admin</span>
+        </div>
         {children}
       </main>
       <AdminFAB />
