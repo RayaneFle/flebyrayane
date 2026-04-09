@@ -162,6 +162,7 @@ model Lesson {
   fileUrl   String?
   position  Int      @default(0)
   sectionId String
+  publishAt   DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
