@@ -13,8 +13,9 @@ export default async function LessonPage({ params }: { params: { slug: string; l
     },
   });
   if (!lesson || lesson.section.course.slug !== slug) notFound();
+  if ((lesson as any).hidden) notFound();
 
-  const lessonsInSection = lesson.section.lessons;
+  const lessonsInSection = lesson.section.lessons.filter((l: any) => !(l as any).hidden);
   const idx = lessonsInSection.findIndex(l => l.id === lessonId);
   const prev = idx > 0 ? lessonsInSection[idx - 1] : null;
   const next = idx < lessonsInSection.length - 1 ? lessonsInSection[idx + 1] : null;

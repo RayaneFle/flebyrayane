@@ -9,7 +9,7 @@ export default function Footer() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white font-heading font-black text-sm">R</div>
               <span className="font-heading font-bold text-lg text-brand-800">FLE<span className="text-accent-500">by</span>Rayane</span>
             </Link>
-            <p className="text-sm text-slate-400 leading-relaxed">Plateforme interactive pour apprendre le francais. Cours, exercices et suivi de progression.</p>
+            <p className="text-sm text-slate-400 leading-relaxed">Plateforme interactive pour apprendre le français. Cours, exercices et suivi de progression.</p>
           </div>
           <div>
             <h3 className="font-heading font-bold text-sm text-brand-800 mb-3">Navigation</h3>
@@ -29,8 +29,8 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-6 border-t border-brand-100 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-xs text-slate-300">FLEbyRayane - Tous droits reserves</p>
-          <p className="text-xs text-slate-300">Fait avec amour pour l apprentissage du francais</p>
+          <p className="text-xs text-slate-300">FLEbyRayane</p>
+          <p className="text-xs text-slate-300">Fait avec amour pour le FLE</p>
         </div>
       </div>
     </footer>
