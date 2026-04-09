@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 export default function PageLoader() {
@@ -8,22 +8,24 @@ export default function PageLoader() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // Hide loader when page changes
   useEffect(() => {
     setLoading(false);
   }, [pathname, searchParams]);
 
-  // Auto-hide after 15s in case something goes wrong
+  // Safety: auto-hide after 30s
   useEffect(() => {
     if (loading) {
-      const timer = setTimeout(() => setLoading(false), 15000);
+      const timer = setTimeout(() => setLoading(false), 30000);
       return () => clearTimeout(timer);
     }
   }, [loading]);
 
   useEffect(() => {
-    // Intercept link clicks
     function handleClick(e: MouseEvent) {
       const target = e.target as HTMLElement;
+
+      // Intercept navigation links
       const link = target.closest("a");
       if (link && link.href && link.href.startsWith(window.location.origin) && !link.href.includes("#") && !link.target && !link.hasAttribute("download")) {
         const url = new URL(link.href);
@@ -33,20 +35,17 @@ export default function PageLoader() {
         }
       }
 
-      // Intercept buttons that trigger saves/actions
+      // Intercept save/submit buttons (but NOT small action buttons like toggle, delete, assign)
       const button = target.closest("button");
-      if (button) {
+      if (button && button.type === "submit") {
         const text = button.textContent?.toLowerCase() || "";
-        if (text.includes("sauvegarder") || text.includes("publier") || text.includes("creer et inserer") || text.includes("supprimer") || text.includes("sauvegarde")) {
-          setMessage(text.includes("supprimer") ? "Suppression..." : text.includes("publi") ? "Publication..." : "Sauvegarde...");
+        if (text.includes("sauvegarder") || text.includes("creer") || text.includes("publier")) {
+          setMessage("Sauvegarde...");
           setLoading(true);
-          // Auto-hide after action completes (router.refresh will change pathname/searchParams)
-          setTimeout(() => setLoading(false), 8000);
         }
       }
     }
 
-    // Intercept form submissions
     function handleSubmit(e: Event) {
       const form = e.target as HTMLFormElement;
       if (form.tagName === "FORM") {
