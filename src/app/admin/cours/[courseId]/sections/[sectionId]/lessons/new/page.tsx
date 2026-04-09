@@ -1,9 +1,9 @@
 "use client";
+import dynamic from "next/dynamic";
+const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), { ssr: false });
 import { useState, useEffect, type FormEvent } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { activityTypeLabels } from "@/lib/utils";
-import dynamic from "next/dynamic";
-const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), { ssr: false });
 
 function InlineImg({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [up, setUp] = useState(false);
