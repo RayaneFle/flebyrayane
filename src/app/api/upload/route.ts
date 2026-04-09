@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ message: "Non autorisé." }, { status: 401 });
   const formData = await request.formData();
   const file = formData.get("file") as File;
   if (!file) return NextResponse.json({ message: "Aucun fichier." }, { status: 400 });
