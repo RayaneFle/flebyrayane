@@ -110,6 +110,10 @@ export default function NewLessonPage() {
         <div className="bg-white rounded-2xl border border-brand-100 p-6">
           <label className="block text-sm font-medium text-slate-600 mb-1">Titre *</label>
           <input type="text" required value={title} onChange={e=>setTitle(e.target.value)} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-400 outline-none text-lg font-heading" placeholder="Ex : Les articles definis" />
+          <div className="flex items-center gap-3 mt-3">
+            <div className="flex-1"><label className="block text-xs text-slate-500 mb-1">Publication programmee (optionnel)</label><input type="datetime-local" value={publishAt} onChange={e => setPublishAt(e.target.value)} className="border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-400 w-full" /></div>
+            {publishAt && <button type="button" onClick={() => setPublishAt("")} className="text-xs text-red-400 mt-5">x</button>}
+          </div>
         </div>
 
         <div className="space-y-3">
@@ -284,3 +288,4 @@ export default function NewLessonPage() {
     </div>
   );
 }
+  const [publishAt, setPublishAt] = useState("");
