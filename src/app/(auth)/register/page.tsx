@@ -22,7 +22,7 @@ export default function RegisterPage() {
     const data = await res.json();
     if (!res.ok) { setError(data.message); setLoading(false); return; }
     const login = await signIn("credentials", { email, password, redirect: false });
-    if (login?.error) router.push("/login"); else { router.push("/dashboard"); router.refresh(); }
+    if (login?.error) window.location.href = "/login"; else { window.location.href = "/dashboard"; }
   }
 
   return (

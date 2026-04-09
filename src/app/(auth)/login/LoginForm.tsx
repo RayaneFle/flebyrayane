@@ -17,7 +17,7 @@ export default function LoginForm() {
     e.preventDefault(); setLoading(true); setError(null);
     const res = await signIn("credentials", { email, password, redirect: false });
     if (res?.error) { setError("Email ou mot de passe incorrect."); setLoading(false); }
-    else { router.push(callbackUrl); router.refresh(); }
+    else { window.location.href = callbackUrl; }
   }
 
   return (
