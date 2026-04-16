@@ -38,8 +38,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </Link>
             );
           })}
-          {isAdmin && (
-            <Link href="/admin/utilisateurs"
+          <Link href="/admin/utilisateurs"
               className={"flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all " +
                 (pathname?.startsWith("/admin/utilisateurs") ? "bg-brand-50 text-brand-700 font-bold" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700")}>
               <span>👥</span>Utilisateurs
