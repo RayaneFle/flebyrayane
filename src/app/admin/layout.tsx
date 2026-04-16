@@ -43,7 +43,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 (pathname?.startsWith("/admin/utilisateurs") ? "bg-brand-50 text-brand-700 font-bold" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700")}>
               <span>👥</span>Utilisateurs
             </Link>
-          )}
         </nav>
       </aside>
 
