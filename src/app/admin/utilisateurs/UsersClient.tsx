@@ -13,16 +13,21 @@ interface User {
   avgScore: number;
   lastActivity: string | null;
   counts: { activityResults: number; enrollments: number; classroomMemberships: number; lessonProgress: number };
+  classroomIds: string[];
 }
 
-export default function UsersClient({ users, isAdmin, currentUserEmail }: { users: User[]; isAdmin: boolean; currentUserEmail: string }) {
+interface Classroom { id: string; name: string; code: string; memberCount: number; }
+
+export default function UsersClient({ users, isAdmin, currentUserEmail, classrooms }: { users: User[]; isAdmin: boolean; currentUserEmail: string; classrooms: Classroom[] }) {
   const [sort, setSort] = useState("recent");
   const [roleFilter, setRoleFilter] = useState<string | null>(null);
+  const [classFilter, setClassFilter] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
     let result = users;
     if (roleFilter) result = result.filter(u => u.role === roleFilter);
+    if (classFilter) result = result.filter(u => u.classroomIds.includes(classFilter));
     if (search) {
       const s = search.toLowerCase();
       result = result.filter(u => (u.name || "").toLowerCase().includes(s) || (u.email || "").toLowerCase().includes(s));
@@ -40,7 +45,7 @@ export default function UsersClient({ users, isAdmin, currentUserEmail }: { user
       if (sort === "created") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       return 0;
     });
-  }, [users, sort, roleFilter, search]);
+  }, [users, sort, roleFilter, classFilter, search]);
 
   function daysSince(dateStr: string | null) {
     if (!dateStr) return null;
@@ -58,8 +63,8 @@ export default function UsersClient({ users, isAdmin, currentUserEmail }: { user
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <div>
-          <h1 className="font-heading text-2xl font-bold text-slate-900">Utilisateurs</h1>
-          <p className="text-sm text-slate-400">{filtered.length} utilisateur{filtered.length > 1 ? "s" : ""} {inactiveCount > 0 && " - " + inactiveCount + " inactif" + (inactiveCount > 1 ? "s" : "") + " (>7j)"}</p>
+          <h1 className="font-heading text-2xl font-bold text-slate-900">{isAdmin ? "Utilisateurs" : "Mes eleves"}</h1>
+          <p className="text-sm text-slate-400">{filtered.length} {isAdmin ? "utilisateur" : "eleve"}{filtered.length > 1 ? "s" : ""} {inactiveCount > 0 && " - " + inactiveCount + " inactif" + (inactiveCount > 1 ? "s" : "") + " (>7j)"}</p>
         </div>
       </div>
 
@@ -73,13 +78,26 @@ export default function UsersClient({ users, isAdmin, currentUserEmail }: { user
           <Pill active={sort === "lessons"} onClick={() => setSort("lessons")}>Lecons</Pill>
           <Pill active={sort === "created"} onClick={() => setSort("created")}>Plus recents</Pill>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-bold text-slate-500 mr-1">Role :</span>
-          <Pill active={!roleFilter} onClick={() => setRoleFilter(null)}>Tous</Pill>
-          <Pill active={roleFilter === "student"} onClick={() => setRoleFilter("student")}>Eleves</Pill>
-          <Pill active={roleFilter === "teacher"} onClick={() => setRoleFilter("teacher")}>Professeurs</Pill>
-          {isAdmin && <Pill active={roleFilter === "admin"} onClick={() => setRoleFilter("admin")}>Admins</Pill>}
-        </div>
+        {isAdmin && (
+          <>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-slate-500 mr-1">Role :</span>
+              <Pill active={!roleFilter} onClick={() => setRoleFilter(null)}>Tous</Pill>
+              <Pill active={roleFilter === "student"} onClick={() => setRoleFilter("student")}>Eleves</Pill>
+              <Pill active={roleFilter === "teacher"} onClick={() => setRoleFilter("teacher")}>Professeurs</Pill>
+              <Pill active={roleFilter === "admin"} onClick={() => setRoleFilter("admin")}>Admins</Pill>
+            </div>
+            {classrooms.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold text-slate-500 mr-1">Classe :</span>
+                <Pill active={!classFilter} onClick={() => setClassFilter(null)}>Toutes</Pill>
+                {classrooms.map(c => (
+                  <Pill key={c.id} active={classFilter === c.id} onClick={() => setClassFilter(c.id)}>{c.name} ({c.memberCount})</Pill>
+                ))}
+              </div>
+            )}
+          </>
+        )}
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher par nom ou email..." className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-brand-400" />
       </div>
 
