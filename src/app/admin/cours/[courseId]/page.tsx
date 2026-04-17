@@ -11,6 +11,7 @@ import DeleteCourseBtn from "./DeleteCourseBtn";
 import DeleteSectionBtn from "./DeleteSectionBtn";
 import DeleteLessonBtn from "./DeleteLessonBtn";
 import ToggleLessonBtn from "./ToggleLessonBtn";
+import DuplicateLessonBtn from "./DuplicateLessonBtn";
 
 export default async function AdminCourseEditorPage({ params }: { params: { courseId: string } }) {
   const course = await prisma.course.findUnique({ where: { id: params.courseId }, include: { sections: { orderBy: { position: "asc" }, include: { lessons: { orderBy: { position: "asc" }, include: { _count: { select: { blocks: true } } } } } } } });
@@ -67,7 +68,7 @@ export default async function AdminCourseEditorPage({ params }: { params: { cour
                   <span className="text-sm font-medium text-slate-300 w-8">{si+1}.{li+1}</span>
                   <p className="flex-1 font-medium text-slate-700">{l.title}</p>
                   <span className="text-xs text-slate-400">{l._count.blocks} blocs</span>
-                  <div className="flex items-center gap-1.5"><Link href={`/admin/cours/${course.id}/sections/${s.id}/lessons/${l.id}/modifier`} className="text-xs px-3 py-1 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100">Modifier</Link><ToggleLessonBtn lessonId={l.id} hidden={(l as any).hidden || false} /><DeleteLessonBtn courseId={course.id} sectionId={s.id} lessonId={l.id} /></div>
+                  <div className="flex items-center gap-1.5"><Link href={`/admin/cours/${course.id}/sections/${s.id}/lessons/${l.id}/modifier`} className="text-xs px-3 py-1 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100">Modifier</Link><DuplicateLessonBtn lessonId={l.id} currentCourseId={course.id} /><ToggleLessonBtn lessonId={l.id} hidden={(l as any).hidden || false} /><DeleteLessonBtn courseId={course.id} sectionId={s.id} lessonId={l.id} /></div>
                 </div>
               ))}</div>}
           </div>
