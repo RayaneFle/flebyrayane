@@ -271,6 +271,9 @@ export default function NewLessonPage() {
           ))}
         </div>
 
+        <div className="mb-4">
+          <button type="button" onClick={addTextBlock} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400 hover:text-brand-500 transition-all">+ Bloc texte</button>
+        </div>
         <div className="flex gap-3">
           <button type="submit" disabled={isSubmitting} className="px-8 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow disabled:opacity-50 transition-all">{isSubmitting?"Sauvegarde...":"Sauvegarder"}</button>
           <button type="button" onClick={()=>router.back()} className="px-8 py-3 bg-slate-50 text-slate-600 font-semibold rounded-xl">Annuler</button>
