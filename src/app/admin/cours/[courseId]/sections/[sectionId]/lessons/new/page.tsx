@@ -36,7 +36,7 @@ export default function NewLessonPage() {
   const sectionId = params.sectionId as string;
 
   const [title, setTitle] = useState("");
-  const [blocks, setBlocks] = useState<BlockDraft[]>([]);
+  const [blocks, setBlocks] = useState<BlockDraft[]>([{ id:"b0", type:"text", content:"", activityId:"", requireScore:false, minScore:60 }]);
   const [activities, setActivities] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
