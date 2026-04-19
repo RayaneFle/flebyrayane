@@ -126,26 +126,44 @@ export default async function AdminUsersPage() {
     coursesMap.set(u.id, courses);
   }
 
-  // For each user, count total available lessons (across their enrolled courses AND their class courses)
+  // Build courseIds per user from coursesPerUser (already fetched) - NO extra query
+  const courseIdsPerUser = new Map<string, Set<string>>();
+  for (const u of coursesPerUser) {
+    const ids = new Set<string>();
+    for (const e of u.enrollments) ids.add(e.course.id);
+    for (const m of u.classroomMemberships) for (const cc of m.classroom.courses) ids.add(cc.course.id);
+    courseIdsPerUser.set(u.id, ids);
+  }
+
+  // Count lessons per course ONCE (aggregate query)
+  const allCourseIds = Array.from(new Set(Array.from(courseIdsPerUser.values()).flatMap(s => Array.from(s))));
+  const lessonsByCourse = allCourseIds.length > 0 ? await prisma.lesson.groupBy({
+    by: ["sectionId"],
+    where: { section: { courseId: { in: allCourseIds } } },
+    _count: { _all: true },
+  }) : [];
+
+  // Get sectionId -> courseId mapping (for the lesson groupBy)
+  const sections = allCourseIds.length > 0 ? await prisma.section.findMany({
+    where: { courseId: { in: allCourseIds } },
+    select: { id: true, courseId: true },
+  }) : [];
+  const sectionToCourse = new Map(sections.map(s => [s.id, s.courseId]));
+
+  // lessonsByCourse: courseId -> count
+  const lessonsCountByCourse = new Map<string, number>();
+  for (const l of lessonsByCourse) {
+    const cid = sectionToCourse.get(l.sectionId);
+    if (cid) lessonsCountByCourse.set(cid, (lessonsCountByCourse.get(cid) || 0) + l._count._all);
+  }
+
+  // Now compute totalLessons per user by summing lesson counts of their courses
   const totalLessonsMap = new Map<string, number>();
-  await Promise.all(users.map(async (u) => {
-    const [enrolledCourses, classCourses] = await Promise.all([
-      prisma.enrollment.findMany({ where: { userId: u.id }, select: { courseId: true } }),
-      prisma.classroomMember.findMany({
-        where: { userId: u.id },
-        select: { classroom: { select: { courses: { select: { courseId: true } } } } },
-      }),
-    ]);
-    const courseIds = new Set([
-      ...enrolledCourses.map(e => e.courseId),
-      ...classCourses.flatMap(m => m.classroom.courses.map(c => c.courseId)),
-    ]);
-    if (courseIds.size === 0) { totalLessonsMap.set(u.id, 0); return; }
-    const total = await prisma.lesson.count({
-      where: { section: { courseId: { in: Array.from(courseIds) } } },
-    });
-    totalLessonsMap.set(u.id, total);
-  }));
+  for (const [userId, courseIds] of courseIdsPerUser.entries()) {
+    let total = 0;
+    for (const cid of courseIds) total += lessonsCountByCourse.get(cid) || 0;
+    totalLessonsMap.set(userId, total);
+  }
 
   const scoreMap = new Map(scoreAggs.map(s => [s.userId, s._avg.score]));
   const lastActivityMap = new Map(lastActivities.map(l => [l.userId, l._max.updatedAt]));
