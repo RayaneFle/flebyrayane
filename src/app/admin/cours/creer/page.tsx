@@ -1,5 +1,5 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 const LEVELS = ["A1","A2","B1","B2","C1","C2"];
 export default function CreerCoursPage() {
@@ -9,9 +9,9 @@ export default function CreerCoursPage() {
   const [classrooms, setClassrooms] = useState<any[]>([]);
   const [selectedClassroom, setSelectedClassroom] = useState("");
 
-  useState(() => {
+  useEffect(() => {
     fetch("/api/classrooms").then(r => r.json()).then(setClassrooms).catch(() => {});
-  });
+  }, []);
   const [loading, setLoading] = useState(false); const [error, setError] = useState<string|null>(null);
   async function onSubmit(e: FormEvent) {
     e.preventDefault(); if (!title||!desc) { setError("Titre et description requis."); return; }
