@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
+import DOMPurify from "isomorphic-dompurify";
 import ActivityPlayer from "@/components/activities/ActivityPlayer";
 import { activityTypeLabels } from "@/lib/utils";
 
@@ -93,7 +94,7 @@ export default function LessonContent({ blocks, lessonId, nextLessonUrl, courseU
           return (
             <div key={block.id} ref={el => { if (el) blockRefs.current.set(idx, el); }}
               className={"bg-white rounded-2xl border border-brand-100 p-6 sm:p-8 transition-opacity " + (!accessible ? "opacity-40 pointer-events-none" : "")}>
-              <div className="lesson-content" dangerouslySetInnerHTML={{ __html: block.content }} />
+              <div className="lesson-content" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(block.content, { ADD_TAGS: ["iframe"], ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "src"] }) }} />
             </div>
           );
         }
