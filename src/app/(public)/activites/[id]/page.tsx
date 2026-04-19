@@ -1,12 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { activityTypeLabels, levelColors } from "@/lib/utils";
 import ActivityPlayer from "@/components/activities/ActivityPlayer";
 import Link from "next/link";
 
 export default async function ActivityPlayPage({ params }: { params: { id: string } }) {
-  const a = await prisma.activity.findUnique({ where: { id: params.id }, include: { createdBy: { select: { name: true } }, _count: { select: { results: true } } } });
+  const session = await getServerSession(authOptions);
+  const isTeacher = session?.user?.role === "admin" || session?.user?.role === "teacher";
+  const a = await prisma.activity.findUnique({ where: { id: params.id }, include: { createdBy: { select: { id: true, name: true } }, _count: { select: { results: true } } } });
   if (!a) notFound();
+  if (!a.isPublic && !isTeacher && a.createdBy.id !== session?.user?.id) notFound();
   const t = activityTypeLabels[a.type] || { label: a.type, emoji: "📝" };
   const config = typeof a.config === "string" ? JSON.parse(a.config) : a.config;
 

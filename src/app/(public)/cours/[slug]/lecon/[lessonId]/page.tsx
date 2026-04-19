@@ -1,10 +1,16 @@
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import LessonContent from "./LessonContent";
 
 export default async function LessonPage({ params }: { params: { slug: string; lessonId: string } }) {
   const { slug, lessonId } = params;
+  const session = await getServerSession(authOptions);
+  if (!session) redirect("/login?callbackUrl=/cours/" + slug + "/lecon/" + lessonId);
+  const isTeacher = session.user.role === "admin" || session.user.role === "teacher";
+
   const lesson = await prisma.lesson.findUnique({
     where: { id: lessonId },
     include: {
@@ -13,7 +19,17 @@ export default async function LessonPage({ params }: { params: { slug: string; l
     },
   });
   if (!lesson || lesson.section.course.slug !== slug) notFound();
-  if ((lesson as any).hidden) notFound();
+  if ((lesson as any).hidden && !isTeacher) notFound();
+
+  const course = await prisma.course.findUnique({ where: { slug }, select: { id: true, requiresEnrollment: true, authorId: true } });
+  if (!course) notFound();
+  if (!isTeacher && course.authorId !== session.user.id && course.requiresEnrollment) {
+    const enrollment = await prisma.enrollment.findUnique({ where: { userId_courseId: { userId: session.user.id, courseId: course.id } } });
+    if (!enrollment) redirect("/cours/" + slug + "/inscription");
+  }
+
+  const publishAt = (lesson as any).publishAt;
+  if (publishAt && new Date(publishAt) > new Date() && !isTeacher) notFound();
 
   const lessonsInSection = lesson.section.lessons.filter((l: any) => !(l as any).hidden);
   const idx = lessonsInSection.findIndex(l => l.id === lessonId);
