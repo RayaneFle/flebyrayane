@@ -112,9 +112,9 @@ export default function ActivitiesClient({ myActivities, otherActivities, isAdmi
           {list.map(a => {
             const t = activityTypeLabels[a.type] || { emoji: "📝", label: a.type };
             return (
-              <div key={a.id} className="bg-white rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-md transition-all flex flex-col overflow-hidden">
+              <div key={a.id} className="bg-white rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-md transition-all flex flex-col">
                 {showAuthor && (
-                  <div className="bg-gradient-to-r from-slate-50 to-brand-50/30 px-5 py-2 border-b border-slate-100">
+                  <div className="bg-gradient-to-r from-slate-50 to-brand-50/30 px-5 py-2 border-b border-slate-100 rounded-t-2xl">
                     <p className="text-[11px] text-slate-500">
                       Par <span className="font-semibold text-slate-700">{a.createdBy.name || "Inconnu"}</span>
                     </p>
@@ -140,7 +140,7 @@ export default function ActivitiesClient({ myActivities, otherActivities, isAdmi
                     <span className="text-slate-400">🎯</span> <b className="text-slate-700">{a.resultsCount}</b> partie{a.resultsCount > 1 ? "s" : ""} jouée{a.resultsCount > 1 ? "s" : ""}
                   </p>
                 </div>
-                <div className="border-t border-slate-100 px-3 py-2 flex items-center justify-between gap-1 bg-slate-50/50">
+                <div className="border-t border-slate-100 px-3 py-2 flex items-center justify-between gap-1 bg-slate-50/50 rounded-b-2xl">
                   <div className="flex items-center gap-1">
                     <Link href={"/admin/activites/" + a.id + "/modifier"} className="text-xs font-semibold px-3 py-1.5 bg-brand-50 text-brand-700 rounded-lg hover:bg-brand-100 transition-colors">
                       ✏️ Modifier
