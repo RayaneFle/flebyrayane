@@ -17,7 +17,7 @@ const loginAttempts = new Map<string, { count: number; firstAttempt: number }>()
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const MAX_ATTEMPTS_PER_EMAIL = 5;
 
-function checkAndIncrementRateLimit(email: string): boolean {
+function isRateLimited(email: string): boolean {
   const key = email.toLowerCase();
   const now = Date.now();
   const record = loginAttempts.get(key);
@@ -29,14 +29,23 @@ function checkAndIncrementRateLimit(email: string): boolean {
     }
   }
 
+  if (!record) return false;
+  if (now - record.firstAttempt > RATE_LIMIT_WINDOW_MS) {
+    loginAttempts.delete(key);
+    return false;
+  }
+  return record.count >= MAX_ATTEMPTS_PER_EMAIL;
+}
+
+function recordFailedAttempt(email: string) {
+  const key = email.toLowerCase();
+  const now = Date.now();
+  const record = loginAttempts.get(key);
   if (!record || now - record.firstAttempt > RATE_LIMIT_WINDOW_MS) {
     loginAttempts.set(key, { count: 1, firstAttempt: now });
-    return true;
+  } else {
+    record.count++;
   }
-
-  if (record.count >= MAX_ATTEMPTS_PER_EMAIL) return false;
-  record.count++;
-  return true;
 }
 
 function clearRateLimit(email: string) {
@@ -54,15 +63,19 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // Rate limit: block after MAX_ATTEMPTS failures within window
-        if (!checkAndIncrementRateLimit(credentials.email)) {
-          throw new Error("Trop de tentatives. Reessayez dans 15 minutes.");
-        }
+        // Rate limit: silently reject if blocked (no info leaked to attacker)
+        if (isRateLimited(credentials.email)) return null;
 
         const user = await prisma.user.findUnique({ where: { email: credentials.email } });
-        if (!user || !user.hashedPassword) return null;
+        if (!user || !user.hashedPassword) {
+          recordFailedAttempt(credentials.email);
+          return null;
+        }
         const valid = await bcrypt.compare(credentials.password, user.hashedPassword);
-        if (!valid) return null;
+        if (!valid) {
+          recordFailedAttempt(credentials.email);
+          return null;
+        }
 
         // Successful login: reset the counter for this email
         clearRateLimit(credentials.email);
