@@ -28,29 +28,42 @@ export default async function AdminUsersPage() {
 
   const users = await prisma.user.findMany({
     where: userFilter,
-    include: {
+    select: {
+      id: true, name: true, email: true, role: true, createdAt: true,
       _count: { select: { activityResults: true, enrollments: true, classroomMemberships: true, lessonProgress: true } },
-      activityResults: { select: { updatedAt: true, score: true, completed: true } },
       classroomMemberships: { select: { classroomId: true } },
     },
   });
 
-  const enriched = users.map(u => {
-    const completed = u.activityResults.filter(r => r.completed);
-    const avgScore = completed.length > 0 ? Math.round(completed.reduce((s, r) => s + (r.score || 0), 0) / completed.length) : 0;
-    const lastActivity = u.activityResults.length > 0 ? u.activityResults.map(r => r.updatedAt).sort((a: any, b: any) => new Date(b).getTime() - new Date(a).getTime())[0] : null;
-    return {
-      id: u.id,
-      name: u.name,
-      email: u.email,
-      role: u.role,
-      createdAt: u.createdAt.toISOString(),
-      avgScore,
-      lastActivity: lastActivity ? new Date(lastActivity).toISOString() : null,
-      counts: u._count,
-      classroomIds: u.classroomMemberships.map(m => m.classroomId),
-    };
-  });
+  // Aggregate stats per user (avgScore + lastActivity) in a single DB query
+  const userIds = users.map(u => u.id);
+  const [scoreAggs, lastActivities] = await Promise.all([
+    userIds.length > 0 ? prisma.activityResult.groupBy({
+      by: ["userId"],
+      where: { userId: { in: userIds }, completed: true },
+      _avg: { score: true },
+    }) : Promise.resolve([]),
+    userIds.length > 0 ? prisma.activityResult.groupBy({
+      by: ["userId"],
+      where: { userId: { in: userIds } },
+      _max: { updatedAt: true },
+    }) : Promise.resolve([]),
+  ]);
+
+  const scoreMap = new Map(scoreAggs.map(s => [s.userId, s._avg.score]));
+  const lastActivityMap = new Map(lastActivities.map(l => [l.userId, l._max.updatedAt]));
+
+  const enriched = users.map(u => ({
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    role: u.role,
+    createdAt: u.createdAt.toISOString(),
+    avgScore: Math.round(scoreMap.get(u.id) || 0),
+    lastActivity: lastActivityMap.get(u.id) ? new Date(lastActivityMap.get(u.id)!).toISOString() : null,
+    counts: u._count,
+    classroomIds: u.classroomMemberships.map(m => m.classroomId),
+  }));
 
   const classrooms = allClasses.map(c => ({ id: c.id, name: c.name, code: c.code, memberCount: c.members.length }));
 
