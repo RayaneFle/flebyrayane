@@ -1,11 +1,18 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 export default function ProfilPage() {
+  const router = useRouter();
   const { data: session } = useSession();
   const [current, setCurrent] = useState(""); const [newPw, setNewPw] = useState(""); const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ type: "ok"|"err"; text: string }|null>(null);
+  const [showDelete, setShowDelete] = useState(false);
+  const [deletePw, setDeletePw] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string|null>(null);
   async function changePw(e: React.FormEvent) {
     e.preventDefault(); setMsg(null);
     if (newPw !== confirm) { setMsg({ type: "err", text: "Les mots de passe ne correspondent pas." }); return; }
@@ -16,6 +23,18 @@ export default function ProfilPage() {
     if (!res.ok) setMsg({ type: "err", text: data.message });
     else { setMsg({ type: "ok", text: "Mot de passe modifié !" }); setCurrent(""); setNewPw(""); setConfirm(""); }
     setLoading(false);
+  }
+  async function deleteAccount(e: React.FormEvent) {
+    e.preventDefault(); setDeleteError(null); setDeleteLoading(true);
+    const res = await fetch("/api/user/delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: deletePw }) });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setDeleteError(data.message || "Erreur lors de la suppression.");
+      setDeleteLoading(false);
+      return;
+    }
+    await signOut({ redirect: false });
+    router.push("/");
   }
   return (
     <div>
@@ -40,10 +59,27 @@ export default function ProfilPage() {
           </form>
         </div>
       </div>
-      <div className="bg-white rounded-2xl border border-brand-100 p-6">
+      <div className="bg-white rounded-2xl border border-brand-100 p-6 mb-6">
         <h2 className="font-heading font-bold text-slate-800 mb-2">📦 Mes données (RGPD)</h2>
         <p className="text-sm text-slate-500 mb-4">Conformément au RGPD, vous pouvez télécharger toutes les données que nous détenons sur vous dans un fichier lisible.</p>
         <a href="/api/user/export" download className="inline-block px-5 py-2.5 bg-brand-100 text-brand-700 font-semibold rounded-xl hover:bg-brand-200 transition-colors text-sm">Télécharger mes données (JSON)</a>
+      </div>
+      <div className="bg-white rounded-2xl border border-red-200 p-6">
+        <h2 className="font-heading font-bold text-red-800 mb-2">⚠️ Supprimer mon compte</h2>
+        <p className="text-sm text-slate-500 mb-4">La suppression de votre compte est définitive. Toutes vos données (progression, scores, inscriptions) seront effacées et ne pourront pas être récupérées.</p>
+        {!showDelete ? (
+          <button onClick={() => setShowDelete(true)} className="inline-block px-5 py-2.5 bg-red-50 text-red-700 font-semibold rounded-xl hover:bg-red-100 transition-colors text-sm border border-red-200">Supprimer mon compte</button>
+        ) : (
+          <form onSubmit={deleteAccount} className="space-y-3">
+            <p className="text-sm font-semibold text-red-800">Confirmez votre mot de passe pour supprimer votre compte :</p>
+            {deleteError && <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">{deleteError}</div>}
+            <input type="password" required value={deletePw} onChange={e => setDeletePw(e.target.value)} className="w-full border border-red-200 rounded-xl px-4 py-2.5 outline-none text-sm" placeholder="Votre mot de passe" />
+            <div className="flex gap-2">
+              <button type="button" onClick={() => { setShowDelete(false); setDeletePw(""); setDeleteError(null); }} className="flex-1 bg-slate-100 text-slate-700 py-2.5 rounded-xl font-semibold hover:bg-slate-200 transition-all text-sm">Annuler</button>
+              <button type="submit" disabled={deleteLoading} className="flex-1 bg-red-600 text-white py-2.5 rounded-xl font-semibold hover:bg-red-700 disabled:opacity-50 transition-all text-sm">{deleteLoading ? "Suppression…" : "Supprimer définitivement"}</button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
