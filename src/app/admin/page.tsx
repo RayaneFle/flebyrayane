@@ -8,37 +8,37 @@ export default async function AdminPage() {
   const uid = session?.user?.id || "";
   const isAdmin = session?.user?.role === "admin";
 
-  const [myActivities, myCourses, myClassrooms, totalUsers, totalResults, recentResults] = await Promise.all([
+  const [myActivities, myCourses, myClassrooms, totalUsers, totalResults, recentResults, recentCourses] = await Promise.all([
     prisma.activity.count({ where: { createdById: uid } }),
     prisma.course.count({ where: { authorId: uid } }),
     prisma.classroom.findMany({
       where: { ownerId: uid },
-      include: {
-        members: true,
-        subclasses: true,
-        courses: { include: { course: { select: { title: true } } } },
+      select: {
+        id: true, name: true, code: true,
+        members: { select: { userId: true } },
+        subclasses: { select: { id: true, name: true } },
+        courses: { select: { courseId: true } },
       },
       orderBy: { createdAt: "desc" },
     }),
     isAdmin ? prisma.user.count() : Promise.resolve(0),
     prisma.activityResult.count({ where: { activity: { createdById: uid } } }),
-prisma.activityResult.findMany({
+    prisma.activityResult.findMany({
       where: { activity: { createdById: uid }, completed: true },
-      include: { user: { select: { name: true } }, activity: { select: { title: true, type: true } } },
+      select: { score: true, user: { select: { name: true } }, activity: { select: { title: true, type: true } } },
       orderBy: { completedAt: "desc" },
       take: 10,
     }),
+    prisma.course.findMany({
+      where: isAdmin ? {} : { authorId: uid },
+      select: {
+        id: true, title: true, slug: true,
+        sections: { select: { id: true, title: true }, orderBy: { position: "asc" } },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 5,
+    }),
   ]);
-
-  const recentCourses = await prisma.course.findMany({
-    where: isAdmin ? {} : { authorId: uid },
-    select: {
-      id: true, title: true, slug: true,
-      sections: { select: { id: true, title: true }, orderBy: { position: "asc" } },
-    },
-    orderBy: { updatedAt: "desc" },
-    take: 5,
-  });
 
   const totalStudents = new Set(myClassrooms.flatMap(c => c.members.map(m => m.userId))).size;
   const avgScore = recentResults.length > 0
