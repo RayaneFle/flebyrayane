@@ -55,6 +55,77 @@ export default async function AdminUsersPage() {
     }) : Promise.resolve([]),
   ]);
 
+  // Fetch last 5 activities per user + list of courses they have access to
+  const [recentActivitiesPerUser, coursesPerUser] = await Promise.all([
+    userIds.length > 0 ? prisma.activityResult.findMany({
+      where: { userId: { in: userIds } },
+      select: {
+        userId: true,
+        score: true,
+        completed: true,
+        updatedAt: true,
+        activity: { select: { title: true, type: true, level: true } },
+      },
+      orderBy: { updatedAt: "desc" },
+    }) : Promise.resolve([]),
+    userIds.length > 0 ? prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: {
+        id: true,
+        enrollments: { select: { course: { select: { id: true, title: true, level: true, slug: true } } } },
+        classroomMemberships: {
+          select: {
+            classroom: {
+              select: {
+                name: true,
+                courses: { select: { course: { select: { id: true, title: true, level: true, slug: true } } } },
+              },
+            },
+          },
+        },
+      },
+    }) : Promise.resolve([]),
+  ]);
+
+  // Regroup recent activities per user (max 5 per user)
+  const recentActivitiesMap = new Map<string, { title: string; type: string; level: string | null; score: number | null; completed: boolean; updatedAt: string }[]>();
+  for (const r of recentActivitiesPerUser) {
+    const arr = recentActivitiesMap.get(r.userId) || [];
+    if (arr.length < 5) {
+      arr.push({
+        title: r.activity.title,
+        type: r.activity.type,
+        level: r.activity.level,
+        score: r.score,
+        completed: r.completed,
+        updatedAt: r.updatedAt.toISOString(),
+      });
+      recentActivitiesMap.set(r.userId, arr);
+    }
+  }
+
+  // Regroup courses per user (unique, from enrollments + classes)
+  const coursesMap = new Map<string, { id: string; title: string; level: string; slug: string; source: string }[]>();
+  for (const u of coursesPerUser) {
+    const seen = new Set<string>();
+    const courses: { id: string; title: string; level: string; slug: string; source: string }[] = [];
+    for (const e of u.enrollments) {
+      if (!seen.has(e.course.id)) {
+        seen.add(e.course.id);
+        courses.push({ ...e.course, source: "Inscrit" });
+      }
+    }
+    for (const m of u.classroomMemberships) {
+      for (const cc of m.classroom.courses) {
+        if (!seen.has(cc.course.id)) {
+          seen.add(cc.course.id);
+          courses.push({ ...cc.course, source: m.classroom.name });
+        }
+      }
+    }
+    coursesMap.set(u.id, courses);
+  }
+
   // For each user, count total available lessons (across their enrolled courses AND their class courses)
   const totalLessonsMap = new Map<string, number>();
   await Promise.all(users.map(async (u) => {
@@ -92,6 +163,8 @@ export default async function AdminUsersPage() {
     lessonsCompleted: lessonsCompletedMap.get(u.id) || 0,
     lessonsTotal: totalLessonsMap.get(u.id) || 0,
     classroomIds: u.classroomMemberships.map(m => m.classroomId),
+    recentActivities: recentActivitiesMap.get(u.id) || [],
+    courses: coursesMap.get(u.id) || [],
   }));
 
   const classrooms = allClasses.map(c => ({ id: c.id, name: c.name, code: c.code, memberCount: c.members.length }));

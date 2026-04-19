@@ -16,6 +16,8 @@ interface User {
   lessonsCompleted: number;
   lessonsTotal: number;
   classroomIds: string[];
+  recentActivities: { title: string; type: string; level: string | null; score: number | null; completed: boolean; updatedAt: string }[];
+  courses: { id: string; title: string; level: string; slug: string; source: string }[];
 }
 
 interface Classroom { id: string; name: string; code: string; memberCount: number; }
@@ -25,6 +27,7 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [classFilter, setClassFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let result = users;
@@ -121,26 +124,31 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
           {filtered.map(u => {
             const ago = daysSince(u.lastActivity);
             const isInactive = u.lastActivity && (Date.now() - new Date(u.lastActivity).getTime()) > 7 * 24 * 60 * 60 * 1000;
+            const isExpanded = expandedId === u.id;
             return (
-              <div key={u.id} className="bg-white rounded-2xl border border-slate-200 hover:border-brand-200 hover:shadow-sm transition-all p-5">
+              <div key={u.id} className={"bg-white rounded-2xl border transition-all " + (isExpanded ? "border-brand-300 shadow-md" : "border-slate-200 hover:border-brand-200 hover:shadow-sm")}>
+                <div className="p-5 cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : u.id)}>
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
-                  <Link href={"/admin/utilisateurs/" + u.id} className="shrink-0">
+                  <div className="shrink-0">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center text-white text-lg font-bold shadow-sm">
                       {u.name?.charAt(0).toUpperCase() || "?"}
                     </div>
-                  </Link>
+                  </div>
 
                   {/* Main info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <Link href={"/admin/utilisateurs/" + u.id} className="font-heading font-bold text-slate-900 hover:text-brand-700 truncate block">
-                          {u.name || "—"}
-                        </Link>
-                        <p className="text-xs text-slate-500 truncate">{u.email}</p>
+                      <div className="min-w-0 flex items-center gap-2">
+                        <div>
+                          <p className="font-heading font-bold text-slate-900 truncate">{u.name || "—"}</p>
+                          <p className="text-xs text-slate-500 truncate">{u.email}</p>
+                        </div>
+                        <svg className={"w-4 h-4 text-slate-400 shrink-0 transition-transform " + (isExpanded ? "rotate-180" : "")} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
                       </div>
-                      {isAdmin && <ActionMenu user={u} currentUserEmail={currentUserEmail} />}
+                      {isAdmin && <div onClick={e => e.stopPropagation()}><ActionMenu user={u} currentUserEmail={currentUserEmail} /></div>}
                     </div>
 
                     {/* Badges */}
@@ -188,6 +196,64 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
                     </div>
                   </div>
                 </div>
+                </div>
+
+                {/* Accordion content */}
+                {isExpanded && (
+                  <div className="border-t border-slate-100 bg-slate-50/50 px-5 py-4 space-y-4 animate-slide-down">
+                    {/* Courses */}
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Cours accessibles ({u.courses.length})</h4>
+                      {u.courses.length === 0 ? (
+                        <p className="text-sm text-slate-400 italic">Aucun cours.</p>
+                      ) : (
+                        <div className="grid sm:grid-cols-2 gap-2">
+                          {u.courses.map(cc => (
+                            <Link key={cc.id} href={"/cours/" + cc.slug} className="flex items-center justify-between gap-2 bg-white rounded-lg px-3 py-2 border border-slate-200 hover:border-brand-300 transition-colors" onClick={e => e.stopPropagation()}>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-slate-800 truncate">{cc.title}</p>
+                                <p className="text-[10px] text-slate-400">{cc.source}</p>
+                              </div>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-50 text-brand-700 shrink-0">{cc.level}</span>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Recent activities */}
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Dernières activités ({u.recentActivities.length})</h4>
+                      {u.recentActivities.length === 0 ? (
+                        <p className="text-sm text-slate-400 italic">Aucune activité.</p>
+                      ) : (
+                        <div className="space-y-1.5">
+                          {u.recentActivities.map((a, i) => (
+                            <div key={i} className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-slate-200">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-slate-800 truncate">{a.title}</p>
+                                <p className="text-[10px] text-slate-400">{daysSince(a.updatedAt) || "—"}</p>
+                              </div>
+                              {a.completed && a.score !== null ? (
+                                <span className={"text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0 " + (a.score >= 80 ? "bg-green-100 text-green-700" : a.score >= 50 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700")}>{Math.round(a.score)}%</span>
+                              ) : (
+                                <span className="text-[10px] text-slate-400 shrink-0">En cours</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bouton page complete */}
+                    <div className="pt-2 flex justify-end">
+                      <Link href={"/admin/utilisateurs/" + u.id} className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-800 transition-colors" onClick={e => e.stopPropagation()}>
+                        Voir la page complète
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
