@@ -13,6 +13,8 @@ interface User {
   avgScore: number;
   lastActivity: string | null;
   counts: { activityResults: number; enrollments: number; classroomMemberships: number; lessonProgress: number };
+  lessonsCompleted: number;
+  lessonsTotal: number;
   classroomIds: string[];
 }
 
@@ -40,6 +42,7 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
       }
       if (sort === "name") return (a.name || "").localeCompare(b.name || "");
       if (sort === "score") return b.avgScore - a.avgScore;
+      if (sort === "lessons") return b.lessonsCompleted - a.lessonsCompleted;
       return 0;
     });
   }, [users, sort, roleFilter, classFilter, search]);
@@ -103,6 +106,7 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
             <option value="recent">↕ Activité récente</option>
             <option value="name">↕ Nom A-Z</option>
             <option value="score">↕ Meilleur score</option>
+            <option value="lessons">↕ Leçons terminées</option>
           </select>
         </div>
       </div>
@@ -175,7 +179,7 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
                       </span>
                       <span className="flex items-center gap-1">
                         <span className="text-slate-400">📖</span>
-                        <span><b className="text-slate-700">{u.counts.lessonProgress}</b> leçon{u.counts.lessonProgress > 1 ? "s" : ""}</span>
+                        <span><b className="text-slate-700">{u.lessonsCompleted}</b>{u.lessonsTotal > 0 ? <span className="text-slate-400">/{u.lessonsTotal}</span> : null} leçon{u.lessonsCompleted > 1 ? "s" : ""}</span>
                       </span>
                       <span className="flex items-center gap-1 ml-auto">
                         <span className="text-slate-400">⏰</span>
