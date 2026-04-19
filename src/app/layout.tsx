@@ -38,6 +38,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" translate="no" className="notranslate">
       <body className="min-h-screen bg-surface-50 antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "EducationalOrganization",
+              "name": "FLE by Rayane",
+              "description": "Plateforme interactive d'apprentissage du français langue étrangère",
+              "url": "https://flebyrayane.vercel.app",
+              "sameAs": [],
+              "inLanguage": "fr",
+              "audience": {
+                "@type": "EducationalAudience",
+                "educationalRole": "student",
+              },
+            }),
+          }}
+        />
         <Providers><Suspense fallback={null}><PageLoader /></Suspense>{children}</Providers>
       </body>
     </html>

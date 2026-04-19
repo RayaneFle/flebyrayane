@@ -37,6 +37,21 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
   });
   if (!course) notFound();
 
+  const courseSchema = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": course.title,
+    "description": course.description,
+    "provider": {
+      "@type": "EducationalOrganization",
+      "name": "FLE by Rayane",
+      "sameAs": "https://flebyrayane.vercel.app",
+    },
+    "inLanguage": "fr",
+    "educationalLevel": course.level,
+    "isAccessibleForFree": !course.requiresEnrollment,
+  };
+
   const session = await getServerSession(authOptions);
   const progressMap = new Map<string, string>();
   if (session?.user) {
@@ -61,6 +76,8 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
   const overallProgress = totalLessons > 0 ? Math.round(completedLessons / totalLessons * 100) : 0;
 
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-slate-400 mb-6">
@@ -162,5 +179,6 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
         </div>
       )}
     </div>
+    </>
   );
 }
