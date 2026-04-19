@@ -28,6 +28,15 @@ export default function Footer() {
             </nav>
           </div>
         </div>
+        <div className="mt-6 pt-6 border-t border-brand-100">
+          <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-slate-400">
+            <Link href="/mentions-legales" className="hover:text-brand-600 transition-colors">Mentions legales</Link>
+            <span className="text-slate-300">&middot;</span>
+            <Link href="/confidentialite" className="hover:text-brand-600 transition-colors">Confidentialite</Link>
+            <span className="text-slate-300">&middot;</span>
+            <Link href="/cgu" className="hover:text-brand-600 transition-colors">CGU</Link>
+          </nav>
+        </div>
         <div className="mt-8 pt-6 border-t border-brand-100 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-slate-300">FLEbyRayane</p>
           <p className="text-xs text-slate-300">Fait avec amour pour le FLE</p>
