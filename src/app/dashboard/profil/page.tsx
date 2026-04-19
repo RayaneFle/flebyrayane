@@ -1,13 +1,11 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-
 export default function ProfilPage() {
   const { data: session } = useSession();
   const [current, setCurrent] = useState(""); const [newPw, setNewPw] = useState(""); const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ type: "ok"|"err"; text: string }|null>(null);
-
   async function changePw(e: React.FormEvent) {
     e.preventDefault(); setMsg(null);
     if (newPw !== confirm) { setMsg({ type: "err", text: "Les mots de passe ne correspondent pas." }); return; }
@@ -19,11 +17,10 @@ export default function ProfilPage() {
     else { setMsg({ type: "ok", text: "Mot de passe modifié !" }); setCurrent(""); setNewPw(""); setConfirm(""); }
     setLoading(false);
   }
-
   return (
     <div>
       <h1 className="font-heading text-2xl font-bold text-slate-900 mb-8">Mon profil</h1>
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-2xl border border-brand-100 p-6">
           <h2 className="font-heading font-bold text-slate-800 mb-4">Informations</h2>
           <div className="space-y-3">
@@ -42,6 +39,11 @@ export default function ProfilPage() {
             <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-brand-500 to-accent-500 text-white py-2.5 rounded-xl font-semibold hover:shadow-glow disabled:opacity-50 transition-all">{loading ? "Modification…" : "Modifier"}</button>
           </form>
         </div>
+      </div>
+      <div className="bg-white rounded-2xl border border-brand-100 p-6">
+        <h2 className="font-heading font-bold text-slate-800 mb-2">📦 Mes données (RGPD)</h2>
+        <p className="text-sm text-slate-500 mb-4">Conformément au RGPD, vous pouvez télécharger toutes les données que nous détenons sur vous dans un fichier lisible.</p>
+        <a href="/api/user/export" download className="inline-block px-5 py-2.5 bg-brand-100 text-brand-700 font-semibold rounded-xl hover:bg-brand-200 transition-colors text-sm">Télécharger mes données (JSON)</a>
       </div>
     </div>
   );
