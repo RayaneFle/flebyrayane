@@ -117,9 +117,9 @@ export default async function AdminCourseEditorPage({ params }: { params: { cour
         ) : (
           <div className="space-y-3">
             {course.sections.map((s, si) => (
-              <div key={s.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <div key={s.id} className="bg-white rounded-2xl border border-slate-200">
                 {/* Section header */}
-                <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-r from-brand-50/50 to-accent-50/30 border-b border-slate-100">
+                <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-r from-brand-50/50 to-accent-50/30 border-b border-slate-100 rounded-t-2xl">
                   <ReorderSectionBtns sectionId={s.id} isFirst={si === 0} isLast={si === course.sections.length - 1} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-semibold text-brand-600 uppercase tracking-wider">Section {si + 1}</p>
@@ -156,7 +156,7 @@ export default async function AdminCourseEditorPage({ params }: { params: { cour
                 )}
 
                 {/* Add lesson button */}
-                <div className="border-t border-slate-100 px-5 py-3 bg-slate-50/50">
+                <div className="border-t border-slate-100 px-5 py-3 bg-slate-50/50 rounded-b-2xl">
                   <Link href={"/admin/cours/" + course.id + "/sections/" + s.id + "/lessons/new"} className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-800 transition-colors">
                     <span>+</span>
                     <span>Nouvelle leçon dans cette section</span>

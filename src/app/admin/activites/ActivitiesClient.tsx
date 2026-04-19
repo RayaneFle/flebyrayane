@@ -192,7 +192,7 @@ function ActivityActionsMenu({ activityId, canDelete }: { activityId: string; ca
 
   async function deleteActivity() {
     if (!confirm("Supprimer cette activité ? Cette action est irréversible.")) return;
-    await fetch("/api/admin/activities/" + activityId, { method: "DELETE" });
+    await fetch("/api/activities/" + activityId, { method: "DELETE" });
     setOpen(false);
     router.refresh();
   }
