@@ -1,11 +1,14 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 export default function ProfilPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
+  const [name, setName] = useState(""); const [email, setEmail] = useState("");
+  const [infoLoading, setInfoLoading] = useState(false);
+  const [infoMsg, setInfoMsg] = useState<{ type: "ok"|"err"; text: string }|null>(null);
   const [current, setCurrent] = useState(""); const [newPw, setNewPw] = useState(""); const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ type: "ok"|"err"; text: string }|null>(null);
@@ -13,6 +16,18 @@ export default function ProfilPage() {
   const [deletePw, setDeletePw] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string|null>(null);
+  useEffect(() => {
+    if (session?.user) { setName(session.user.name || ""); setEmail(session.user.email || ""); }
+  }, [session]);
+  async function updateInfo(e: React.FormEvent) {
+    e.preventDefault(); setInfoMsg(null); setInfoLoading(true);
+    const res = await fetch("/api/user/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email }) });
+    const data = await res.json();
+    if (!res.ok) { setInfoMsg({ type: "err", text: data.message }); setInfoLoading(false); return; }
+    setInfoMsg({ type: "ok", text: "Informations mises à jour !" });
+    await update();
+    setInfoLoading(false);
+  }
   async function changePw(e: React.FormEvent) {
     e.preventDefault(); setMsg(null);
     if (newPw !== confirm) { setMsg({ type: "err", text: "Les mots de passe ne correspondent pas." }); return; }
@@ -42,11 +57,22 @@ export default function ProfilPage() {
       <div className="grid lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-2xl border border-brand-100 p-6">
           <h2 className="font-heading font-bold text-slate-800 mb-4">Informations</h2>
-          <div className="space-y-3">
-            <div><p className="text-xs text-slate-400">Nom</p><p className="font-medium text-slate-800">{session?.user?.name || "—"}</p></div>
-            <div><p className="text-xs text-slate-400">Email</p><p className="font-medium text-slate-800">{session?.user?.email}</p></div>
-            <div><p className="text-xs text-slate-400">Rôle</p><p className="font-medium text-slate-800 capitalize">{session?.user?.role}</p></div>
-          </div>
+          {infoMsg && <div className={`text-sm px-4 py-3 rounded-xl mb-4 ${infoMsg.type === "ok" ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-600"}`}>{infoMsg.text}</div>}
+          <form onSubmit={updateInfo} className="space-y-3">
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">Nom</label>
+              <input type="text" required value={name} onChange={e => setName(e.target.value)} maxLength={100} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">Email</label>
+              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} maxLength={200} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none text-sm" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-400">Rôle</p>
+              <p className="font-medium text-slate-800 capitalize">{session?.user?.role}</p>
+            </div>
+            <button type="submit" disabled={infoLoading} className="w-full bg-gradient-to-r from-brand-500 to-accent-500 text-white py-2.5 rounded-xl font-semibold hover:shadow-glow disabled:opacity-50 transition-all">{infoLoading ? "Enregistrement…" : "Enregistrer"}</button>
+          </form>
         </div>
         <div className="bg-white rounded-2xl border border-brand-100 p-6">
           <h2 className="font-heading font-bold text-slate-800 mb-4">🔒 Changer le mot de passe</h2>
