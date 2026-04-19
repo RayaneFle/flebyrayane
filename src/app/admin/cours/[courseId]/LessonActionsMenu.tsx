@@ -16,6 +16,7 @@ export default function LessonActionsMenu({ courseId, sectionId, lessonId, hidde
   const [hidden, setHidden] = useState(initialHidden);
   const [toggling, setToggling] = useState(false);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
+  const [deletedRow, setDeletedRow] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,11 +44,22 @@ export default function LessonActionsMenu({ courseId, sectionId, lessonId, hidde
 
   async function deleteLesson() {
     if (!confirm("Supprimer cette leçon ?")) return;
-    await fetch("/api/admin/courses/" + courseId + "/sections/" + sectionId + "/lessons/" + lessonId, {
-      method: "DELETE",
-    });
     setOpen(false);
-    router.refresh();
+    // UI optimiste : on cache la row IMMEDIATEMENT via parent
+    const row = ref.current?.closest("[data-lesson-row]") as HTMLElement | null;
+    if (row) row.style.display = "none";
+    try {
+      const res = await fetch("/api/admin/courses/" + courseId + "/sections/" + sectionId + "/lessons/" + lessonId, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        if (row) row.style.display = "";
+        alert("Erreur lors de la suppression.");
+      }
+    } catch {
+      if (row) row.style.display = "";
+      alert("Erreur réseau.");
+    }
   }
 
   return (

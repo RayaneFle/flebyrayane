@@ -18,7 +18,9 @@ interface Course {
 
 export default function CoursesClient({ myCourses, otherCourses, isAdmin, currentUserId }: { myCourses: Course[]; otherCourses: Course[]; isAdmin: boolean; currentUserId: string }) {
   const [tab, setTab] = useState<"mine" | "others">("mine");
-  const list = tab === "mine" ? myCourses : otherCourses;
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+  const rawList = tab === "mine" ? myCourses : otherCourses;
+  const list = rawList.filter(c => !hiddenIds.has(c.id));
   const showAuthor = tab === "others";
 
   return (
@@ -123,7 +125,7 @@ export default function CoursesClient({ myCourses, otherCourses, isAdmin, curren
                   {(c.author.id === currentUserId || isAdmin) && (
                     <>
                       <DuplicateCourseBtn courseId={c.id} />
-                      <DeleteCourseInline courseId={c.id} canDelete={c.author.id === currentUserId || isAdmin} />
+                      <DeleteCourseInline courseId={c.id} canDelete={c.author.id === currentUserId || isAdmin} onDeleted={() => setHiddenIds(prev => new Set(prev).add(c.id))} />
                     </>
                   )}
                 </div>

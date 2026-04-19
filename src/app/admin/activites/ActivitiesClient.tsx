@@ -17,8 +17,10 @@ interface Activity {
 export default function ActivitiesClient({ myActivities, otherActivities, isAdmin, currentUserId }: { myActivities: Activity[]; otherActivities: Activity[]; isAdmin: boolean; currentUserId: string }) {
   const [tab, setTab] = useState<"mine" | "others">("mine");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
 
-  const baseList = tab === "mine" ? myActivities : otherActivities;
+  const rawBaseList = tab === "mine" ? myActivities : otherActivities;
+  const baseList = rawBaseList.filter(a => !hiddenIds.has(a.id));
 
   // Filter by type
   const list = useMemo(() => {
@@ -149,7 +151,7 @@ export default function ActivitiesClient({ myActivities, otherActivities, isAdmi
                       👁
                     </Link>
                   </div>
-                  <ActivityActionsMenu activityId={a.id} canDelete={a.createdBy.id === currentUserId || isAdmin} />
+                  <ActivityActionsMenu activityId={a.id} canDelete={a.createdBy.id === currentUserId || isAdmin} onDeleted={() => setHiddenIds(prev => new Set(prev).add(a.id))} />
                 </div>
               </div>
             );
@@ -160,7 +162,7 @@ export default function ActivitiesClient({ myActivities, otherActivities, isAdmi
   );
 }
 
-function ActivityActionsMenu({ activityId, canDelete }: { activityId: string; canDelete: boolean }) {
+function ActivityActionsMenu({ activityId, canDelete, onDeleted }: { activityId: string; canDelete: boolean; onDeleted?: () => void }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -192,9 +194,14 @@ function ActivityActionsMenu({ activityId, canDelete }: { activityId: string; ca
 
   async function deleteActivity() {
     if (!confirm("Supprimer cette activité ? Cette action est irréversible.")) return;
-    await fetch("/api/activities/" + activityId, { method: "DELETE" });
     setOpen(false);
-    router.refresh();
+    if (onDeleted) onDeleted();
+    try {
+      const res = await fetch("/api/activities/" + activityId, { method: "DELETE" });
+      if (!res.ok) alert("Erreur lors de la suppression. Rechargez la page.");
+    } catch {
+      alert("Erreur réseau. Rechargez la page.");
+    }
   }
 
   return (

@@ -137,7 +137,7 @@ export default async function AdminCourseEditorPage({ params }: { params: { cour
                 ) : (
                   <div className="divide-y divide-slate-50">
                     {s.lessons.map((l, li) => (
-                      <div key={l.id} className="flex items-center gap-3 px-5 py-3 hover:bg-brand-50/30 transition-colors">
+                      <div key={l.id} data-lesson-row className="flex items-center gap-3 px-5 py-3 hover:bg-brand-50/30 transition-colors">
                         <ReorderLessonBtns lessonId={l.id} isFirst={li === 0} isLast={li === s.lessons.length - 1} />
                         <span className="text-xs font-semibold text-slate-400 w-10 shrink-0">{si + 1}.{li + 1}</span>
                         <div className="flex-1 min-w-0">
