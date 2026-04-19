@@ -3,8 +3,18 @@ import { prisma } from "@/lib/prisma";
 import { levelColors } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import type { Metadata } from "next";
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "Cours de français FLE",
+  description: "Parcourez tous les cours de français langue étrangère, du niveau débutant (A1) à maîtrise (C2). Grammaire, vocabulaire, expression écrite et orale.",
+  openGraph: {
+    title: "Cours de français FLE | FLE by Rayane",
+    description: "Cours de français langue étrangère (FLE) du niveau A1 à C2.",
+  },
+};
 
 export default async function CoursPage({ searchParams }: { searchParams: { level?: string } }) {
   const sp = await (searchParams as any);

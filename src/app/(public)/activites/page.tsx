@@ -3,8 +3,18 @@ import { prisma } from "@/lib/prisma";
 import { activityTypeLabels, levelColors } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import type { Metadata } from "next";
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "Activités FLE interactives",
+  description: "Exercices interactifs pour apprendre le français : QCM, memory, texte à trous, remise en ordre, pendu et plus. Tous niveaux, du A1 au C2.",
+  openGraph: {
+    title: "Activités FLE interactives | FLE by Rayane",
+    description: "Exercices interactifs pour pratiquer le français langue étrangère.",
+  },
+};
 
 export default async function ActivitesPage({ searchParams }: { searchParams: { type?: string; level?: string } }) {
   const sp = await (searchParams as any);

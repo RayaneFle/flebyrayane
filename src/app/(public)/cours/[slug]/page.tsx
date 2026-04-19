@@ -4,8 +4,26 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { levelColors } from "@/lib/utils";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 export const revalidate = 30;
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const course = await prisma.course.findUnique({
+    where: { slug: params.slug },
+    select: { title: true, description: true, level: true },
+  });
+  if (!course) return { title: "Cours introuvable" };
+  const shortDesc = course.description.length > 160 ? course.description.slice(0, 157) + "..." : course.description;
+  return {
+    title: course.title + " — Niveau " + course.level,
+    description: shortDesc,
+    openGraph: {
+      title: course.title + " | FLE by Rayane",
+      description: shortDesc,
+    },
+  };
+}
 
 export default async function CourseDetailPage({ params }: { params: { slug: string } }) {
   const slug = params.slug;
