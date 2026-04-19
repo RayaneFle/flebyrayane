@@ -15,6 +15,7 @@ import DuplicateLessonBtn from "./DuplicateLessonBtn";
 import EditCourseForm from "./EditCourseForm";
 import ReorderSectionBtns from "./ReorderSectionBtns";
 import ReorderLessonBtns from "./ReorderLessonBtns";
+import LessonActionsMenu from "./LessonActionsMenu";
 
 export default async function AdminCourseEditorPage({ params }: { params: { courseId: string } }) {
   const session = await getServerSession(authOptions);
@@ -143,14 +144,12 @@ export default async function AdminCourseEditorPage({ params }: { params: { cour
                           <p className="font-medium text-slate-800 truncate">{l.title}</p>
                           <p className="text-[11px] text-slate-400">{l._count.blocks} bloc{l._count.blocks > 1 ? "s" : ""}</p>
                         </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <Link href={"/admin/cours/" + course.id + "/sections/" + s.id + "/lessons/" + l.id + "/modifier"} className="text-[11px] font-semibold px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition-colors">
-                            ✏️ Modifier
-                          </Link>
-                          <DuplicateLessonBtn lessonId={l.id} currentCourseId={course.id} />
-                          <ToggleLessonBtn lessonId={l.id} hidden={(l as any).hidden || false} />
-                          <DeleteLessonBtn courseId={course.id} sectionId={s.id} lessonId={l.id} />
-                        </div>
+                        <LessonActionsMenu
+                          courseId={course.id}
+                          sectionId={s.id}
+                          lessonId={l.id}
+                          hidden={(l as any).hidden || false}
+                        />
                       </div>
                     ))}
                   </div>
