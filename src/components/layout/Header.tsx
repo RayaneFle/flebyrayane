@@ -12,6 +12,7 @@ export default function Header() {
   const [profileOpen, setProfileOpen] = useState(false);
   const isAdmin = session?.user?.role === "admin";
   const isTeacher = session?.user?.role === "teacher" || isAdmin;
+  const isStudent = !!session && !isTeacher;
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-brand-100/50">
@@ -27,8 +28,14 @@ export default function Header() {
 
           <nav className="hidden md:flex items-center gap-1">
             <NavLink href="/">Accueil</NavLink>
-            <NavLink href="/cours">Cours</NavLink>
-            <NavLink href="/activites">Activités</NavLink>
+            {isStudent ? (
+              <NavLink href="/dashboard/cours">Mes cours</NavLink>
+            ) : (
+              <>
+                <NavLink href="/cours">Cours</NavLink>
+                <NavLink href="/activites">Activités</NavLink>
+              </>
+            )}
             {isTeacher && <NavLink href="/admin">Admin</NavLink>}
           </nav>
 
@@ -76,8 +83,14 @@ export default function Header() {
         {menuOpen && (
           <div className="md:hidden border-t border-brand-100 py-4 space-y-1 animate-slide-down">
             <MLink href="/" onClick={() => setMenuOpen(false)}>🏠 Accueil</MLink>
-            <MLink href="/cours" onClick={() => setMenuOpen(false)}>📖 Cours</MLink>
-            <MLink href="/activites" onClick={() => setMenuOpen(false)}>🎮 Activités</MLink>
+            {isStudent ? (
+              <MLink href="/dashboard/cours" onClick={() => setMenuOpen(false)}>📖 Mes cours</MLink>
+            ) : (
+              <>
+                <MLink href="/cours" onClick={() => setMenuOpen(false)}>📖 Cours</MLink>
+                <MLink href="/activites" onClick={() => setMenuOpen(false)}>🎮 Activités</MLink>
+              </>
+            )}
             {isTeacher && <MLink href="/admin" onClick={() => setMenuOpen(false)}>⚙️ Admin</MLink>}
             <hr className="border-brand-100 my-2" />
             {session ? (

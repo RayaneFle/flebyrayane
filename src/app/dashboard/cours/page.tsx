@@ -38,9 +38,19 @@ export default async function DashboardCoursPage() {
 
       {empty ? (
         <div className="bg-white rounded-2xl border border-brand-100 p-12 text-center">
-          <span className="text-5xl">\ud83d\udcd6</span>
-          <p className="text-slate-400 mt-4">Aucun contenu.</p>
-          <Link href="/cours" className="inline-block mt-4 text-brand-600 font-semibold">Parcourir les cours \u2192</Link>
+          <span className="text-5xl">\ud83d\udc4b</span>
+          <h2 className="font-heading text-xl font-bold text-slate-800 mt-4">Bienvenue {session?.user?.name || ""} !</h2>
+          <p className="text-slate-500 mt-3 max-w-md mx-auto">Pour commencer, rejoins une classe avec le code donné par ton enseignant, ou explore les cours publics disponibles.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
+            <Link href="/dashboard/rejoindre" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all">
+              <span>\ud83c\udf93</span>
+              <span>Rejoindre une classe</span>
+            </Link>
+            <Link href="/cours" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-50 text-brand-700 font-semibold rounded-xl hover:bg-brand-100 transition-colors">
+              <span>\ud83d\udd0d</span>
+              <span>Explorer les cours</span>
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">
