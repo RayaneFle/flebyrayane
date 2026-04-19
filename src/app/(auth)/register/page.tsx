@@ -16,7 +16,7 @@ export default function RegisterPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault(); setError(null);
     if (password !== confirm) { setError("Les mots de passe ne correspondent pas."); return; }
-    if (password.length < 6) { setError("6 caractères minimum."); return; }
+    if (password.length < 8) { setError("8 caractères minimum."); return; }
     setLoading(true);
     const res = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, password }) });
     const data = await res.json();

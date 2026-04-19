@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const { name, email, password } = await request.json();
     if (!name || !email || !password) return NextResponse.json({ message: "Champs requis." }, { status: 400 });
-    if (password.length < 6) return NextResponse.json({ message: "6 caractères minimum." }, { status: 400 });
+    if (password.length < 8) return NextResponse.json({ message: "8 caractères minimum." }, { status: 400 });
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) return NextResponse.json({ message: "Email déjà utilisé." }, { status: 409 });
     const hashed = await bcrypt.hash(password, 12);

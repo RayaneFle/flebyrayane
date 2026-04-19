@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   if (!session?.user) return NextResponse.json({ message: "Non autorisé." }, { status: 401 });
   const { currentPassword, newPassword } = await request.json();
   if (!currentPassword || !newPassword) return NextResponse.json({ message: "Champs requis." }, { status: 400 });
-  if (newPassword.length < 6) return NextResponse.json({ message: "6 caractères minimum." }, { status: 400 });
+  if (newPassword.length < 8) return NextResponse.json({ message: "8 caractères minimum." }, { status: 400 });
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!user?.hashedPassword) return NextResponse.json({ message: "Erreur." }, { status: 400 });
   const valid = await bcrypt.compare(currentPassword, user.hashedPassword);

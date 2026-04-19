@@ -11,7 +11,7 @@ export default function ProfilPage() {
   async function changePw(e: React.FormEvent) {
     e.preventDefault(); setMsg(null);
     if (newPw !== confirm) { setMsg({ type: "err", text: "Les mots de passe ne correspondent pas." }); return; }
-    if (newPw.length < 6) { setMsg({ type: "err", text: "6 caractères minimum." }); return; }
+    if (newPw.length < 8) { setMsg({ type: "err", text: "8 caractères minimum." }); return; }
     setLoading(true);
     const res = await fetch("/api/user/password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ currentPassword: current, newPassword: newPw }) });
     const data = await res.json();
