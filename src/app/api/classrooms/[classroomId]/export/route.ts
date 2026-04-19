@@ -18,6 +18,7 @@ export async function GET(_r: Request, { params }: { params: { classroomId: stri
     },
   });
   if (!classroom) return NextResponse.json({ message: "Non trouve." }, { status: 404 });
+  if (session.user.role !== "admin" && classroom.ownerId !== session.user.id) return NextResponse.json({ message: "Non autorise." }, { status: 403 });
 
   const lessons = await prisma.lesson.findMany({
     where: { section: { courseId: { in: classroom.courses.map(c => c.courseId) } } },

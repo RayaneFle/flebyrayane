@@ -1,9 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import ClassroomTabs from "./ClassroomTabs";
 
 export default async function ClassroomDetailPage({ params }: { params: { classroomId: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session) notFound();
+  const isAdmin = session.user.role === "admin";
+
   const classroom = await prisma.classroom.findUnique({
     where: { id: params.classroomId },
     include: {
@@ -15,6 +21,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
     },
   });
   if (!classroom) notFound();
+  if (!isAdmin && classroom.ownerId !== session.user.id) notFound();
 
   const allCourses = await prisma.course.findMany({ where: { published: true }, select: { id: true, title: true, level: true } });
   const assignedCourseIds = new Set(classroom.courses.map(c => c.courseId));

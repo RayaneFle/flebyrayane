@@ -14,10 +14,13 @@ import ToggleLessonBtn from "./ToggleLessonBtn";
 import DuplicateLessonBtn from "./DuplicateLessonBtn";
 
 export default async function AdminCourseEditorPage({ params }: { params: { courseId: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session) notFound();
+  const isAdmin = session.user.role === "admin";
+
   const course = await prisma.course.findUnique({ where: { id: params.courseId }, include: { sections: { orderBy: { position: "asc" }, include: { lessons: { orderBy: { position: "asc" }, include: { _count: { select: { blocks: true } } } } } } } });
   if (!course) notFound();
-
-  const session = await getServerSession(authOptions);
+  if (!isAdmin && course.authorId !== session.user.id) notFound();
   const classrooms = await prisma.classroom.findMany({
     where: { ownerId: session?.user?.id || "" },
     include: { courses: { select: { courseId: true } } },
