@@ -46,9 +46,10 @@ export function slugify(text: string): string {
 }
 
 export function generateClassCode(): string {
+  const { randomInt } = require("crypto");
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
-  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  for (let i = 0; i < 6; i++) code += chars[randomInt(0, chars.length)];
   return code;
 }
 
