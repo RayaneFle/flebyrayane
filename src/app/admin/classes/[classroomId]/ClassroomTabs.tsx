@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { activityTypeLabels } from "@/lib/utils";
+import { activityTypeLabels, getYouTubeEmbedUrl } from "@/lib/utils";
 import AssignCourseForm from "./AssignCourseForm";
 import AssignActivityForm from "./AssignActivityForm";
 import UnassignActivityBtn from "./UnassignActivityBtn";
@@ -266,7 +266,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
                     <DeletePostBtn classroomId={classroom.id} postId={p.id} />
                   </div>
                   {p.content && <p className="text-sm text-slate-600 mb-2">{p.content}</p>}
-                  {p.videoUrl && <div className="rounded-lg overflow-hidden bg-black"><iframe src={p.videoUrl.replace("watch?v=","embed/")} className="w-full aspect-video" allowFullScreen /></div>}
+                  {getYouTubeEmbedUrl(p.videoUrl) && <div className="rounded-lg overflow-hidden bg-black"><iframe src={getYouTubeEmbedUrl(p.videoUrl) || ""} className="w-full aspect-video" allowFullScreen /></div>}
                   {p.fileUrl && <a href={p.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-brand-600 bg-brand-50 px-4 py-2 rounded-lg mt-2">{p.fileName || "Fichier"}</a>}
                 </div>
               ))}

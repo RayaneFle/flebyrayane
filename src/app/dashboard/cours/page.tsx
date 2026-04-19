@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { levelColors, activityTypeLabels } from "@/lib/utils";
+import { levelColors, activityTypeLabels, getYouTubeEmbedUrl } from "@/lib/utils";
 
 export default async function DashboardCoursPage() {
   const session = await getServerSession(authOptions);
@@ -105,7 +105,7 @@ export default async function DashboardCoursPage() {
                       <span className="text-xs text-slate-400 ml-auto">{p.classroomName}</span>
                     </div>
                     {p.content && <p className="text-sm text-slate-600 mb-3">{p.content}</p>}
-                    {p.videoUrl && <div className="rounded-xl overflow-hidden bg-black mb-3"><iframe src={p.videoUrl.replace("watch?v=","embed/")} className="w-full aspect-video" allowFullScreen /></div>}
+                    {getYouTubeEmbedUrl(p.videoUrl) && <div className="rounded-xl overflow-hidden bg-black mb-3"><iframe src={getYouTubeEmbedUrl(p.videoUrl) || ""} className="w-full aspect-video" allowFullScreen /></div>}
                     {p.fileUrl && <a href={p.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-brand-600 bg-brand-50 px-4 py-2 rounded-lg">\ud83d\udcc4 {p.fileName||"Fichier"}</a>}
                   </div>
                 ))}
