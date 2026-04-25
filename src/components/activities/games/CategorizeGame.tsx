@@ -24,16 +24,16 @@ export default function CategorizeGame({ config, onComplete }: { config: any; on
     const r = new Map<string, boolean>();
     config.items.forEach((i: any) => r.set(key(i), placements.get(key(i)) === i.category));
     setResults(r); setChecked(true);
-    const details = config.items.map((i: any) => ({ question: i.text || i.imageUrl || "?", userAnswer: placements.get(key(i)) || "(non place)", correctAnswer: i.category, isCorrect: r.get(key(i)) || false, imageUrl: i.imageUrl }));
+    const details = config.items.map((i: any) => ({ question: i.text || i.imageUrl || "?", userAnswer: placements.get(key(i)) || "(non placé)", correctAnswer: i.category, isCorrect: r.get(key(i)) || false, imageUrl: i.imageUrl }));
     onComplete((Array.from(r.values()).filter(Boolean).length / config.items.length) * 100, details);
   }
 
   return (
     <div className="bg-white rounded-2xl border border-brand-100 p-6 sm:p-8">
-      <p className="text-sm text-slate-400 mb-2">{config.instruction || "Triez les elements"}</p>
-      <p className="text-xs text-slate-300 mb-6">{placements.size}/{config.items.length} tries</p>
+      <p className="text-sm text-slate-400 mb-2">{config.instruction || "Triez les éléments"}</p>
+      <p className="text-xs text-slate-300 mb-6">{placements.size}/{config.items.length} triés</p>
       <div className="flex flex-wrap gap-3 mb-8 min-h-[60px] p-3 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-        {unplaced.length === 0 && !checked && <p className="text-xs text-slate-300 m-auto">Tous tries !</p>}
+        {unplaced.length === 0 && !checked && <p className="text-xs text-slate-300 m-auto">Tous triés !</p>}
         {unplaced.map((i: any) => (
           <div key={key(i)} draggable onDragStart={() => dragStart(key(i))} onDragEnd={() => { setDragging(null); ref.current = null; }} onClick={() => tap(key(i))}
             className={`px-4 py-2 rounded-xl font-medium text-sm cursor-grab select-none transition-all flex items-center gap-2 ${dragging === key(i) ? "bg-brand-500 text-white scale-105 shadow-lg" : "bg-white text-slate-700 border border-slate-200 hover:border-brand-300"}`}>
@@ -67,13 +67,13 @@ export default function CategorizeGame({ config, onComplete }: { config: any; on
                     </div>
                   );
                 })}
-                {items.length === 0 && <p className="text-xs text-slate-300 text-center italic py-2">Deposez ici</p>}
+                {items.length === 0 && <p className="text-xs text-slate-300 text-center italic py-2">Déposez ici</p>}
               </div>
             </div>
           );
         })}
       </div>
-      {!checked && <div className="mt-6 text-center"><button onClick={check} disabled={placements.size !== config.items.length} className="px-8 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow disabled:opacity-40 transition-all">Verifier</button></div>}
+      {!checked && <div className="mt-6 text-center"><button onClick={check} disabled={placements.size !== config.items.length} className="px-8 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow disabled:opacity-40 transition-all">Vérifier</button></div>}
     </div>
   );
 }

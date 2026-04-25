@@ -90,7 +90,7 @@ export default function ActivityPlayer({ activityId, type, config, embedded, onE
 
         {details.length > 0 && (
           <div className="mb-6">
-            <h3 className="font-heading font-bold text-slate-800 mb-3 text-sm">Detail des reponses :</h3>
+            <h3 className="font-heading font-bold text-slate-800 mb-3 text-sm">Détail des réponses :</h3>
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {details.map((d, i) => (
                 <div key={i} className={"p-3 rounded-xl border " + (d.isCorrect ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200")}>
@@ -101,11 +101,11 @@ export default function ActivityPlayer({ activityId, type, config, embedded, onE
                       {d.imageUrl && <img src={d.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover mt-1" />}
                       {!d.isCorrect && (
                         <div className="mt-1">
-                          <p className="text-xs text-red-600">Votre reponse : <span className="font-medium">{d.userAnswer || "(vide)"}</span></p>
-                          <p className="text-xs text-green-700">Bonne reponse : <span className="font-medium">{d.correctAnswer}</span></p>
+                          <p className="text-xs text-red-600">Votre réponse : <span className="font-medium">{d.userAnswer || "(vide)"}</span></p>
+                          <p className="text-xs text-green-700">Bonne réponse : <span className="font-medium">{d.correctAnswer}</span></p>
                         </div>
                       )}
-                      {d.isCorrect && <p className="text-xs text-green-700 mt-1">Votre reponse : <span className="font-medium">{d.userAnswer}</span></p>}
+                      {d.isCorrect && <p className="text-xs text-green-700 mt-1">Votre réponse : <span className="font-medium">{d.userAnswer}</span></p>}
                       {d.explanation && <p className="text-xs text-slate-500 mt-1 italic">{"\ud83d\udca1"} {d.explanation}</p>}
                     </div>
                   </div>
@@ -141,7 +141,7 @@ export default function ActivityPlayer({ activityId, type, config, embedded, onE
   return (
     <div key={state}>
       {!embedded && <div className="flex justify-end mb-3"><span className="text-xs text-brand-400 bg-brand-50 px-3 py-1 rounded-full">{"\u23f1"} {formatTime(time)}</span></div>}
-      {games[type] || <div className="text-center py-12 bg-white rounded-2xl border border-brand-100"><span className="text-4xl">{"\ud83d\udea7"}</span><p className="text-brand-400 mt-4">Type {type} bientot disponible !</p></div>}
+      {games[type] || <div className="text-center py-12 bg-white rounded-2xl border border-brand-100"><span className="text-4xl">{"\ud83d\udea7"}</span><p className="text-brand-400 mt-4">Type {type} bientôt disponible !</p></div>}
     </div>
   );
 }

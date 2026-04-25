@@ -33,7 +33,7 @@ export default function FillBlanksGame({ config, onComplete }: { config: any; on
 
   return (
     <div className="bg-white rounded-2xl border border-brand-100 p-6 sm:p-8">
-      <p className="text-sm text-brand-400 mb-6">{blanks.length} trou{blanks.length !== 1 ? "s" : ""} a completer</p>
+      <p className="text-sm text-brand-400 mb-6">{blanks.length} trou{blanks.length !== 1 ? "s" : ""} à compléter</p>
       <div className="text-lg leading-loose text-slate-800">
         {segments.map((seg, i) => {
           if (seg.type === "text") return <span key={i}>{seg.value}</span>;
@@ -43,7 +43,7 @@ export default function FillBlanksGame({ config, onComplete }: { config: any; on
         })}
       </div>
       {checked && <div className="mt-4 space-y-1">{blanks.map((b, i) => !results[i] && <p key={i} className="text-sm text-red-600">{"\u274c"} {answers[i] || "(vide)"} {"\u2192"} <span className="text-green-700 font-medium">{b.value}</span></p>)}</div>}
-      {!checked && <div className="mt-6 text-center"><button onClick={check} disabled={answers.some(a => !a.trim())} className="px-8 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow disabled:opacity-40 transition-all">Verifier</button></div>}
+      {!checked && <div className="mt-6 text-center"><button onClick={check} disabled={answers.some(a => !a.trim())} className="px-8 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow disabled:opacity-40 transition-all">Vérifier</button></div>}
     </div>
   );
 }

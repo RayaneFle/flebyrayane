@@ -25,7 +25,7 @@ export default function CourseEnrollPage() {
     e.preventDefault();
     setLoading(true); setError(null); setSuccess(null);
     if (!course) {
-      setError("Cours non trouve.");
+      setError("Cours non trouvé.");
       setLoading(false);
       return;
     }
@@ -41,13 +41,13 @@ export default function CourseEnrollPage() {
         setLoading(false);
         return;
       }
-      setSuccess("Inscription validee ! Redirection...");
+      setSuccess("Inscription validée ! Redirection...");
       setTimeout(() => {
         router.push("/cours/" + slug);
         router.refresh();
       }, 1500);
     } catch {
-      setError("Erreur reseau.");
+      setError("Erreur réseau.");
       setLoading(false);
     }
   }
@@ -68,10 +68,10 @@ export default function CourseEnrollPage() {
         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
           <div className="text-center mb-6">
             <span className="text-5xl">&#128274;</span>
-            <h1 className="font-heading text-2xl font-bold text-slate-900 mt-3">Cours protege</h1>
+            <h1 className="font-heading text-2xl font-bold text-slate-900 mt-3">Cours protégé</h1>
             {course ? (
               <>
-                <p className="text-sm text-slate-600 mt-2">Pour acceder au cours</p>
+                <p className="text-sm text-slate-600 mt-2">Pour accéder au cours</p>
                 <p className="font-heading font-bold text-lg text-brand-700 mt-1">{course.title}</p>
                 {course.level && <span className="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-100 text-brand-700">{course.level}</span>}
               </>
@@ -106,7 +106,7 @@ export default function CourseEnrollPage() {
               disabled={loading || !!success || code.length < 4 || !course}
               className="w-full bg-gradient-to-r from-brand-500 to-accent-500 text-white py-3 rounded-xl font-semibold hover:shadow-glow disabled:opacity-50 transition-all"
             >
-              {loading ? "Verification..." : success ? "Redirection..." : "S'inscrire au cours"}
+              {loading ? "Vérification..." : success ? "Redirection..." : "S’inscrire au cours"}
             </button>
           </form>
         </div>
@@ -115,11 +115,11 @@ export default function CourseEnrollPage() {
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-slate-200 p-5">
             <h3 className="font-heading font-bold text-slate-900 text-sm mb-2">&#128161; Pas de code ?</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">Demande a ton professeur le code d'inscription. Il l'a defini lors de la creation du cours.</p>
+            <p className="text-xs text-slate-500 leading-relaxed">Demande à ton professeur le code d’inscription. Il l’a défini lors de la création du cours.</p>
           </div>
           <div className="bg-brand-50 rounded-2xl border border-brand-200 p-5">
             <h3 className="font-heading font-bold text-brand-900 text-sm mb-2">&#127919; Cours libres</h3>
-            <p className="text-xs text-slate-600 leading-relaxed mb-3">Tu peux acceder a d'autres cours sans inscription :</p>
+            <p className="text-xs text-slate-600 leading-relaxed mb-3">Tu peux accéder à d’autres cours sans inscription :</p>
             <Link href="/cours" className="block text-center text-xs font-semibold text-white bg-gradient-to-r from-brand-500 to-accent-500 py-2 rounded-lg hover:shadow-md transition-all">
               Voir tous les cours &rarr;
             </Link>

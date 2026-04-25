@@ -26,7 +26,7 @@ export default function QCMGame({ config, onComplete }: { config: any; onComplet
           const optText = (o: any) => typeof o === "string" ? o : o.text || "";
           return {
             question: q.question,
-            userAnswer: ans >= 0 ? optText(q.options[ans]) : "(non repondu)",
+            userAnswer: ans >= 0 ? optText(q.options[ans]) : "(non répondu)",
             correctAnswer: optText(q.options[q.correctIndex]),
             isCorrect: ans === q.correctIndex,
             explanation: q.explanation || undefined,

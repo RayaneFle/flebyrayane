@@ -45,7 +45,7 @@ export default function SortingGame({ config, onComplete }: { config: any; onCom
           );
         })}
       </div>
-      {!checked && <div className="mt-6 text-center"><button onClick={check} className="px-8 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all">Verifier</button></div>}
+      {!checked && <div className="mt-6 text-center"><button onClick={check} className="px-8 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all">Vérifier</button></div>}
     </div>
   );
 }

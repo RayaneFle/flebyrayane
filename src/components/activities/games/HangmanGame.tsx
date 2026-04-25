@@ -19,7 +19,7 @@ export default function HangmanGame({ config, onComplete }: { config: any; onCom
   function guess(l: string) { if (over || guessed.has(l)) return; setGuessed(p => new Set(p).add(l)); }
   function next() {
     const w = found ? won + 1 : won; setWon(w);
-    if (isLast) { const details = config.words.map((wd: any, i: number) => ({ question: wd.hint || "Mot " + (i+1), userAnswer: i < wi ? "Trouve" : found ? "Trouve" : "Perdu", correctAnswer: wd.word, isCorrect: i < wi ? true : found, imageUrl: wd.imageUrl })); onComplete((w / config.words.length) * 100, details); } else { setWi(i => i + 1); setGuessed(new Set()); }
+    if (isLast) { const details = config.words.map((wd: any, i: number) => ({ question: wd.hint || "Mot " + (i+1), userAnswer: i < wi ? "Trouvé" : found ? "Trouvé" : "Perdu", correctAnswer: wd.word, isCorrect: i < wi ? true : found, imageUrl: wd.imageUrl })); onComplete((w / config.words.length) * 100, details); } else { setWi(i => i + 1); setGuessed(new Set()); }
   }
 
   const parts = [
@@ -44,7 +44,7 @@ export default function HangmanGame({ config, onComplete }: { config: any; onCom
             return <span key={i} className={`w-10 h-12 flex items-center justify-center text-xl font-bold border-b-2 ${sp ? "" : over && !guessed.has(ch) ? "border-red-400 text-red-500 bg-red-50 rounded" : rev ? "border-green-400 text-green-700" : "border-brand-300"}`}>{rev ? ch : ""}</span>;
           })}
         </div>
-        {over && <div className={`text-center p-4 rounded-xl ${found ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}><p className="font-bold text-lg">{found ? "🎉 Bravo !" : `😞 C'était : ${cur.word}`}</p><button onClick={next} className="mt-3 px-6 py-2 bg-gradient-to-r from-brand-500 to-accent-500 text-white rounded-lg font-semibold hover:shadow-glow transition-all">{isLast ? "Résultat" : "Suivant →"}</button></div>}
+        {over && <div className={`text-center p-4 rounded-xl ${found ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}><p className="font-bold text-lg">{found ? "🎉 Bravo !" : `😞 C’était : ${cur.word}`}</p><button onClick={next} className="mt-3 px-6 py-2 bg-gradient-to-r from-brand-500 to-accent-500 text-white rounded-lg font-semibold hover:shadow-glow transition-all">{isLast ? "Résultat" : "Suivant →"}</button></div>}
         {!over && <div className="space-y-2">{KB.map((row, ri) => <div key={ri} className="flex gap-1.5 justify-center">{row.map(l => { const used = guessed.has(l); const ok = used && word.includes(l); const bad = used && !word.includes(l); return <button key={l} onClick={() => guess(l)} disabled={used} className={`w-9 h-10 sm:w-10 sm:h-11 rounded-lg font-bold text-sm transition-all ${ok ? "bg-green-500 text-white" : bad ? "bg-brand-200 text-brand-400" : "bg-brand-50 hover:bg-accent-100 hover:text-accent-700 cursor-pointer"}`}>{l}</button>; })}</div>)}</div>}
       </div>
     </div>
