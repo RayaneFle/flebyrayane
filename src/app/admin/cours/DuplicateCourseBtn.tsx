@@ -7,7 +7,7 @@ export default function DuplicateCourseBtn({ courseId }: { courseId: string }) {
   const [loading, setLoading] = useState(false);
 
   async function handleDuplicate() {
-    if (!confirm("Dupliquer ce cours ? Une copie independante sera creee.")) return;
+    if (!confirm("Dupliquer ce cours ? Une copie indépendante sera créée.")) return;
     setLoading(true);
     const res = await fetch("/api/admin/courses/" + courseId + "/duplicate", { method: "POST" });
     if (res.ok) {

@@ -12,13 +12,13 @@ export default function CreerActivitePage() {
   return (
     <div className="max-w-5xl">
       <div className="flex items-center gap-2 text-xs text-slate-500 mb-4">
-        <a href="/admin/activites" className="hover:text-brand-600 transition-colors">Mes activites</a>
+        <a href="/admin/activites" className="hover:text-brand-600 transition-colors">Mes activités</a>
         <span className="text-slate-300">/</span>
-        <span className="text-slate-700 font-medium">Nouvelle activite</span>
+        <span className="text-slate-700 font-medium">Nouvelle activité</span>
       </div>
       <div className="mb-8">
-        <h1 className="font-heading text-2xl font-bold text-slate-900">Creer une activite</h1>
-        <p className="text-sm text-slate-500 mt-1">Choisis le type de jeu que tu veux creer pour tes eleves.</p>
+        <h1 className="font-heading text-2xl font-bold text-slate-900">Créer une activité</h1>
+        <p className="text-sm text-slate-500 mt-1">Choisis le type de jeu que tu veux créer pour tes élèves.</p>
       </div>
       {Object.entries(CATS).map(([cat, types]) => (
         <div key={cat} className="mb-8">

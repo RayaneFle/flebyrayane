@@ -259,11 +259,11 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
       {tab === "activites" && (
         <div className="space-y-6">
           <div>
-            <h2 className="font-heading text-lg font-bold text-slate-900 mb-4">Activites assignees ({classroom.activities.length})</h2>
+            <h2 className="font-heading text-lg font-bold text-slate-900 mb-4">Activités assignées ({classroom.activities.length})</h2>
             {classroom.activities.length === 0 ? (
               <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
                 <span className="text-4xl">A</span>
-                <p className="text-slate-500 mt-3">Aucune activite assignee a cette classe.</p>
+                <p className="text-slate-500 mt-3">Aucune activité assignée à cette classe.</p>
                 <p className="text-xs text-slate-400 mt-1">Utilisez le formulaire ci-dessous pour en ajouter.</p>
               </div>
             ) : (
@@ -301,7 +301,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
                         <div className="flex items-center gap-4 shrink-0">
                           <div className="text-center">
                             <p className="font-heading font-bold text-lg text-slate-900">{uniqueStudents}<span className="text-xs text-slate-400">/{classroom.members.length}</span></p>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Eleves</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Élèves</p>
                           </div>
                           <div className="text-center">
                             <p className="font-heading font-bold text-lg text-slate-900">{totalAttempts}</p>
@@ -321,10 +321,10 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
             )}
           </div>
           <div className="bg-white rounded-2xl border border-dashed border-brand-300 p-5">
-            <h3 className="font-heading font-bold text-slate-800 mb-3">+ Assigner une activite</h3>
+            <h3 className="font-heading font-bold text-slate-800 mb-3">+ Assigner une activité</h3>
             <AssignActivityForm classroomId={classroom.id} activities={availableActivities} />
             <Link href="/admin/activites/creer" className="inline-block mt-3 text-xs text-brand-600 font-semibold hover:text-brand-800">
-              Ou creer une nouvelle activite
+              Ou créer une nouvelle activité
             </Link>
           </div>
         </div>
@@ -335,15 +335,15 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="font-heading text-lg font-bold text-slate-900">Eleves ({classroom.members.length})</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Gerez les inscriptions et les sous-classes</p>
+              <h2 className="font-heading text-lg font-bold text-slate-900">Élèves ({classroom.members.length})</h2>
+              <p className="text-xs text-slate-400 mt-0.5">Gérez les inscriptions et les sous-classes</p>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowSubclasses(!showSubclasses)}
                 className="text-xs font-semibold px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
               >
-                {showSubclasses ? "Masquer" : "Gerer les sous-classes"}
+                {showSubclasses ? "Masquer" : "Gérer les sous-classes"}
               </button>
               <div className="bg-slate-100 rounded-lg px-3 py-2">
                 <p className="text-[9px] uppercase tracking-wider text-slate-500 font-semibold">Code</p>
@@ -362,8 +362,8 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
           {classroom.members.length === 0 ? (
             <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
               <span className="text-4xl">EE</span>
-              <p className="text-slate-500 mt-3">Aucun eleve dans cette classe.</p>
-              <p className="text-xs text-slate-400 mt-1">Partagez le code <b className="font-mono">{classroom.code}</b> a vos eleves.</p>
+              <p className="text-slate-500 mt-3">Aucun élève dans cette classe.</p>
+              <p className="text-xs text-slate-400 mt-1">Partagez le code <b className="font-mono">{classroom.code}</b> à vos élèves.</p>
             </div>
           ) : (
             <>
@@ -401,7 +401,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
                 return (
                   <div>
                     {classroom.subclasses.length > 0 && (
-                      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Non assignes ({unassigned.length})</h3>
+                      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Non assignés ({unassigned.length})</h3>
                     )}
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {unassigned.map((m: any) => (
@@ -434,7 +434,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
               <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
                 <span className="text-4xl">P</span>
                 <p className="text-slate-500 mt-3">Aucune publication pour cette classe.</p>
-                <p className="text-xs text-slate-400 mt-1">Utilisez le formulaire ci-dessous pour publier votre premiere ressource.</p>
+                <p className="text-xs text-slate-400 mt-1">Utilisez le formulaire ci-dessous pour publier votre première ressource.</p>
               </div>
             ) : (
               <div className="grid lg:grid-cols-2 gap-4">
@@ -457,7 +457,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
                       {post.fileUrl && (
                         <a href={post.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-lg transition-colors">
                           <span>F</span>
-                          <span className="truncate">{post.fileName || "Telecharger le fichier"}</span>
+                          <span className="truncate">{post.fileName || "Télécharger le fichier"}</span>
                         </a>
                       )}
                     </div>

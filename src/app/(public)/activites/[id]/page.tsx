@@ -9,14 +9,14 @@ import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const a = await prisma.activity.findUnique({ where: { id: params.id }, select: { title: true, description: true, type: true, level: true, isPublic: true } });
-  if (!a || !a.isPublic) return { title: "Activite introuvable" };
+  if (!a || !a.isPublic) return { title: "Activité introuvable" };
   const t = activityTypeLabels[a.type] || { label: a.type, emoji: "" };
   return {
     title: a.title + " — " + t.label + (a.level ? " (" + a.level + ")" : ""),
-    description: a.description || "Activite interactive de FLE : " + a.title,
+    description: a.description || "Activité interactive de FLE : " + a.title,
     openGraph: {
       title: a.title + " | FLE by Rayane",
-      description: a.description || "Activite interactive de FLE",
+      description: a.description || "Activité interactive de FLE",
     },
   };
 }
@@ -59,7 +59,7 @@ export default async function ActivityPlayPage({ params }: { params: { id: strin
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 mb-6">
-        <Link href="/activites" className="hover:text-brand-600 transition-colors">Activites</Link>
+        <Link href="/activites" className="hover:text-brand-600 transition-colors">Activités</Link>
         <span className="text-slate-300">/</span>
         <span className="text-slate-700 font-medium truncate">{a.title}</span>
       </div>
@@ -75,7 +75,7 @@ export default async function ActivityPlayPage({ params }: { params: { id: strin
             <span className={"text-[10px] font-bold px-2 py-0.5 rounded-full " + (levelColors[a.level] || "bg-slate-100 text-slate-600")}>{a.level}</span>
           )}
           {!a.isPublic && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Privee</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Privée</span>
           )}
         </div>
         <h1 className="font-heading text-2xl md:text-3xl font-bold text-slate-900 leading-tight">{a.title}</h1>
@@ -85,7 +85,7 @@ export default async function ActivityPlayPage({ params }: { params: { id: strin
           {a._count.results > 0 && (
             <>
               <span className="text-slate-300">.</span>
-              <span><b className="text-slate-700">{a._count.results}</b> partie{a._count.results > 1 ? "s" : ""} jouee{a._count.results > 1 ? "s" : ""}</span>
+              <span><b className="text-slate-700">{a._count.results}</b> partie{a._count.results > 1 ? "s" : ""} jouée{a._count.results > 1 ? "s" : ""}</span>
             </>
           )}
         </div>
@@ -117,7 +117,7 @@ export default async function ActivityPlayPage({ params }: { params: { id: strin
       {/* Footer CTA */}
       <div className="mt-6 flex items-center justify-between flex-wrap gap-3">
         <Link href="/activites" className="text-sm font-semibold text-slate-600 hover:text-brand-700 transition-colors">
-          &larr; Retour aux activites
+          &larr; Retour aux activités
         </Link>
         {!session?.user && (
           <Link href="/register" className="text-sm font-semibold text-brand-600 hover:text-brand-800 transition-colors">

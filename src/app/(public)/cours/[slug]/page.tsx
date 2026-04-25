@@ -121,7 +121,7 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
         <div className="relative">
           <div className="flex items-center gap-3 mb-3">
             <span className="bg-white/20 backdrop-blur px-3 py-1 rounded-lg text-sm font-bold">{course.level}</span>
-            <span className="text-brand-100 text-sm">{totalLessons} lecon{totalLessons > 1 ? "s" : ""}</span>
+            <span className="text-brand-100 text-sm">{totalLessons} leçon{totalLessons > 1 ? "s" : ""}</span>
           </div>
           <h1 className="font-heading text-2xl sm:text-3xl font-bold">{course.title}</h1>
           <p className="text-brand-100 mt-2 text-sm">{course.description}</p>
@@ -136,7 +136,7 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
               <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                 <div className="h-full bg-white rounded-full transition-all duration-500" style={{width: overallProgress + "%"}} />
               </div>
-              <p className="text-[10px] text-brand-200 mt-1">{completedLessons}/{totalLessons} lecons terminees</p>
+              <p className="text-[10px] text-brand-200 mt-1">{completedLessons}/{totalLessons} leçons terminées</p>
             </div>
           )}
 
@@ -155,7 +155,7 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
               <span className="text-2xl">&#127881;</span>
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-white/80 font-bold">Bravo</p>
-                <p className="text-sm font-bold">Cours termine !</p>
+                <p className="text-sm font-bold">Cours terminé !</p>
               </div>
             </div>
           )}

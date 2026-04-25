@@ -30,14 +30,14 @@ export default function EditLessonPage() {
   const gameTypes = [
     { key:"QCM", label:"QCM", emoji:"\ud83d\udcdd", def:{ questions:[{question:"",options:["",""],correctIndex:0,explanation:""}] } },
     { key:"TRUE_FALSE", label:"Vrai/Faux", emoji:"\u2705", def:{ questions:[{statement:"",isTrue:true}] } },
-    { key:"FILL_BLANKS", label:"Texte a trous", emoji:"\u270f\ufe0f", def:{ text:"", caseSensitive:false } },
+    { key:"FILL_BLANKS", label:"Texte à trous", emoji:"\u270f\ufe0f", def:{ text:"", caseSensitive:false } },
     { key:"MATCHING", label:"Appariement", emoji:"\ud83d\udd17", def:{ pairs:[{left:"",right:""}] } },
     { key:"MEMORY", label:"Memory", emoji:"\ud83c\udccf", def:{ pairs:[{front:"",back:""}] } },
     { key:"HANGMAN", label:"Pendu", emoji:"\ud83d\udc80", def:{ words:[{word:"",hint:""}] } },
     { key:"SORTING", label:"Classement", emoji:"\ud83d\udcca", def:{ items:["",""],correctOrder:["",""],instruction:"" } },
     { key:"WORD_ORDER", label:"Mots dans l'ordre", emoji:"\ud83d\udd24", def:{ sentences:[{text:"",hint:""}] } },
-    { key:"CATEGORIZE", label:"Categorisation", emoji:"\ud83d\udcc2", def:{ categories:[{name:"",imageUrl:""},{name:"",imageUrl:""}], items:[{text:"",category:"",imageUrl:""}], instruction:"" } },
-    { key:"DRAG_DROP", label:"Glisser-deposer", emoji:"\ud83c\udfaf", def:{ zones:[{name:"",imageUrl:""},{name:"",imageUrl:""}], items:[], instruction:"" } },
+    { key:"CATEGORIZE", label:"Catégorisation", emoji:"\ud83d\udcc2", def:{ categories:[{name:"",imageUrl:""},{name:"",imageUrl:""}], items:[{text:"",category:"",imageUrl:""}], instruction:"" } },
+    { key:"DRAG_DROP", label:"Glisser-déposer", emoji:"\ud83c\udfaf", def:{ zones:[{name:"",imageUrl:""},{name:"",imageUrl:""}], items:[], instruction:"" } },
   ];
 
   function startCreate(idx: number) { setShowCreate(idx); setShowPicker(null); setCreateType(""); setCreateTitle(""); setCreateConfig(null); }
@@ -120,7 +120,7 @@ export default function EditLessonPage() {
         setError("Erreur de sauvegarde.");
       }
     } catch {
-      setError("Erreur reseau.");
+      setError("Erreur réseau.");
     }
     setSaving(false);
   }
@@ -172,12 +172,12 @@ export default function EditLessonPage() {
                 </div>
               )}
               <div className="flex justify-center mt-1">
-                <button type="button" onClick={() => {setShowPicker(showPicker===idx?null:idx);setShowCreate(null);}} className="text-xs px-3 py-1 bg-brand-100 text-brand-700 rounded-full hover:bg-brand-200 font-medium">+ Inserer existante</button>
-                <button type="button" onClick={() => startCreate(idx)} className="text-xs px-3 py-1 bg-amber-100 text-amber-700 rounded-full hover:bg-amber-200 font-medium">+ Creer ici</button>
+                <button type="button" onClick={() => {setShowPicker(showPicker===idx?null:idx);setShowCreate(null);}} className="text-xs px-3 py-1 bg-brand-100 text-brand-700 rounded-full hover:bg-brand-200 font-medium">+ Insérer existante</button>
+                <button type="button" onClick={() => startCreate(idx)} className="text-xs px-3 py-1 bg-amber-100 text-amber-700 rounded-full hover:bg-amber-200 font-medium">+ Créer ici</button>
               </div>
               {showPicker === idx && (
                 <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-4 mt-2 max-h-60 overflow-y-auto animate-slide-down">
-                  {activities.length === 0 ? <p className="text-xs text-slate-300">Aucune activite.</p> :
+                  {activities.length === 0 ? <p className="text-xs text-slate-300">Aucune activité.</p> :
                     activities.map((a: any) => (
                       <button key={a.id} type="button" onClick={() => insertActivity(idx, a)} className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-brand-50 text-sm">
                         <span>{activityTypeLabels[a.type]?.emoji || "📝"}</span>
@@ -191,7 +191,7 @@ export default function EditLessonPage() {
                 <div className="bg-amber-50 rounded-xl border border-amber-200 p-4 mt-2">
                   {!createType ? (
                     <div>
-                      <p className="text-xs font-semibold text-slate-500 mb-3">Type d activite :</p>
+                      <p className="text-xs font-semibold text-slate-500 mb-3">Type d’activité :</p>
                       <div className="grid grid-cols-3 gap-2">{gameTypes.map(g => (
                         <button key={g.key} type="button" onClick={()=>pickType(g.key)} className="p-3 bg-white rounded-xl border border-slate-200 hover:border-brand-300 text-center">
                           <span className="text-xl">{g.emoji}</span><p className="text-xs font-medium text-slate-700 mt-1">{g.label}</p>
@@ -205,7 +205,7 @@ export default function EditLessonPage() {
                         <p className="text-sm font-bold text-slate-700">{gameTypes.find(g=>g.key===createType)?.emoji} {gameTypes.find(g=>g.key===createType)?.label}</p>
                         <button type="button" onClick={()=>setCreateType("")} className="text-xs text-slate-400">Changer</button>
                       </div>
-                      <input value={createTitle} onChange={e=>setCreateTitle(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Titre de l activite" />
+                      <input value={createTitle} onChange={e=>setCreateTitle(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Titre de l’activité" />
 
                       {createType==="QCM" && <div className="space-y-2">
                         {createConfig?.questions?.map((q:any,qi:number) => (
@@ -229,7 +229,7 @@ export default function EditLessonPage() {
                         <button type="button" onClick={()=>{const c={...createConfig};c.questions=[...c.questions,{statement:"",isTrue:true}];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Affirmation</button>
                       </div>}
 
-                      {createType==="FILL_BLANKS" && <textarea value={createConfig?.text||""} onChange={e=>setCreateConfig({...createConfig,text:e.target.value})} rows={3} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono outline-none" placeholder={"Je {{suis}} francais."} />}
+                      {createType==="FILL_BLANKS" && <textarea value={createConfig?.text||""} onChange={e=>setCreateConfig({...createConfig,text:e.target.value})} rows={3} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono outline-none" placeholder={"Je {{suis}} français."} />}
 
                       {createType==="MATCHING" && <div className="space-y-2">
                         {createConfig?.pairs?.map((p:any,i:number)=>(<div key={i} className="flex gap-2 items-center"><input value={p.left||""} onChange={e=>{const c={...createConfig};c.pairs[i]={...p,left:e.target.value};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Gauche" /><input value={p.right||""} onChange={e=>{const c={...createConfig};c.pairs[i]={...p,right:e.target.value};setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Droite" />{createConfig.pairs.length>1&&<button type="button" onClick={()=>{const c={...createConfig};c.pairs=c.pairs.filter((_:any,j:number)=>j!==i);setCreateConfig({...c});}} className="text-red-400 text-xs">x</button>}</div>))}
@@ -248,7 +248,7 @@ export default function EditLessonPage() {
 
                       {createType==="SORTING" && <div className="space-y-2">
                         {createConfig?.items?.map((s:string,i:number)=>(<div key={i} className="flex items-center gap-2"><span className="text-xs w-4">{i+1}.</span><input value={s} onChange={e=>{const c={...createConfig};c.items[i]=e.target.value;c.correctOrder[i]=e.target.value;setCreateConfig({...c});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" />{createConfig.items.length>1&&<button type="button" onClick={()=>{const c={...createConfig};c.items=c.items.filter((_:any,j:number)=>j!==i);c.correctOrder=c.correctOrder.filter((_:any,j:number)=>j!==i);setCreateConfig({...c});}} className="text-red-400 text-xs">x</button>}</div>))}
-                        <button type="button" onClick={()=>{const c={...createConfig};c.items=[...c.items,""];c.correctOrder=[...c.correctOrder,""];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Element</button>
+                        <button type="button" onClick={()=>{const c={...createConfig};c.items=[...c.items,""];c.correctOrder=[...c.correctOrder,""];setCreateConfig({...c});}} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs text-slate-400">+ Élément</button>
                       </div>}
 
                       {createType==="WORD_ORDER" && <div className="space-y-2">
@@ -262,25 +262,25 @@ export default function EditLessonPage() {
 
                       {createType==="CATEGORIZE" && <div className="space-y-3">
                         <input value={createConfig?.instruction||""} onChange={e=>setCreateConfig({...createConfig,instruction:e.target.value})} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Instruction" />
-                        <p className="text-xs font-bold text-slate-500">Categories :</p>
+                        <p className="text-xs font-bold text-slate-500">Catégories :</p>
                         {createConfig?.categories?.map((c:any,i:number)=>(<div key={i} className="flex gap-2 items-center"><input value={c.name||""} onChange={e=>{const cfg={...createConfig};cfg.categories[i]={...c,name:e.target.value};setCreateConfig({...cfg});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder={`Cat ${i+1}`} />{createConfig.categories.length>2&&<button type="button" onClick={()=>{const cfg={...createConfig};cfg.categories=cfg.categories.filter((_:any,j:number)=>j!==i);setCreateConfig({...cfg});}} className="text-red-400 text-xs">x</button>}</div>))}
-                        <button type="button" onClick={()=>{const cfg={...createConfig};cfg.categories=[...cfg.categories,{name:"",imageUrl:""}];setCreateConfig({...cfg});}} className="text-xs text-brand-600">+ Categorie</button>
-                        <p className="text-xs font-bold text-slate-500">Elements :</p>
+                        <button type="button" onClick={()=>{const cfg={...createConfig};cfg.categories=[...cfg.categories,{name:"",imageUrl:""}];setCreateConfig({...cfg});}} className="text-xs text-brand-600">+ Catégorie</button>
+                        <p className="text-xs font-bold text-slate-500">Éléments :</p>
                         {createConfig?.items?.map((it:any,i:number)=>(<div key={i} className="flex gap-2 items-center"><input value={it.text||""} onChange={e=>{const cfg={...createConfig};cfg.items[i]={...it,text:e.target.value};setCreateConfig({...cfg});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Texte" /><select value={it.category||""} onChange={e=>{const cfg={...createConfig};cfg.items[i]={...it,category:e.target.value};setCreateConfig({...cfg});}} className="border border-slate-200 rounded-lg px-2 py-2 text-sm outline-none"><option value="">Cat...</option>{createConfig.categories.filter((c:any)=>c.name).map((c:any)=><option key={c.name} value={c.name}>{c.name}</option>)}</select>{createConfig.items.length>1&&<button type="button" onClick={()=>{const cfg={...createConfig};cfg.items=cfg.items.filter((_:any,j:number)=>j!==i);setCreateConfig({...cfg});}} className="text-red-400 text-xs">x</button>}</div>))}
-                        <button type="button" onClick={()=>{const cfg={...createConfig};cfg.items=[...cfg.items,{text:"",category:"",imageUrl:""}];setCreateConfig({...cfg});}} className="text-xs text-brand-600">+ Element</button>
+                        <button type="button" onClick={()=>{const cfg={...createConfig};cfg.items=[...cfg.items,{text:"",category:"",imageUrl:""}];setCreateConfig({...cfg});}} className="text-xs text-brand-600">+ Élément</button>
                       </div>}
 
                       {createType==="DRAG_DROP" && <div className="space-y-3">
                         <p className="text-xs font-bold text-slate-500">Zones :</p>
                         {createConfig?.zones?.map((z:any,i:number)=>(<div key={i} className="flex gap-2 items-center"><input value={z.name||""} onChange={e=>{const cfg={...createConfig};cfg.zones[i]={...z,name:e.target.value};setCreateConfig({...cfg});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder={`Zone ${i+1}`} />{createConfig.zones.length>2&&<button type="button" onClick={()=>{const cfg={...createConfig};cfg.zones=cfg.zones.filter((_:any,j:number)=>j!==i);setCreateConfig({...cfg});}} className="text-red-400 text-xs">x</button>}</div>))}
                         <button type="button" onClick={()=>{const cfg={...createConfig};cfg.zones=[...cfg.zones,{name:"",imageUrl:""}];setCreateConfig({...cfg});}} className="text-xs text-brand-600">+ Zone</button>
-                        <p className="text-xs font-bold text-slate-500">Elements :</p>
+                        <p className="text-xs font-bold text-slate-500">Éléments :</p>
                         {(createConfig?.items||[]).map((it:any,i:number)=>(<div key={i} className="flex gap-2 items-center"><input value={it.text||""} onChange={e=>{const cfg={...createConfig};cfg.items[i]={...it,text:e.target.value};setCreateConfig({...cfg});}} className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Texte" /><select value={it.zone||""} onChange={e=>{const cfg={...createConfig};cfg.items[i]={...it,zone:e.target.value};setCreateConfig({...cfg});}} className="border border-slate-200 rounded-lg px-2 py-2 text-sm outline-none"><option value="">Zone...</option>{createConfig.zones.filter((z:any)=>z.name).map((z:any)=><option key={z.name} value={z.name}>{z.name}</option>)}</select>{(createConfig.items||[]).length>1&&<button type="button" onClick={()=>{const cfg={...createConfig};cfg.items=cfg.items.filter((_:any,j:number)=>j!==i);setCreateConfig({...cfg});}} className="text-red-400 text-xs">x</button>}</div>))}
-                        <button type="button" onClick={()=>{const cfg={...createConfig};cfg.items=[...(cfg.items||[]),{text:"",zone:"",imageUrl:""}];setCreateConfig({...cfg});}} className="text-xs text-brand-600">+ Element</button>
+                        <button type="button" onClick={()=>{const cfg={...createConfig};cfg.items=[...(cfg.items||[]),{text:"",zone:"",imageUrl:""}];setCreateConfig({...cfg});}} className="text-xs text-brand-600">+ Élément</button>
                       </div>}
 
                       <div className="flex gap-2 pt-2">
-                        <button type="button" onClick={()=>createAndInsert(idx)} disabled={!createTitle||creating} className="px-5 py-2 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 disabled:opacity-50">{creating?"Creation...":"Creer et inserer"}</button>
+                        <button type="button" onClick={()=>createAndInsert(idx)} disabled={!createTitle||creating} className="px-5 py-2 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 disabled:opacity-50">{creating?"Création...":"Créer et insérer"}</button>
                         <button type="button" onClick={()=>setShowCreate(null)} className="px-5 py-2 bg-slate-100 text-slate-500 text-sm rounded-lg">Annuler</button>
                       </div>
                     </div>

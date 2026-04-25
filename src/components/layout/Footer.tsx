@@ -16,7 +16,7 @@ export default function Footer() {
             <nav className="flex flex-col gap-2 text-sm text-slate-400">
               <Link href="/" className="hover:text-brand-600 transition-colors">Accueil</Link>
               <Link href="/cours" className="hover:text-brand-600 transition-colors">Cours</Link>
-              <Link href="/activites" className="hover:text-brand-600 transition-colors">Activites</Link>
+              <Link href="/activites" className="hover:text-brand-600 transition-colors">Activités</Link>
             </nav>
           </div>
           <div>
@@ -30,9 +30,9 @@ export default function Footer() {
         </div>
         <div className="mt-6 pt-6 border-t border-brand-100">
           <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-slate-400">
-            <Link href="/mentions-legales" className="hover:text-brand-600 transition-colors">Mentions legales</Link>
+            <Link href="/mentions-legales" className="hover:text-brand-600 transition-colors">Mentions légales</Link>
             <span className="text-slate-300">&middot;</span>
-            <Link href="/confidentialite" className="hover:text-brand-600 transition-colors">Confidentialite</Link>
+            <Link href="/confidentialite" className="hover:text-brand-600 transition-colors">Confidentialité</Link>
             <span className="text-slate-300">&middot;</span>
             <Link href="/cgu" className="hover:text-brand-600 transition-colors">CGU</Link>
           </nav>

@@ -14,7 +14,7 @@ export default function AssignActivityForm({ classroomId, activities }: { classr
   return (
     <div className="flex gap-2">
       <select value={activityId} onChange={e => setActivityId(e.target.value)} className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none">
-        <option value="">Assigner une activite...</option>
+        <option value="">Assigner une activité...</option>
         {activities.map(a => <option key={a.id} value={a.id}>{a.title} ({a.type}{a.level ? " " + a.level : ""})</option>)}
       </select>
       <button onClick={assign} disabled={!activityId || loading} className="px-4 py-2 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600 disabled:opacity-50">+</button>

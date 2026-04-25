@@ -61,8 +61,8 @@ export default async function AdminClassesPage() {
       {classrooms.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center mt-6">
           <span className="text-5xl">&#127979;</span>
-          <h2 className="font-heading font-bold text-slate-900 mt-4">Aucune classe creee</h2>
-          <p className="text-sm text-slate-500 mt-2 max-w-sm mx-auto">Cree ta premiere classe pour assigner des cours, des activites et suivre la progression de tes eleves.</p>
+          <h2 className="font-heading font-bold text-slate-900 mt-4">Aucune classe créée</h2>
+          <p className="text-sm text-slate-500 mt-2 max-w-sm mx-auto">Crée ta première classe pour assigner des cours, des activités et suivre la progression de tes élèves.</p>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
@@ -86,7 +86,7 @@ export default async function AdminClassesPage() {
                 <div className="grid grid-cols-3 gap-2 mb-3 text-center">
                   <div>
                     <p className="font-heading font-bold text-base text-slate-900">{c._count.members}</p>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Eleves</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Élèves</p>
                   </div>
                   <div>
                     <p className="font-heading font-bold text-base text-slate-900">{c._count.courses}</p>
@@ -94,7 +94,7 @@ export default async function AdminClassesPage() {
                   </div>
                   <div>
                     <p className="font-heading font-bold text-base text-slate-900">{c._count.activities}</p>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Activites</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Activités</p>
                   </div>
                 </div>
 
@@ -107,7 +107,7 @@ export default async function AdminClassesPage() {
                   </div>
                   <div className="flex items-center justify-between text-[11px] text-slate-400">
                     <span>Progression moyenne</span>
-                    <span>Creee le {date}</span>
+                    <span>Créée le {date}</span>
                   </div>
                 </div>
               </Link>

@@ -25,10 +25,10 @@ export default async function HomePage() {
               <h1 className="font-heading text-3xl md:text-5xl font-extrabold text-white leading-tight">
                 Apprenez le français<br /><span className="bg-gradient-to-r from-accent-200 to-yellow-200 bg-clip-text text-transparent">en vous amusant</span>
               </h1>
-              <p className="mt-4 text-base md:text-lg text-pink-100/80 max-w-md leading-relaxed">Cours structures, exercices ludiques et suivi de progression - tout en un.</p>
+              <p className="mt-4 text-base md:text-lg text-pink-100/80 max-w-md leading-relaxed">Cours structurés, exercices ludiques et suivi de progression — tout en un.</p>
               <div className="mt-3 inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 border border-white/20">
                 <span className="text-sm">&#10003;</span>
-                <span className="text-xs font-semibold text-white">100% gratuit, sans publicite</span>
+                <span className="text-xs font-semibold text-white">100 % gratuit, sans publicité</span>
               </div>
               <div className="mt-6 flex flex-wrap gap-3 justify-center md:justify-start">
                 <Link href="/activites" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-brand-700 font-semibold rounded-xl hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm">🎮 Jouer</Link>
@@ -47,7 +47,7 @@ export default async function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-10">
           <h2 className="font-heading text-2xl md:text-3xl font-bold text-brand-900">Choisissez votre niveau</h2>
-          <p className="text-brand-400 mt-2">Du débutant complet au niveau maîtrise</p>
+          <p className="text-brand-400 mt-2">Du débutant complet à la maîtrise</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 stagger-children">
           {(["A1","A2","B1","B2","C1","C2"] as const).map((lv) => (
@@ -61,13 +61,13 @@ export default async function HomePage() {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-10">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-brand-900">Comment ca marche ?</h2>
-          <p className="text-brand-400 mt-2">3 etapes pour commencer a apprendre</p>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-brand-900">Comment ça marche ?</h2>
+          <p className="text-brand-400 mt-2">3 étapes pour commencer à apprendre</p>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
-          <StepCard num="1" emoji="&#128100;" title="Creez un compte" desc="Inscription en 30 secondes, gratuite et sans engagement." />
+          <StepCard num="1" emoji="&#128100;" title="Créez un compte" desc="Inscription en 30 secondes, gratuite et sans engagement." />
           <StepCard num="2" emoji="&#127971;" title="Rejoignez ou explorez" desc="Entrez le code de votre classe ou parcourez les cours libres." />
-          <StepCard num="3" emoji="&#127919;" title="Apprenez en jouant" desc="Suivez les lecons, faites les activites et progressez a votre rythme." />
+          <StepCard num="3" emoji="&#127919;" title="Apprenez en jouant" desc="Suivez les leçons, faites les activités et progressez à votre rythme." />
         </div>
       </section>
 

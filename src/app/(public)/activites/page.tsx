@@ -44,9 +44,9 @@ export default async function ActivitesPage({ searchParams }: { searchParams: { 
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex items-center justify-between mb-10 flex-wrap gap-3">
         <div>
-          <h1 className="font-heading text-4xl font-bold text-brand-900">Activites interactives</h1>
-          <p className="text-brand-400 mt-2 text-lg">Pratique le francais en t\'amusant</p>
-          <p className="text-sm text-slate-500 mt-1">{allActivities.length} activite{allActivities.length > 1 ? "s" : ""} disponible{allActivities.length > 1 ? "s" : ""}</p>
+          <h1 className="font-heading text-4xl font-bold text-brand-900">Activités interactives</h1>
+          <p className="text-brand-400 mt-2 text-lg">Pratique le français en t'amusant</p>
+          <p className="text-sm text-slate-500 mt-1">{allActivities.length} activité{allActivities.length > 1 ? "s" : ""} disponible{allActivities.length > 1 ? "s" : ""}</p>
         </div>
         {isTeacher && <Link href="/admin/activites/creer" className="px-5 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all text-sm">+ Créer une activité</Link>}
       </div>

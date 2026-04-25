@@ -12,20 +12,20 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-white font-heading font-black text-xl">R</div>
             <span className="font-heading font-bold text-2xl text-white">FLE<span className="text-accent-200">by</span>Rayane</span>
           </Link>
-          <h2 className="font-heading text-4xl font-bold text-white leading-tight mb-4">Apprenez le francais<br />en vous amusant</h2>
-          <p className="text-brand-100 text-lg leading-relaxed mb-8">Cours structures, exercices ludiques et suivi de progression pour tous les niveaux.</p>
+          <h2 className="font-heading text-4xl font-bold text-white leading-tight mb-4">Apprenez le français<br />en vous amusant</h2>
+          <p className="text-brand-100 text-lg leading-relaxed mb-8">Cours structurés, exercices ludiques et suivi de progression pour tous les niveaux.</p>
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">10</div>
-              <div><p className="text-white font-medium text-sm">Types d exercices</p><p className="text-brand-200 text-xs">QCM, memory, pendu, appariement...</p></div>
+              <div><p className="text-white font-medium text-sm">Types d’exercices</p><p className="text-brand-200 text-xs">QCM, memory, pendu, appariement...</p></div>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white text-lg">A1</div>
-              <div><p className="text-white font-medium text-sm">Tous les niveaux CECRL</p><p className="text-brand-200 text-xs">De debutant a avance</p></div>
+              <div><p className="text-white font-medium text-sm">Tous les niveaux CECRL</p><p className="text-brand-200 text-xs">Du débutant à l’avancé</p></div>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white text-lg">%</div>
-              <div><p className="text-white font-medium text-sm">Suivi de progression</p><p className="text-brand-200 text-xs">Scores, erreurs, temps passe</p></div>
+              <div><p className="text-white font-medium text-sm">Suivi de progression</p><p className="text-brand-200 text-xs">Scores, erreurs, temps passé</p></div>
             </div>
           </div>
         </div>

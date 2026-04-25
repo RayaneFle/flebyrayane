@@ -19,14 +19,14 @@ export default async function ResultatsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-slate-900">Mes resultats</h1>
-        <p className="text-sm text-slate-500 mt-1">L\'historique de toutes tes activites</p>
+        <h1 className="font-heading text-2xl font-bold text-slate-900">Mes résultats</h1>
+        <p className="text-sm text-slate-500 mt-1">L’historique de toutes tes activités</p>
       </div>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <StatCard icon="&#127919;" label="Activites" value={results.length} color="brand" />
-        <StatCard icon="&#9989;" label="Terminees" value={completedCount} color="green" />
+        <StatCard icon="&#127919;" label="Activités" value={results.length} color="brand" />
+        <StatCard icon="&#9989;" label="Terminées" value={completedCount} color="green" />
         <StatCard icon="&#128200;" label="Score moyen" value={Math.round(avg) + "%"} color={avg >= 80 ? "green" : avg >= 50 ? "amber" : "slate"} />
         <StatCard icon="&#127942;" label="Meilleur" value={Math.round(best) + "%"} color={best >= 80 ? "green" : best >= 50 ? "amber" : "slate"} />
       </div>
@@ -35,10 +35,10 @@ export default async function ResultatsPage() {
       {results.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
           <span className="text-5xl">&#128200;</span>
-          <p className="text-slate-500 mt-4">Pas encore de resultat.</p>
-          <p className="text-xs text-slate-400 mt-1">Joue a une activite pour voir tes scores ici.</p>
+          <p className="text-slate-500 mt-4">Pas encore de résultat.</p>
+          <p className="text-xs text-slate-400 mt-1">Joue à une activité pour voir tes scores ici.</p>
           <Link href="/activites" className="inline-block mt-4 text-sm font-semibold text-brand-600 bg-brand-50 px-4 py-2 rounded-lg hover:bg-brand-100 transition-colors">
-            Decouvrir les activites &rarr;
+            Découvrir les activités &rarr;
           </Link>
         </div>
       ) : (
@@ -57,7 +57,7 @@ export default async function ResultatsPage() {
                       <span className={"text-[10px] font-bold px-2 py-0.5 rounded-full " + (levelColors[r.activity.level] || "bg-slate-100 text-slate-600")}>{r.activity.level}</span>
                     )}
                     {r.completed ? (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">Termine</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">Terminé</span>
                     ) : (
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">En cours</span>
                     )}

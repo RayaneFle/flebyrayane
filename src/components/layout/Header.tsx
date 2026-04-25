@@ -68,7 +68,7 @@ export default function Header() {
             ) : (
               <>
                 <Link href="/login" className="text-sm font-medium text-brand-600 hover:text-brand-700">Connexion</Link>
-                <Link href="/register" className="text-sm font-semibold bg-gradient-to-r from-brand-500 to-accent-500 text-white px-5 py-2 rounded-xl hover:shadow-glow transition-all">S'inscrire</Link>
+                <Link href="/register" className="text-sm font-semibold bg-gradient-to-r from-brand-500 to-accent-500 text-white px-5 py-2 rounded-xl hover:shadow-glow transition-all">S’inscrire</Link>
               </>
             )}
           </div>
@@ -101,7 +101,7 @@ export default function Header() {
             ) : (
               <>
                 <MLink href="/login" onClick={() => setMenuOpen(false)}>🔑 Connexion</MLink>
-                <MLink href="/register" onClick={() => setMenuOpen(false)}>✨ S'inscrire</MLink>
+                <MLink href="/register" onClick={() => setMenuOpen(false)}>✨ S’inscrire</MLink>
               </>
             )}
           </div>
