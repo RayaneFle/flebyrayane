@@ -425,25 +425,50 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
         </div>
       )}
 
-      {/* RESSOURCES TAB (gardé pour Vague 3) */}
+      {/* RESSOURCES TAB - Vague 3 */}
       {tab === "ressources" && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="font-heading font-bold text-lg text-slate-900 mb-4">Ressources</h2>
-          <AddPostForm classroomId={classroom.id} />
-          <div className="mt-4 space-y-3">
-            {classroom.posts.length === 0 ? <p className="text-sm text-slate-400">Aucune publication.</p> :
-              classroom.posts.map((p: any) => (
-                <div key={p.id} className="p-4 bg-slate-50 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-medium text-slate-800 text-sm">{p.title || "Publication"}</span>
-                    <span className="text-xs text-slate-400 ml-auto">{p.author.name}</span>
-                    <DeletePostBtn classroomId={classroom.id} postId={p.id} />
+        <div className="space-y-6">
+          <div>
+            <h2 className="font-heading text-lg font-bold text-slate-900 mb-4">Publications ({classroom.posts.length})</h2>
+            {classroom.posts.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
+                <span className="text-4xl">P</span>
+                <p className="text-slate-500 mt-3">Aucune publication pour cette classe.</p>
+                <p className="text-xs text-slate-400 mt-1">Utilisez le formulaire ci-dessous pour publier votre premiere ressource.</p>
+              </div>
+            ) : (
+              <div className="grid lg:grid-cols-2 gap-4">
+                {classroom.posts.map((post: any) => (
+                  <div key={post.id} data-classroom-post-card className="bg-white rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all overflow-hidden flex flex-col">
+                    <div className="flex items-start justify-between gap-3 px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-heading font-bold text-slate-900 text-sm truncate">{post.title || "Publication"}</p>
+                        <p className="text-[11px] text-slate-500 truncate">Par <b>{post.author.name}</b> - {new Date(post.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}</p>
+                      </div>
+                      <DeletePostBtn classroomId={classroom.id} postId={post.id} />
+                    </div>
+                    <div className="p-5 flex-1 space-y-3">
+                      {post.content && <p className="text-sm text-slate-700 whitespace-pre-wrap">{post.content}</p>}
+                      {getYouTubeEmbedUrl(post.videoUrl) && (
+                        <div className="rounded-lg overflow-hidden bg-black">
+                          <iframe src={getYouTubeEmbedUrl(post.videoUrl) || ""} className="w-full aspect-video" allowFullScreen />
+                        </div>
+                      )}
+                      {post.fileUrl && (
+                        <a href={post.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-lg transition-colors">
+                          <span>F</span>
+                          <span className="truncate">{post.fileName || "Telecharger le fichier"}</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  {p.content && <p className="text-sm text-slate-600 mb-2">{p.content}</p>}
-                  {getYouTubeEmbedUrl(p.videoUrl) && <div className="rounded-lg overflow-hidden bg-black"><iframe src={getYouTubeEmbedUrl(p.videoUrl) || ""} className="w-full aspect-video" allowFullScreen /></div>}
-                  {p.fileUrl && <a href={p.fileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-brand-600 bg-brand-50 px-4 py-2 rounded-lg mt-2">{p.fileName || "Fichier"}</a>}
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="bg-white rounded-2xl border border-dashed border-brand-300 p-5">
+            <h3 className="font-heading font-bold text-slate-800 mb-3">+ Nouvelle publication</h3>
+            <AddPostForm classroomId={classroom.id} />
           </div>
         </div>
       )}

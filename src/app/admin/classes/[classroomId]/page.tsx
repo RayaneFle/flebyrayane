@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import ClassroomTabs from "./ClassroomTabs";
+import ClassroomActionsMenu from "./ClassroomActionsMenu";
 
 export default async function ClassroomDetailPage({ params }: { params: { classroomId: string } }) {
   const session = await getServerSession(authOptions);
@@ -98,6 +99,7 @@ export default async function ClassroomDetailPage({ params }: { params: { classr
               <p className="text-[9px] uppercase tracking-wider text-white/80 font-semibold">Code classe</p>
               <p className="font-mono font-bold text-base tracking-widest">{classroom.code}</p>
             </div>
+            <ClassroomActionsMenu classroomId={classroom.id} classroomName={classroom.name} />
           </div>
         </div>
 
