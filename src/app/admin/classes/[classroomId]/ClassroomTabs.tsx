@@ -225,7 +225,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {classroom.courses.map((cc: any) => (
-                  <div key={cc.id} className="bg-white rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-4">
+                  <div key={cc.id} data-classroom-course-card className="bg-white rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-4">
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <Link href={"/cours/" + cc.course.slug} className="font-heading font-bold text-slate-900 hover:text-brand-700 text-sm leading-tight flex-1 line-clamp-2">
                         {cc.course.title}
@@ -282,7 +282,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
                     ? Math.round(Array.from(bestPerStudent.values()).reduce((a: number, b: number) => a + b, 0) / bestPerStudent.size)
                     : 0;
                   return (
-                    <div key={ca.id} className="bg-white rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-5">
+                    <div key={ca.id} data-classroom-activity-card className="bg-white rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-5">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -377,7 +377,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
                         <h3 className="text-xs font-bold text-brand-700 uppercase tracking-wider mb-2">{sc.name} ({scMembers.length})</h3>
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                           {scMembers.map((m: any) => (
-                            <div key={m.id} className="bg-white rounded-xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-4">
+                            <div key={m.id} data-classroom-member-card className="bg-white rounded-xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-4">
                               <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center text-white text-sm font-bold shrink-0">{m.user.name?.charAt(0).toUpperCase() || "?"}</div>
                                 <div className="flex-1 min-w-0">
@@ -405,7 +405,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
                     )}
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {unassigned.map((m: any) => (
-                        <div key={m.id} className="bg-white rounded-xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-4">
+                        <div key={m.id} data-classroom-member-card className="bg-white rounded-xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-400 to-slate-500 flex items-center justify-center text-white text-sm font-bold shrink-0">{m.user.name?.charAt(0).toUpperCase() || "?"}</div>
                             <div className="flex-1 min-w-0">
