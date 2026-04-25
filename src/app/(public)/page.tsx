@@ -25,7 +25,11 @@ export default async function HomePage() {
               <h1 className="font-heading text-3xl md:text-5xl font-extrabold text-white leading-tight">
                 Apprenez le français<br /><span className="bg-gradient-to-r from-accent-200 to-yellow-200 bg-clip-text text-transparent">en vous amusant</span>
               </h1>
-              <p className="mt-4 text-base md:text-lg text-pink-100/80 max-w-md leading-relaxed">Cours structurés, exercices ludiques et suivi de progression — tout en un.</p>
+              <p className="mt-4 text-base md:text-lg text-pink-100/80 max-w-md leading-relaxed">Cours structures, exercices ludiques et suivi de progression - tout en un.</p>
+              <div className="mt-3 inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 border border-white/20">
+                <span className="text-sm">&#10003;</span>
+                <span className="text-xs font-semibold text-white">100% gratuit, sans publicite</span>
+              </div>
               <div className="mt-6 flex flex-wrap gap-3 justify-center md:justify-start">
                 <Link href="/activites" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-brand-700 font-semibold rounded-xl hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm">🎮 Jouer</Link>
                 <Link href="/cours" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-all border border-white/20 text-sm">📖 Cours</Link>
@@ -52,6 +56,18 @@ export default async function HomePage() {
               <span className={`text-xl font-heading font-extrabold px-3 py-1 rounded-lg ${levelColors[lv]}`}>{lv}</span>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-10">
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-brand-900">Comment ca marche ?</h2>
+          <p className="text-brand-400 mt-2">3 etapes pour commencer a apprendre</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          <StepCard num="1" emoji="&#128100;" title="Creez un compte" desc="Inscription en 30 secondes, gratuite et sans engagement." />
+          <StepCard num="2" emoji="&#127971;" title="Rejoignez ou explorez" desc="Entrez le code de votre classe ou parcourez les cours libres." />
+          <StepCard num="3" emoji="&#127919;" title="Apprenez en jouant" desc="Suivez les lecons, faites les activites et progressez a votre rythme." />
         </div>
       </section>
 
@@ -113,4 +129,15 @@ function MiniStat({ n, l, e }: { n: number; l: string; e: string }) {
 }
 function FCard({ emoji, title, desc, href, gradient, border }: { emoji: string; title: string; desc: string; href: string; gradient: string; border: string }) {
   return <Link href={href} className={`group block p-7 rounded-2xl border-2 ${border} bg-gradient-to-br ${gradient} card-hover animate-fade-in-up`}><span className="text-3xl">{emoji}</span><h3 className="font-heading text-lg font-bold mt-3 group-hover:text-brand-600 transition-colors">{title}</h3><p className="text-brand-500 mt-2 text-sm leading-relaxed">{desc}</p></Link>;
+}
+
+function StepCard({ num, emoji, title, desc }: { num: string; emoji: string; title: string; desc: string }) {
+  return (
+    <div className="relative bg-white rounded-2xl p-6 border-2 border-brand-100 hover:border-accent-300 transition-all">
+      <div className="absolute -top-3 -left-3 w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-accent-500 text-white font-heading font-bold text-lg flex items-center justify-center shadow-lg">{num}</div>
+      <span className="text-3xl">{emoji}</span>
+      <h3 className="font-heading font-bold text-lg text-brand-900 mt-3">{title}</h3>
+      <p className="text-sm text-brand-500 mt-2 leading-relaxed">{desc}</p>
+    </div>
+  );
 }
