@@ -40,6 +40,8 @@ export default function NewLessonPage() {
   const [activities, setActivities] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedToast, setSavedToast] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [showPicker, setShowPicker] = useState<number | null>(null);
   const [showCreate, setShowCreate] = useState<number | null>(null);
   const [createType, setCreateType] = useState("");
@@ -48,6 +50,30 @@ export default function NewLessonPage() {
   const [creating, setCreating] = useState(false);
 
   useEffect(() => { loadActivities(); }, []);
+
+  // Warn before leaving if unsaved changes
+  useEffect(() => {
+    if (!dirty) return;
+    function handler(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirty]);
+
+  // Ctrl+S to save
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        const form = document.querySelector("form");
+        if (form) form.requestSubmit();
+      }
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
   function loadActivities() { fetch("/api/activities").then(r => r.json()).then(setActivities).catch(() => {}); }
 
   const gameTypes = [
@@ -63,14 +89,14 @@ export default function NewLessonPage() {
     { key:"DRAG_DROP", label:"Glisser-deposer", emoji:"\ud83c\udfaf", def:{ zones:[{name:"",imageUrl:""},{name:"",imageUrl:""}], items:[], instruction:"" } },
   ];
 
-  function addTextBlock() { setBlocks([...blocks, { id:"b"+Date.now(), type:"text", content:"", activityId:"", requireScore:false, minScore:60 }]); }
+  function addTextBlock() { setBlocks([...blocks, { id:"b"+Date.now(), type:"text", content:"", activityId:"", requireScore:false, minScore:60 }]); setDirty(true); }
   function insertActivity(idx: number, act: any) {
     const nb: BlockDraft = { id:"b"+Date.now(), type:"activity", content:"", activityId:act.id, requireScore:false, minScore:60 };
     const a = [...blocks]; a.splice(idx+1, 0, nb); setBlocks(a); setShowPicker(null);
   }
-  function updateBlock(idx: number, u: Partial<BlockDraft>) { const a=[...blocks]; a[idx]={...a[idx],...u}; setBlocks(a); }
-  function removeBlock(idx: number) { setBlocks(blocks.filter((_,i) => i!==idx)); }
-  function moveBlock(idx: number, dir: string) { const ni = dir==="up"?idx-1:idx+1; if(ni<0||ni>=blocks.length)return; const a=[...blocks]; [a[idx],a[ni]]=[a[ni],a[idx]]; setBlocks(a); }
+  function updateBlock(idx: number, u: Partial<BlockDraft>) { const a=[...blocks]; a[idx]={...a[idx],...u}; setBlocks(a); setDirty(true); }
+  function removeBlock(idx: number) { setBlocks(blocks.filter((_,i) => i!==idx)); setDirty(true); }
+  function moveBlock(idx: number, dir: string) { const ni = dir==="up"?idx-1:idx+1; if(ni<0||ni>=blocks.length)return; const a=[...blocks]; [a[idx],a[ni]]=[a[ni],a[idx]]; setBlocks(a); setDirty(true); }
 
   function startCreate(idx: number) { setShowCreate(idx); setShowPicker(null); setCreateType(""); setCreateTitle(""); setCreateConfig(null); }
   function pickType(t: string) { setCreateType(t); const g=gameTypes.find(x=>x.key===t); setCreateConfig(g?JSON.parse(JSON.stringify(g.def)):{}); }
@@ -91,12 +117,21 @@ export default function NewLessonPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault(); if(!title.trim()){setError("Titre requis.");return;}
     setIsSubmitting(true); setError(null);
-    const res = await fetch(`/api/admin/courses/${courseId}/sections/${sectionId}/lessons`, {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ title, blocks: blocks.map((b,i) => ({ position:i, type:b.type, content:b.type==="text"?b.content:null, activityId:b.type==="activity"?b.activityId:null, requireScore:b.requireScore, minScore:b.minScore })) }),
-    });
-    if(res.ok) { router.push(`/admin/cours/${courseId}`); router.refresh(); }
-    else setError("Erreur de sauvegarde.");
+    try {
+      const res = await fetch(`/api/admin/courses/${courseId}/sections/${sectionId}/lessons`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ title, blocks: blocks.map((b,i) => ({ position:i, type:b.type, content:b.type==="text"?b.content:null, activityId:b.type==="activity"?b.activityId:null, requireScore:b.requireScore, minScore:b.minScore })) }),
+      });
+      if (res.ok) {
+        setDirty(false);
+        setSavedToast(true);
+        setTimeout(() => { router.push(`/admin/cours/${courseId}`); router.refresh(); }, 1200);
+      } else {
+        setError("Erreur de sauvegarde.");
+      }
+    } catch {
+      setError("Erreur reseau.");
+    }
     setIsSubmitting(false);
   }
 
