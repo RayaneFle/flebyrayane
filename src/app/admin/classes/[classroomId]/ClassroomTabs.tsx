@@ -24,6 +24,7 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
   const [tab, setTab] = useState("suivi");
   const [subclassFilter, setSubclassFilter] = useState<string | null>(null);
   const [expandedMember, setExpandedMember] = useState<string | null>(null);
+  const [showSubclasses, setShowSubclasses] = useState(false);
 
   const filteredMembers = subclassFilter
     ? classroom.members.filter((m: any) => m.subclassId === subclassFilter)
@@ -254,81 +255,173 @@ export default function ClassroomTabs({ classroom, availableCourses, availableAc
         </div>
       )}
 
-      {/* ACTIVITES TAB (gardé style simple pour Vague 2) */}
+      {/* ACTIVITES TAB - Vague 2 */}
       {tab === "activites" && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="font-heading font-bold text-lg text-slate-900 mb-4">Activités assignées</h2>
-          {classroom.activities.length > 0 ? (
-            <div className="space-y-2 mb-6">{classroom.activities.map((ca: any) => {
-              const t = activityTypeLabels[ca.activity.type] || { emoji: "?", label: ca.activity.type };
-              return (
-                <div key={ca.id} className="flex items-center justify-between p-3 bg-brand-50 rounded-xl">
-                  <div className="flex items-center gap-2">
-                    <span>{t.emoji}</span>
-                    <Link href={"/activites/" + ca.activity.id} className="font-medium text-brand-700 hover:text-brand-800 text-sm">{ca.activity.title}</Link>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-400">{ca.activity.level || ""}</span>
-                    <UnassignActivityBtn classroomId={classroom.id} activityId={ca.activity.id} />
-                  </div>
-                </div>
-              );
-            })}</div>
-          ) : <p className="text-sm text-slate-400 mb-4">Aucune activité assignée.</p>}
-          <AssignActivityForm classroomId={classroom.id} activities={availableActivities} />
+        <div className="space-y-6">
+          <div>
+            <h2 className="font-heading text-lg font-bold text-slate-900 mb-4">Activites assignees ({classroom.activities.length})</h2>
+            {classroom.activities.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
+                <span className="text-4xl">A</span>
+                <p className="text-slate-500 mt-3">Aucune activite assignee a cette classe.</p>
+                <p className="text-xs text-slate-400 mt-1">Utilisez le formulaire ci-dessous pour en ajouter.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {classroom.activities.map((ca: any) => {
+                  const t = activityTypeLabels[ca.activity.type] || { emoji: "?", label: ca.activity.type };
+                  const activityResults = studentResults.filter((r: any) => r.activity.id === ca.activity.id);
+                  const uniqueStudents = new Set(activityResults.map((r: any) => r.user.id)).size;
+                  const totalAttempts = activityResults.length;
+                  const bestPerStudent = new Map();
+                  activityResults.forEach((r: any) => {
+                    const ex = bestPerStudent.get(r.user.id);
+                    if (!ex || (r.score || 0) > ex) bestPerStudent.set(r.user.id, r.score || 0);
+                  });
+                  const avgScore = bestPerStudent.size > 0
+                    ? Math.round(Array.from(bestPerStudent.values()).reduce((a: number, b: number) => a + b, 0) / bestPerStudent.size)
+                    : 0;
+                  return (
+                    <div key={ca.id} className="bg-white rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-5">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg bg-brand-50 text-brand-700">
+                              <span>{t.emoji}</span>
+                              <span>{t.label}</span>
+                            </span>
+                            {ca.activity.level && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{ca.activity.level}</span>
+                            )}
+                          </div>
+                          <Link href={"/activites/" + ca.activity.id} className="font-heading font-bold text-slate-900 hover:text-brand-700 text-base leading-tight block">
+                            {ca.activity.title}
+                          </Link>
+                        </div>
+                        <div className="flex items-center gap-4 shrink-0">
+                          <div className="text-center">
+                            <p className="font-heading font-bold text-lg text-slate-900">{uniqueStudents}<span className="text-xs text-slate-400">/{classroom.members.length}</span></p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Eleves</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="font-heading font-bold text-lg text-slate-900">{totalAttempts}</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Tentatives</p>
+                          </div>
+                          <div className="text-center">
+                            <p className={"font-heading font-bold text-lg " + (avgScore >= 80 ? "text-green-600" : avgScore >= 50 ? "text-amber-600" : avgScore > 0 ? "text-red-600" : "text-slate-400")}>{avgScore > 0 ? avgScore + "%" : "-"}</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Score moyen</p>
+                          </div>
+                          <UnassignActivityBtn classroomId={classroom.id} activityId={ca.activity.id} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <div className="bg-white rounded-2xl border border-dashed border-brand-300 p-5">
+            <h3 className="font-heading font-bold text-slate-800 mb-3">+ Assigner une activite</h3>
+            <AssignActivityForm classroomId={classroom.id} activities={availableActivities} />
+            <Link href="/admin/activites/creer" className="inline-block mt-3 text-xs text-brand-600 font-semibold hover:text-brand-800">
+              Ou creer une nouvelle activite
+            </Link>
+          </div>
         </div>
       )}
 
-      {/* ELEVES TAB (gardé pour Vague 2) */}
+      {/* ELEVES TAB - Vague 2 */}
       {tab === "eleves" && (
         <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6">
-            <h2 className="font-heading font-bold text-lg text-slate-900 mb-4">Sous-classes</h2>
-            <SubclassManager classroomId={classroom.id} members={classroom.members} subclasses={classroom.subclasses} />
-          </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-6">
-            <h2 className="font-heading font-bold text-lg text-slate-900 mb-4">Tous les élèves ({classroom.members.length})</h2>
-            <div className="space-y-2">
-              {classroom.subclasses.map((sc: any) => {
-                const scMembers = classroom.members.filter((m: any) => m.subclassId === sc.id);
-                if (scMembers.length === 0) return null;
-                return (
-                  <details key={sc.id} open className="border border-brand-100 rounded-xl overflow-hidden">
-                    <summary className="px-4 py-2.5 bg-brand-50 cursor-pointer flex items-center justify-between">
-                      <span className="text-sm font-bold text-brand-800">{sc.name}</span>
-                      <span className="text-xs text-slate-400">{scMembers.length}</span>
-                    </summary>
-                    <div className="p-2 space-y-0.5">{scMembers.map((m: any) => (
-                      <div key={m.id} className="flex items-center gap-2 py-1.5 px-3 hover:bg-slate-50 rounded-lg">
-                        <div className="w-6 h-6 rounded-full bg-brand-200 flex items-center justify-center text-brand-700 text-[10px] font-bold shrink-0">{m.user.name?.charAt(0) || "?"}</div>
-                        <div className="flex-1 min-w-0"><span className="text-xs text-slate-700">{m.user.name}</span> <span className="text-[10px] text-slate-400">{m.user.email}</span></div>
-                        <RemoveMemberBtn classroomId={classroom.id} userId={m.userId} />
-                      </div>
-                    ))}</div>
-                  </details>
-                );
-              })}
-              {(() => {
-                const unassigned = classroom.members.filter((m: any) => !classroom.subclasses.some((sc: any) => sc.id === m.subclassId));
-                if (unassigned.length === 0 && classroom.subclasses.length > 0) return null;
-                return (
-                  <details open={classroom.subclasses.length === 0} className="border border-slate-200 rounded-xl overflow-hidden">
-                    <summary className="px-4 py-2.5 bg-slate-50 cursor-pointer flex items-center justify-between">
-                      <span className="text-sm font-bold text-slate-600">{classroom.subclasses.length > 0 ? "Non assignés" : "Élèves"}</span>
-                      <span className="text-xs text-slate-400">{unassigned.length}</span>
-                    </summary>
-                    <div className="p-2 space-y-0.5">{unassigned.map((m: any) => (
-                      <div key={m.id} className="flex items-center gap-2 py-1.5 px-3 hover:bg-slate-50 rounded-lg">
-                        <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-[10px] font-bold shrink-0">{m.user.name?.charAt(0) || "?"}</div>
-                        <div className="flex-1 min-w-0"><span className="text-xs text-slate-700">{m.user.name}</span> <span className="text-[10px] text-slate-400">{m.user.email}</span></div>
-                        <RemoveMemberBtn classroomId={classroom.id} userId={m.userId} />
-                      </div>
-                    ))}</div>
-                  </details>
-                );
-              })()}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="font-heading text-lg font-bold text-slate-900">Eleves ({classroom.members.length})</h2>
+              <p className="text-xs text-slate-400 mt-0.5">Gerez les inscriptions et les sous-classes</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowSubclasses(!showSubclasses)}
+                className="text-xs font-semibold px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
+              >
+                {showSubclasses ? "Masquer" : "Gerer les sous-classes"}
+              </button>
+              <div className="bg-slate-100 rounded-lg px-3 py-2">
+                <p className="text-[9px] uppercase tracking-wider text-slate-500 font-semibold">Code</p>
+                <p className="font-mono font-bold text-sm tracking-widest text-slate-700">{classroom.code}</p>
+              </div>
             </div>
           </div>
+
+          {showSubclasses && (
+            <div className="bg-white rounded-2xl border border-brand-200 p-5 animate-slide-down">
+              <h3 className="font-heading font-bold text-slate-800 mb-3">Gestion des sous-classes</h3>
+              <SubclassManager classroomId={classroom.id} members={classroom.members} subclasses={classroom.subclasses} />
+            </div>
+          )}
+
+          {classroom.members.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
+              <span className="text-4xl">EE</span>
+              <p className="text-slate-500 mt-3">Aucun eleve dans cette classe.</p>
+              <p className="text-xs text-slate-400 mt-1">Partagez le code <b className="font-mono">{classroom.code}</b> a vos eleves.</p>
+            </div>
+          ) : (
+            <>
+              {classroom.subclasses.length > 0 && (
+                <>
+                  {classroom.subclasses.map((sc: any) => {
+                    const scMembers = classroom.members.filter((m: any) => m.subclassId === sc.id);
+                    if (scMembers.length === 0) return null;
+                    return (
+                      <div key={sc.id}>
+                        <h3 className="text-xs font-bold text-brand-700 uppercase tracking-wider mb-2">{sc.name} ({scMembers.length})</h3>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                          {scMembers.map((m: any) => (
+                            <div key={m.id} className="bg-white rounded-xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center text-white text-sm font-bold shrink-0">{m.user.name?.charAt(0).toUpperCase() || "?"}</div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-bold text-slate-800 text-sm truncate">{m.user.name || "-"}</p>
+                                  <p className="text-[10px] text-slate-400 truncate">{m.user.email}</p>
+                                </div>
+                                <RemoveMemberBtn classroomId={classroom.id} userId={m.userId} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+
+              {(() => {
+                const unassigned = classroom.members.filter((m: any) => !classroom.subclasses.some((sc: any) => sc.id === m.subclassId));
+                if (unassigned.length === 0) return null;
+                return (
+                  <div>
+                    {classroom.subclasses.length > 0 && (
+                      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Non assignes ({unassigned.length})</h3>
+                    )}
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {unassigned.map((m: any) => (
+                        <div key={m.id} className="bg-white rounded-xl border border-slate-200 hover:border-brand-300 hover:shadow-sm transition-all p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-400 to-slate-500 flex items-center justify-center text-white text-sm font-bold shrink-0">{m.user.name?.charAt(0).toUpperCase() || "?"}</div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-slate-800 text-sm truncate">{m.user.name || "-"}</p>
+                              <p className="text-[10px] text-slate-400 truncate">{m.user.email}</p>
+                            </div>
+                            <RemoveMemberBtn classroomId={classroom.id} userId={m.userId} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </>
+          )}
         </div>
       )}
 
