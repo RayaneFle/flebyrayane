@@ -49,7 +49,7 @@ export default function RegisterPage() {
           <label className="block text-sm font-medium text-slate-700 mb-1.5">Mot de passe</label>
           <input type="password" required value={password} onChange={e => setPassword(e.target.value)}
             className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition-all"
-            placeholder="6 caractères minimum" />
+            placeholder="8 caractères minimum" />
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">Confirmer le mot de passe</label>
