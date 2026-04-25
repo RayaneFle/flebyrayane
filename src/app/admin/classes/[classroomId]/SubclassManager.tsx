@@ -100,7 +100,7 @@ export default function SubclassManager({ classroomId, members, subclasses }: { 
                 </div>
                 {selected.size > 0 && (
                   <button onClick={() => assignSelected(sc.id)} className="mt-2 w-full py-1.5 bg-brand-500 text-white text-xs font-bold rounded-lg hover:bg-brand-600">
-                    Ajouter {selected.size} eleve{selected.size > 1 ? "s" : ""}
+                    Ajouter {selected.size} élève{selected.size > 1 ? "s" : ""}
                   </button>
                 )}
               </div>
@@ -114,7 +114,7 @@ export default function SubclassManager({ classroomId, members, subclasses }: { 
       })}
 
       {unassigned.length > 0 && subclasses.length > 0 && (
-        <p className="text-[10px] text-slate-400 text-center">{unassigned.length} eleve{unassigned.length > 1 ? "s" : ""} non assigne{unassigned.length > 1 ? "s" : ""}</p>
+        <p className="text-[10px] text-slate-400 text-center">{unassigned.length} élève{unassigned.length > 1 ? "s" : ""} non assigné{unassigned.length > 1 ? "s" : ""}</p>
       )}
     </div>
   );

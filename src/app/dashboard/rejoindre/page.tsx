@@ -33,7 +33,7 @@ export default function JoinClassPage() {
     <div className="max-w-3xl">
       <div className="mb-6">
         <h1 className="font-heading text-2xl font-bold text-slate-900">Rejoindre une classe</h1>
-        <p className="text-sm text-slate-500 mt-1">Entre le code donne par ton professeur</p>
+        <p className="text-sm text-slate-500 mt-1">Entre le code donné par ton professeur</p>
       </div>
 
       <div className="grid lg:grid-cols-[1fr_320px] gap-6">
@@ -42,7 +42,7 @@ export default function JoinClassPage() {
           <div className="text-center mb-6">
             <span className="text-5xl">&#128218;</span>
             <h2 className="font-heading font-bold text-slate-900 text-lg mt-3">Code de classe</h2>
-            <p className="text-xs text-slate-500 mt-1">Le code fait generalement 6 caracteres (ex: ABC123)</p>
+            <p className="text-xs text-slate-500 mt-1">Le code fait généralement 6 caractères (ex: ABC123)</p>
           </div>
 
           {error && <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4">{error}</div>}
@@ -64,7 +64,7 @@ export default function JoinClassPage() {
               disabled={loading || code.length < 4 || !!success}
               className="w-full bg-gradient-to-r from-brand-500 to-accent-500 text-white py-3 rounded-xl font-semibold hover:shadow-glow disabled:opacity-50 transition-all"
             >
-              {loading ? "Verification..." : success ? "Redirection..." : "Rejoindre la classe"}
+              {loading ? "Vérification..." : success ? "Redirection..." : "Rejoindre la classe"}
             </button>
           </form>
         </div>
@@ -73,11 +73,11 @@ export default function JoinClassPage() {
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-slate-200 p-5">
             <h3 className="font-heading font-bold text-slate-900 text-sm mb-2">&#128161; Comment obtenir un code ?</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">Demande a ton professeur de FLE le code de classe. Il ressemble a quelque chose comme <b className="font-mono">ABC123</b>.</p>
+            <p className="text-xs text-slate-500 leading-relaxed">Demande à ton professeur de FLE le code de classe. Il ressemble à quelque chose comme <b className="font-mono">ABC123</b>.</p>
           </div>
           <div className="bg-brand-50 rounded-2xl border border-brand-200 p-5">
             <h3 className="font-heading font-bold text-brand-900 text-sm mb-2">&#127919; Pas de code ?</h3>
-            <p className="text-xs text-slate-600 leading-relaxed mb-3">Tu peux quand meme apprendre seul avec nos cours et activites libres.</p>
+            <p className="text-xs text-slate-600 leading-relaxed mb-3">Tu peux quand même apprendre seul avec nos cours et activités libres.</p>
             <Link href="/cours" className="block text-center text-xs font-semibold text-white bg-gradient-to-r from-brand-500 to-accent-500 py-2 rounded-lg hover:shadow-md transition-all">
               Voir les cours libres &rarr;
             </Link>

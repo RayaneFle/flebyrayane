@@ -84,7 +84,7 @@ export default async function DashboardCoursPage() {
 
           {classActivities.length > 0 && (
             <details open className="bg-white rounded-2xl border border-brand-100 overflow-hidden">
-              <summary className="px-6 py-4 bg-gradient-to-r from-brand-50 to-accent-50 border-b border-brand-100 cursor-pointer font-heading font-bold text-slate-800 select-none">\ud83c\udfae Activites de mes classes ({classActivities.length})</summary>
+              <summary className="px-6 py-4 bg-gradient-to-r from-brand-50 to-accent-50 border-b border-brand-100 cursor-pointer font-heading font-bold text-slate-800 select-none">\ud83c\udfae Activités de mes classes ({classActivities.length})</summary>
               <div className="p-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {classActivities.map((a: any) => {
                   const t = activityTypeLabels[a.type] || { emoji: "?", label: a.type };

@@ -76,7 +76,7 @@ export default async function UserDetailPage({ params }: { params: { userId: str
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded capitalize">{user.role}</span>
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded">Inscrit le {new Date(user.createdAt).toLocaleDateString("fr-FR")}</span>
               {lastActivityDate && (
-                <span className="text-xs bg-white/20 px-2 py-0.5 rounded">Derniere activite : {lastActivityDate.toLocaleDateString("fr-FR")}</span>
+                <span className="text-xs bg-white/20 px-2 py-0.5 rounded">Dernière activité : {lastActivityDate.toLocaleDateString("fr-FR")}</span>
               )}
             </div>
           </div>
@@ -138,7 +138,7 @@ export default async function UserDetailPage({ params }: { params: { userId: str
 
       {lessonProgress.length > 0 && (
         <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
-          <h2 className="font-heading font-bold text-slate-800 mb-3">Progression des lecons ({lessonProgress.length}) {lessonProgress.length > 30 && <span className="text-xs text-slate-400 font-normal">- 30 plus recentes</span>}</h2>
+          <h2 className="font-heading font-bold text-slate-800 mb-3">Progression des leçons ({lessonProgress.length}) {lessonProgress.length > 30 && <span className="text-xs text-slate-400 font-normal">- 30 plus récentes</span>}</h2>
           <div className="space-y-1">
             {lessonProgress.slice(0, 30).map((p: any) => (
               <div key={p.id} className="flex items-center justify-between py-2 px-3 border-b border-slate-50 last:border-0">
@@ -160,7 +160,7 @@ export default async function UserDetailPage({ params }: { params: { userId: str
 
       {results.length > 0 && (
         <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
-          <h2 className="font-heading font-bold text-slate-800 mb-3">Activites faites ({results.length}) {results.length > 20 && <span className="text-xs text-slate-400 font-normal">- 20 plus recentes</span>}</h2>
+          <h2 className="font-heading font-bold text-slate-800 mb-3">Activités faites ({results.length}) {results.length > 20 && <span className="text-xs text-slate-400 font-normal">- 20 plus récentes</span>}</h2>
           <div className="space-y-1">
             {results.slice(0, 20).map((r: any) => {
               const t = activityTypeLabels[r.activity.type] || { emoji: "?", label: r.activity.type };
