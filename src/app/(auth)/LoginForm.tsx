@@ -39,10 +39,7 @@ export default function LoginForm() {
             placeholder="vous@exemple.com" />
         </div>
         <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-sm font-medium text-slate-700">Mot de passe</label>
-            <Link href="/mot-de-passe-oublie" className="text-xs font-semibold text-brand-600 hover:text-brand-800 transition-colors">Mot de passe oublie ?</Link>
-          </div>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">Mot de passe</label>
           <input type="password" required value={password} onChange={e => setPassword(e.target.value)}
             className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition-all"
             placeholder="Votre mot de passe" />
