@@ -75,6 +75,35 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
   const completedLessons = session?.user ? course.sections.reduce((s, sec) => s + sec.lessons.filter(l => progressMap.get(l.id) === "completed").length, 0) : 0;
   const overallProgress = totalLessons > 0 ? Math.round(completedLessons / totalLessons * 100) : 0;
 
+  // Find next lesson to do (in_progress first, then first not_started)
+  let nextLesson: { id: string; title: string; sectionTitle: string; sectionIdx: number; lessonIdx: number; status: string } | null = null;
+  if (session?.user) {
+    outer: for (let si = 0; si < course.sections.length; si++) {
+      const s = course.sections[si];
+      const visible = s.lessons.filter((l: any) => !l.hidden);
+      for (let li = 0; li < visible.length; li++) {
+        const l = visible[li];
+        if (progressMap.get(l.id) === "in_progress") {
+          nextLesson = { id: l.id, title: l.title, sectionTitle: s.title, sectionIdx: si, lessonIdx: li, status: "in_progress" };
+          break outer;
+        }
+      }
+    }
+    if (!nextLesson) {
+      outer2: for (let si = 0; si < course.sections.length; si++) {
+        const s = course.sections[si];
+        const visible = s.lessons.filter((l: any) => !l.hidden);
+        for (let li = 0; li < visible.length; li++) {
+          const l = visible[li];
+          if (progressMap.get(l.id) !== "completed") {
+            nextLesson = { id: l.id, title: l.title, sectionTitle: s.title, sectionIdx: si, lessonIdx: li, status: "not_started" };
+            break outer2;
+          }
+        }
+      }
+    }
+  }
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
@@ -108,6 +137,26 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
                 <div className="h-full bg-white rounded-full transition-all duration-500" style={{width: overallProgress + "%"}} />
               </div>
               <p className="text-[10px] text-brand-200 mt-1">{completedLessons}/{totalLessons} lecons terminees</p>
+            </div>
+          )}
+
+          {nextLesson && canAccess && (
+            <Link href={"/cours/" + slug + "/lecon/" + nextLesson.id} className="mt-5 inline-flex items-center gap-3 bg-white text-brand-700 font-semibold rounded-xl px-5 py-3 hover:bg-brand-50 hover:shadow-lg transition-all">
+              <div className="text-left">
+                <p className="text-[10px] uppercase tracking-wider text-brand-500 font-bold">{nextLesson.status === "in_progress" ? "Reprendre" : completedLessons === 0 ? "Commencer" : "Continuer"}</p>
+                <p className="text-sm font-bold truncate max-w-[260px]">{nextLesson.sectionIdx + 1}.{nextLesson.lessonIdx + 1} {nextLesson.title}</p>
+              </div>
+              <span className="text-2xl shrink-0">&rarr;</span>
+            </Link>
+          )}
+
+          {!nextLesson && session?.user && completedLessons === totalLessons && totalLessons > 0 && canAccess && (
+            <div className="mt-5 inline-flex items-center gap-3 bg-green-500/30 backdrop-blur text-white font-semibold rounded-xl px-5 py-3 border border-white/30">
+              <span className="text-2xl">&#127881;</span>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-white/80 font-bold">Bravo</p>
+                <p className="text-sm font-bold">Cours termine !</p>
+              </div>
             </div>
           )}
         </div>
