@@ -28,15 +28,25 @@ export default async function ActivitesPage({ searchParams }: { searchParams: { 
     orderBy: { createdAt: "desc" },
   });
 
+  // Get all public activities for counters (regardless of current filters)
+  const allActivities = await prisma.activity.findMany({ where: { isPublic: true }, select: { type: true, level: true } });
+  const countByType = new Map<string, number>();
+  const countByLevel = new Map<string, number>();
+  for (const a of allActivities) {
+    countByType.set(a.type, (countByType.get(a.type) || 0) + 1);
+    if (a.level) countByLevel.set(a.level, (countByLevel.get(a.level) || 0) + 1);
+  }
+
   const types = Object.entries(activityTypeLabels);
   const levels = ["A1","A2","B1","B2","C1","C2"];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex items-center justify-between mb-10">
+      <div className="flex items-center justify-between mb-10 flex-wrap gap-3">
         <div>
-          <h1 className="font-heading text-4xl font-bold text-brand-900">Activités interactives</h1>
-          <p className="text-brand-400 mt-2 text-lg">Entraînez-vous avec nos jeux</p>
+          <h1 className="font-heading text-4xl font-bold text-brand-900">Activites interactives</h1>
+          <p className="text-brand-400 mt-2 text-lg">Pratique le francais en t\'amusant</p>
+          <p className="text-sm text-slate-500 mt-1">{allActivities.length} activite{allActivities.length > 1 ? "s" : ""} disponible{allActivities.length > 1 ? "s" : ""}</p>
         </div>
         {isTeacher && <Link href="/admin/activites/creer" className="px-5 py-2.5 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow transition-all text-sm">+ Créer une activité</Link>}
       </div>
@@ -44,15 +54,27 @@ export default async function ActivitesPage({ searchParams }: { searchParams: { 
       <div className="mb-4">
         <p className="text-sm font-medium text-brand-500 mb-2">Type :</p>
         <div className="flex flex-wrap gap-2">
-          <Pill href={`/activites${level ? `?level=${level}` : ""}`} active={!type}>Toutes</Pill>
-          {types.map(([k, v]) => <Pill key={k} href={`/activites?type=${k}${level ? `&level=${level}` : ""}`} active={type === k}>{v.emoji} {v.label}</Pill>)}
+          <Pill href={`/activites${level ? `?level=${level}` : ""}`} active={!type}>Toutes ({allActivities.length})</Pill>
+          {types.map(([k, v]) => {
+            const count = countByType.get(k) || 0;
+            if (count === 0) return null;
+            return (
+              <Pill key={k} href={`/activites?type=${k}${level ? `&level=${level}` : ""}`} active={type === k}>{v.emoji} {v.label} ({count})</Pill>
+            );
+          })}
         </div>
       </div>
       <div className="mb-8">
         <p className="text-sm font-medium text-brand-500 mb-2">Niveau :</p>
         <div className="flex flex-wrap gap-2">
           <Pill href={`/activites${type ? `?type=${type}` : ""}`} active={!level}>Tous</Pill>
-          {levels.map(l => <Pill key={l} href={`/activites?${type ? `type=${type}&` : ""}level=${l}`} active={level === l}>{l}</Pill>)}
+          {levels.map(l => {
+            const count = countByLevel.get(l) || 0;
+            if (count === 0) return null;
+            return (
+              <Pill key={l} href={`/activites?${type ? `type=${type}&` : ""}level=${l}`} active={level === l}>{l} ({count})</Pill>
+            );
+          })}
         </div>
       </div>
 
@@ -71,6 +93,10 @@ export default async function ActivitesPage({ searchParams }: { searchParams: { 
                 </div>
                 <h3 className="font-heading font-bold text-lg text-brand-900 group-hover:text-brand-600 transition-colors">{a.title}</h3>
                 {a.description && <p className="text-sm text-brand-400 mt-2 line-clamp-2">{a.description}</p>}
+                <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-slate-500">{a._count.results > 0 ? <>&#127919; <b className="text-slate-700">{a._count.results}</b> partie{a._count.results > 1 ? "s" : ""}</> : <span className="text-slate-400 italic">Sois le premier !</span>}</span>
+                  <span className="font-semibold text-brand-600 group-hover:text-brand-800 transition-colors">Jouer &rarr;</span>
+                </div>
               </Link>
             );
           })}
