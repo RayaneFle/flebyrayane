@@ -17,7 +17,9 @@ export default function EditLessonPage() {
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [savedToast, setSavedToast] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [showPicker, setShowPicker] = useState<number | null>(null);
   const [showCreate, setShowCreate] = useState<number | null>(null);
   const [createType, setCreateType] = useState("");
@@ -66,27 +68,60 @@ export default function EditLessonPage() {
     }).catch(() => setLoading(false));
   }, [courseId, sectionId, lessonId]);
 
-  function addTextBlock() { setBlocks([...blocks, { id: "new-" + Date.now(), type: "text", content: "", activityId: null, requireScore: false, minScore: 60 }]); }
+  // Warn before leaving if unsaved changes
+  useEffect(() => {
+    if (!dirty) return;
+    function handler(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirty]);
+
+  // Ctrl+S to save
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        const form = document.querySelector("form");
+        if (form) form.requestSubmit();
+      }
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  function addTextBlock() { setBlocks([...blocks, { id: "new-" + Date.now(), type: "text", content: "", activityId: null, requireScore: false, minScore: 60 }]); setDirty(true); }
   function insertActivity(idx: number, act: any) {
     const nb = { id: "new-" + Date.now(), type: "activity", content: null, activityId: act.id, requireScore: false, minScore: 60, activity: act };
     const nb2 = [...blocks]; nb2.splice(idx + 1, 0, nb); setBlocks(nb2); setShowPicker(null);
   }
-  function updateBlock(idx: number, updates: any) { const u = [...blocks]; u[idx] = { ...u[idx], ...updates }; setBlocks(u); }
-  function removeBlock(idx: number) { setBlocks(blocks.filter((_, i) => i !== idx)); }
+  function updateBlock(idx: number, updates: any) { const u = [...blocks]; u[idx] = { ...u[idx], ...updates }; setBlocks(u); setDirty(true); }
+  function removeBlock(idx: number) { setBlocks(blocks.filter((_, i) => i !== idx)); setDirty(true); }
   function moveBlock(idx: number, dir: string) {
     const ni = dir === "up" ? idx - 1 : idx + 1; if (ni < 0 || ni >= blocks.length) return;
-    const u = [...blocks]; [u[idx], u[ni]] = [u[ni], u[idx]]; setBlocks(u);
+    const u = [...blocks]; [u[idx], u[ni]] = [u[ni], u[idx]]; setBlocks(u); setDirty(true);
   }
 
   async function save(e: FormEvent) {
     e.preventDefault(); if (!title.trim()) { setError("Titre requis."); return; }
     setSaving(true); setError(null);
-    const res = await fetch(`/api/admin/courses/${courseId}/sections/${sectionId}/lessons/${lessonId}`, {
-      method: "PUT", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, blocks: blocks.map((b, i) => ({ position: i, type: b.type, content: b.content || null, activityId: b.activityId || null, requireScore: b.requireScore || false, minScore: b.minScore || 60 })) }),
-    });
-    if (res.ok) { router.push(`/admin/cours/${courseId}`); router.refresh(); }
-    else { setError("Erreur de sauvegarde."); }
+    try {
+      const res = await fetch(`/api/admin/courses/${courseId}/sections/${sectionId}/lessons/${lessonId}`, {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, blocks: blocks.map((b, i) => ({ position: i, type: b.type, content: b.content || null, activityId: b.activityId || null, requireScore: b.requireScore || false, minScore: b.minScore || 60 })) }),
+      });
+      if (res.ok) {
+        setDirty(false);
+        setSavedToast(true);
+        setTimeout(() => setSavedToast(false), 2500);
+      } else {
+        setError("Erreur de sauvegarde.");
+      }
+    } catch {
+      setError("Erreur reseau.");
+    }
     setSaving(false);
   }
 
@@ -99,7 +134,7 @@ export default function EditLessonPage() {
       <form onSubmit={save} className="space-y-6">
         <div className="bg-white rounded-2xl border border-brand-100 p-6">
           <label className="block text-sm font-medium text-slate-600 mb-1">Titre *</label>
-          <input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-400 outline-none text-lg font-heading" />
+          <input type="text" required value={title} onChange={e => { setTitle(e.target.value); setDirty(true); }} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-400 outline-none text-lg font-heading" />
         </div>
         <div className="space-y-3">
           {blocks.map((block, idx) => (
@@ -258,11 +293,25 @@ export default function EditLessonPage() {
         <div className="mb-4">
           <button type="button" onClick={addTextBlock} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-sm font-medium text-slate-400 hover:border-brand-400 hover:text-brand-500 transition-all">+ Bloc texte</button>
         </div>
-        <div className="flex gap-3">
-          <button type="submit" disabled={saving} className="px-8 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow disabled:opacity-50 transition-all">{saving ? "Sauvegarde..." : "Sauvegarder"}</button>
-          <button type="button" onClick={() => router.back()} className="px-8 py-3 bg-slate-50 text-slate-600 font-semibold rounded-xl">Annuler</button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="submit" disabled={saving} className="px-8 py-3 bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold rounded-xl hover:shadow-glow disabled:opacity-50 transition-all inline-flex items-center gap-2">
+            {saving && <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>}
+            {saving ? "Sauvegarde en cours..." : "Sauvegarder"}
+          </button>
+          <button type="button" onClick={() => { if (dirty && !confirm("Modifications non sauvegardees. Quitter quand meme ?")) return; router.push("/admin/cours/" + courseId); }} className="px-8 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors">Retour au cours</button>
+          <span className="text-xs text-slate-400 ml-auto">Astuce: Ctrl+S pour sauvegarder</span>
+          {dirty && !saving && !savedToast && (
+            <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200">Modifications non sauvegardees</span>
+          )}
         </div>
       </form>
+
+      {savedToast && (
+        <div className="fixed bottom-6 right-6 bg-green-500 text-white font-semibold px-5 py-3 rounded-xl shadow-lg z-50 animate-fade-in-up flex items-center gap-2">
+          <span>&#10003;</span>
+          <span>Lecon enregistree</span>
+        </div>
+      )}
     </div>
   );
 }
