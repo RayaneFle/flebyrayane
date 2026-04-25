@@ -42,7 +42,10 @@ export default async function UserDetailPage({ params }: { params: { userId: str
     }),
     prisma.classroomMember.findMany({
       where: { userId: params.userId },
-      include: { classroom: { select: { id: true, name: true, code: true } } },
+      include: {
+        classroom: { select: { id: true, name: true, code: true } },
+        subclass: { select: { name: true } },
+      },
     }),
   ]);
 
@@ -50,6 +53,12 @@ export default async function UserDetailPage({ params }: { params: { userId: str
   const avgScore = completed.length > 0 ? Math.round(completed.reduce((s, r) => s + (r.score || 0), 0) / completed.length) : 0;
   const completedLessons = lessonProgress.filter(p => p.status === "completed").length;
   const inProgressLessons = lessonProgress.filter(p => p.status === "in_progress").length;
+
+  // Last activity = most recent between activity results and lesson progress
+  const lastResultDate = results.length > 0 ? new Date(results[0].updatedAt).getTime() : 0;
+  const lastLessonDate = lessonProgress.length > 0 ? new Date(lessonProgress[0].updatedAt).getTime() : 0;
+  const lastActivityTimestamp = Math.max(lastResultDate, lastLessonDate);
+  const lastActivityDate = lastActivityTimestamp > 0 ? new Date(lastActivityTimestamp) : null;
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -63,9 +72,12 @@ export default async function UserDetailPage({ params }: { params: { userId: str
           <div className="flex-1">
             <h1 className="font-heading text-2xl font-bold">{user.name || "Sans nom"}</h1>
             <p className="text-brand-100 text-sm">{user.email}</p>
-            <div className="flex gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2">
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded capitalize">{user.role}</span>
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded">Inscrit le {new Date(user.createdAt).toLocaleDateString("fr-FR")}</span>
+              {lastActivityDate && (
+                <span className="text-xs bg-white/20 px-2 py-0.5 rounded">Derniere activite : {lastActivityDate.toLocaleDateString("fr-FR")}</span>
+              )}
             </div>
           </div>
         </div>
@@ -92,12 +104,18 @@ export default async function UserDetailPage({ params }: { params: { userId: str
 
       {memberships.length > 0 && (
         <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
-          <h2 className="font-heading font-bold text-slate-800 mb-3">Classes</h2>
-          <div className="flex flex-wrap gap-2">
+          <h2 className="font-heading font-bold text-slate-800 mb-3">Classes ({memberships.length})</h2>
+          <div className="grid sm:grid-cols-2 gap-2">
             {memberships.map((m: any) => (
               <Link key={m.id} href={"/admin/classes/" + m.classroom.id}
-                className="text-sm bg-brand-50 text-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-100 font-medium">
-                {m.classroom.name} <span className="text-xs text-brand-400 font-mono">{m.classroom.code}</span>
+                className="bg-slate-50 rounded-xl p-3 hover:bg-brand-50 hover:border-brand-200 border border-transparent transition-all flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-sm text-slate-900 truncate">{m.classroom.name}</p>
+                  {m.subclass && (
+                    <p className="text-[11px] text-brand-600 font-semibold">Groupe : {m.subclass.name}</p>
+                  )}
+                </div>
+                <span className="text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded font-mono font-bold tracking-widest shrink-0">{m.classroom.code}</span>
               </Link>
             ))}
           </div>
@@ -120,9 +138,9 @@ export default async function UserDetailPage({ params }: { params: { userId: str
 
       {lessonProgress.length > 0 && (
         <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
-          <h2 className="font-heading font-bold text-slate-800 mb-3">Progression des leçons ({lessonProgress.length})</h2>
+          <h2 className="font-heading font-bold text-slate-800 mb-3">Progression des lecons ({lessonProgress.length}) {lessonProgress.length > 30 && <span className="text-xs text-slate-400 font-normal">- 30 plus recentes</span>}</h2>
           <div className="space-y-1">
-            {lessonProgress.map((p: any) => (
+            {lessonProgress.slice(0, 30).map((p: any) => (
               <div key={p.id} className="flex items-center justify-between py-2 px-3 border-b border-slate-50 last:border-0">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-slate-700 truncate">{p.lesson.title}</p>
@@ -142,9 +160,9 @@ export default async function UserDetailPage({ params }: { params: { userId: str
 
       {results.length > 0 && (
         <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
-          <h2 className="font-heading font-bold text-slate-800 mb-3">Activités faites ({results.length})</h2>
+          <h2 className="font-heading font-bold text-slate-800 mb-3">Activites faites ({results.length}) {results.length > 20 && <span className="text-xs text-slate-400 font-normal">- 20 plus recentes</span>}</h2>
           <div className="space-y-1">
-            {results.map((r: any) => {
+            {results.slice(0, 20).map((r: any) => {
               const t = activityTypeLabels[r.activity.type] || { emoji: "?", label: r.activity.type };
               return (
                 <div key={r.id} className="flex items-center justify-between py-2 px-3 border-b border-slate-50 last:border-0">
