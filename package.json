@@ -13,8 +13,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^1.6.0",
     "@prisma/client": "^6.19.3",
-    "@supabase/ssr": "^0.12.0",
-    "@supabase/supabase-js": "^2.108.2",
+    "@supabase/supabase-js": "^2.101.1",
     "@tiptap/extension-color": "^2.27.2",
     "@tiptap/extension-highlight": "^2.27.2",
     "@tiptap/extension-image": "^2.6.0",
