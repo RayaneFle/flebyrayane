@@ -22,12 +22,21 @@ interface User {
 
 interface Classroom { id: string; name: string; code: string; memberCount: number; }
 
-export default function UsersClient({ users, isAdmin, currentUserEmail, classrooms }: { users: User[]; isAdmin: boolean; currentUserEmail: string; classrooms: Classroom[] }) {
+export default function UsersClient({ users: initialUsers, isAdmin, currentUserEmail, classrooms }: { users: User[]; isAdmin: boolean; currentUserEmail: string; classrooms: Classroom[] }) {
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [sort, setSort] = useState("recent");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [classFilter, setClassFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  function handleDeleted(userId: string) {
+    setUsers(prev => prev.filter(u => u.id !== userId));
+  }
+
+  function handleRoleChanged(userId: string, role: string) {
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, role } : u));
+  }
 
   const filtered = useMemo(() => {
     let result = users;
@@ -66,7 +75,6 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
 
   return (
     <div>
-      {/* Header */}
       <div className="mb-6">
         <h1 className="font-heading text-2xl font-bold text-slate-900">{isAdmin ? "Utilisateurs" : "Mes élèves"}</h1>
         <p className="text-sm text-slate-400 mt-1">
@@ -75,7 +83,6 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
         </p>
       </div>
 
-      {/* Filtres compacts */}
       <div className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 space-y-3">
         <div className="relative">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +121,6 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
         </div>
       </div>
 
-      {/* Liste de cartes */}
       {filtered.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
           <p className="text-slate-400">Aucun utilisateur trouvé.</p>
@@ -129,14 +135,11 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
               <div key={u.id} className={"bg-white rounded-2xl border transition-all " + (isExpanded ? "border-brand-300 shadow-md" : "border-slate-200 hover:border-brand-200 hover:shadow-sm")}>
                 <div className="p-5 cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : u.id)}>
                 <div className="flex items-start gap-4">
-                  {/* Avatar */}
                   <div className="shrink-0">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center text-white text-lg font-bold shadow-sm">
                       {u.name?.charAt(0).toUpperCase() || "?"}
                     </div>
                   </div>
-
-                  {/* Main info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex items-center gap-2">
@@ -148,10 +151,8 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
-                      {isAdmin && <div onClick={e => e.stopPropagation()}><ActionMenu user={u} currentUserEmail={currentUserEmail} /></div>}
+                      {isAdmin && <div onClick={e => e.stopPropagation()}><ActionMenu user={u} currentUserEmail={currentUserEmail} onDeleted={() => handleDeleted(u.id)} onRoleChanged={(role) => handleRoleChanged(u.id, role)} /></div>}
                     </div>
-
-                    {/* Badges */}
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       <span className={"text-[11px] font-semibold px-2 py-0.5 rounded-full " + (roleColors[u.role] || "bg-slate-100 text-slate-600")}>
                         {roleLabels[u.role] || u.role}
@@ -167,8 +168,6 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
                         </span>
                       )}
                     </div>
-
-                    {/* Stats */}
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 pt-3 border-t border-slate-100 text-xs text-slate-500">
                       {u.avgScore > 0 ? (
                         <span className="flex items-center gap-1">
@@ -197,11 +196,8 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
                   </div>
                 </div>
                 </div>
-
-                {/* Accordion content */}
                 {isExpanded && (
                   <div className="border-t border-slate-100 bg-slate-50/50 px-5 py-4 space-y-4 animate-slide-down">
-                    {/* Courses */}
                     <div>
                       <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Cours accessibles ({u.courses.length})</h4>
                       {u.courses.length === 0 ? (
@@ -220,8 +216,6 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
                         </div>
                       )}
                     </div>
-
-                    {/* Recent activities */}
                     <div>
                       <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Dernières activités ({u.recentActivities.length})</h4>
                       {u.recentActivities.length === 0 ? (
@@ -244,8 +238,6 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
                         </div>
                       )}
                     </div>
-
-                    {/* Bouton page complete */}
                     <div className="pt-2 flex justify-end">
                       <Link href={"/admin/utilisateurs/" + u.id} className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-800 transition-colors" onClick={e => e.stopPropagation()}>
                         Voir la page complète
@@ -263,7 +255,7 @@ export default function UsersClient({ users, isAdmin, currentUserEmail, classroo
   );
 }
 
-function ActionMenu({ user, currentUserEmail }: { user: User; currentUserEmail: string }) {
+function ActionMenu({ user, currentUserEmail, onDeleted, onRoleChanged }: { user: User; currentUserEmail: string; onDeleted: () => void; onRoleChanged: (role: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -289,10 +281,10 @@ function ActionMenu({ user, currentUserEmail }: { user: User; currentUserEmail: 
           </Link>
           <div className="px-4 py-2 border-t border-slate-100 mt-1 pt-2">
             <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Changer le rôle</p>
-            <RoleChanger userId={user.id} currentRole={user.role} />
+            <RoleChanger userId={user.id} currentRole={user.role} onChanged={(role) => { onRoleChanged(role); setOpen(false); }} />
           </div>
           <div className="border-t border-slate-100 mt-1 pt-1 px-2">
-            <DeleteUserBtn userId={user.id} email={user.email || ""} currentUserEmail={currentUserEmail} />
+            <DeleteUserBtn userId={user.id} email={user.email || ""} currentUserEmail={currentUserEmail} onDeleted={() => { onDeleted(); setOpen(false); }} />
           </div>
         </div>
       )}
