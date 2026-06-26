@@ -10,7 +10,10 @@ export async function DELETE(_r: Request, { params }: { params: { id: string } }
   // Don't allow deleting own account
   if (params.id === session.user.id) return NextResponse.json({ message: "Impossible de supprimer votre propre compte." }, { status: 400 });
   
-  // Delete user - cascade will handle related records
+  // Supprimer les classrooms dont l'utilisateur est owner (pas de cascade automatique)
+  await prisma.classroom.deleteMany({ where: { ownerId: params.id } });
+
+  // Delete user - cascade will handle the rest
   await prisma.user.delete({ where: { id: params.id } });
   
   return NextResponse.json({ success: true });
